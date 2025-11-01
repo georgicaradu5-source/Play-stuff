@@ -1,0 +1,47 @@
+# X Agent Configuration
+
+# Plan tier: free, basic, pro
+plan: free
+
+# Actions configuration
+actions:
+  post:
+    enabled: true
+    max_per_run: 2  # Limit posts per execution
+    topics:
+      - "AI & automation"
+      - "developer tools"
+      - "productivity"
+  
+  interact:
+    enabled: true
+    max_results_per_query: 5
+    queries:
+      # Query format: X API v2 operators
+      # Example operators: lang:, -is:retweet, -is:reply, has:images, from:, to:
+      - query: '(AI OR "artificial intelligence") lang:en -is:retweet -is:reply'
+        actions:
+          - like
+          # - reply  # Uncomment to enable auto-reply
+          # - repost
+          # - follow
+      
+      - query: '("developer tools" OR "devtools") lang:en -is:retweet -is:reply'
+        actions:
+          - like
+
+# Rate limiting
+rate_limit:
+  min_jitter_ms: 1000
+  max_jitter_ms: 3000
+  min_remaining_buffer: 5  # Stop before hitting zero
+
+# Budget settings
+budget:
+  buffer_pct: 0.05  # 5% safety buffer before hard caps
+
+# Scheduler (for future cron/scheduled runs)
+schedule:
+  enabled: false
+  # Example: run every 6 hours
+  # interval_hours: 6

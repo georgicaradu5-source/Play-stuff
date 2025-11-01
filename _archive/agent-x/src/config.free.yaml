@@ -1,0 +1,28 @@
+tiers:
+  free:
+    monthly_caps:
+      posts_create: 500
+      posts_read: 100
+    per_app_buckets:
+      posts_reposts_per_3h: 300
+      likes_per_24h: 1000
+      follows_per_24h: 1000
+schedule:
+  windows: [morning, afternoon, evening]
+  daily_targets:
+    original_posts: 1
+    replies: 1
+    reposts: 1
+    likes: 10
+    follows: 3
+feature_flags:
+  allow_likes: "auto"
+  allow_follows: "auto"
+watchlist_user_ids: ["<uid_1>", "<uid_2>"]
+metrics:
+  settle_weekly:
+    fetch_last_n_posts: 5
+dedupe:
+  window_days: 7
+jitter_seconds: [8, 20]
+

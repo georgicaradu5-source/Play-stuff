@@ -1,44 +1,81 @@
 <!--
 Repo-level Copilot instructions for the "Play-stuff" repository.
-This file is generated to help AI coding agents be productive when the
-repository has very little discoverable structure.
+Contains X Agent Unified: a production-ready autonomous X (Twitter) agent in Python.
 -->
 
 # Copilot instructions — Play-stuff
 
-Summary
-- This repository is currently minimal: it contains `README.md` and `LICENSE` and no detectable source files, build manifests, or tests.
+## Project overview
+- **Main project**: Unified Python X (Twitter) agent with dual auth support
+- **Architecture**: Modular design with dual authentication, learning loop, budget management, and SQLite storage
+- **Policy compliance**: Uses only official X API (v2 + v1.1 media), implements rate limiting, respects X automation rules
 
-What you can assume
-- Do not assume a programming language, build system, or test framework — none are present here.
-- The user's intent must be clarified before adding language-specific scaffolding (package.json, pyproject.toml, src/, etc.).
+## Key directories and files
+- `src/` — Core Python modules:
+  - `main.py` — CLI entry point with all flags
+  - `auth.py` — Dual auth (Tweepy OAuth 1.0a + OAuth 2.0 PKCE)
+  - `x_client.py` — Unified X API client supporting both auth modes
+  - `budget.py` — Enhanced budget manager with plan tiers
+  - `rate_limiter.py` — Per-endpoint rate limiting with backoff
+  - `storage.py` — Unified SQLite storage with learning tables
+  - `scheduler.py` — Time-window scheduling + action orchestration
+  - `actions.py` — Template-based content generation
+  - `learn.py` — Thompson Sampling learning loop
+- `requirements.txt` — Dependencies (tweepy, requests, python-dotenv, PyYAML)
+- `.env.example` — Environment template for both auth modes
+- `config.example.yaml` — Configuration template with all features
 
-Primary goals for an agent working here
-1. Gather intent: ask what language, runtime, and purpose (library, CLI, webapp) the user wants.
-2. Propose a minimal plan before creating files. Example plan items: add `src/` with a tiny entrypoint, add a manifest (`package.json` / `pyproject.toml`), add CI/workflow, and update `README.md` with run instructions.
-3. Make small, reversible changes and explain them in a commit message.
+## Essential workflows
+### Setup (Windows PowerShell)
+```powershell
+.\setup.bat
+# Edit .env with credentials
+# Choose auth mode: X_AUTH_MODE=tweepy or X_AUTH_MODE=oauth2
+```
 
-Safe editing rules (must follow)
-- Always ask a single clarifying question if the repository lacks language/build info. Example question: "Which language and runtime do you want for this project (Node/Python/Go/etc.) and should I add a package manifest?"
-- If the user approves creating a language scaffold, include a README update and minimal test (happy path) alongside the code.
-- Do not add or modify files outside the repo root (for example global system configs) unless explicitly requested.
+### Run commands
+```powershell
+# Tweepy mode (OAuth 1.0a) - simple setup
+$env:X_AUTH_MODE="tweepy"
+python src/main.py --mode both --dry-run true
 
-When you find more files later
-- If a `src/`, `package.json`, `pyproject.toml`, `go.mod`, or similar appears, re-run a short discovery step: list top-level dirs, open the manifest, and look for test scripts or CI config (`.github/workflows`).
-- Reference these files in future instructions (for example: "use `npm test` as defined in `package.json`").
+# OAuth 2.0 PKCE mode - modern auth
+$env:X_AUTH_MODE="oauth2"
+python src/main.py --authorize
+python src/main.py --mode both --dry-run true
 
-Developer workflows (discoverable today)
-- There are no discoverable build/test/debug commands in the repo today. Mention this explicitly in any PR and prompt the user for the commands they expect agents to use.
+# Learning loop
+python src/main.py --settle-all
+python src/main.py --safety print-learning
+```
 
-Examples and prompts
-- Use this exact prompt to ask the user: "This repo has only `README.md` and `LICENSE`. What language/runtime and project type should I scaffold (options: Node, Python, Go, none)?"
-- If user answers "Node": propose creating `package.json` with `npm test` and `src/index.js`, plus a single Jest test in `test/` and update `README.md` with run steps.
+## Architecture patterns
+- **Dual Authentication**: `auth.py` supports both Tweepy (OAuth 1.0a) and OAuth 2.0 PKCE via `X_AUTH_MODE`
+- **Unified Client**: `x_client.py` wraps both Tweepy and raw requests, switching based on auth mode
+- **Rate Limiting**: `rate_limiter.py` tracks per-endpoint limits with exponential backoff + jitter
+- **Budget Management**: `budget.py` supports Free/Basic/Pro tiers with configurable safety buffers
+- **Deduplication**: `storage.py` uses hash-based + Jaccard similarity checks (7-day window)
+- **Learning**: Thompson Sampling bandit in `learn.py` optimizes (topic, time-window, media) choices
+- **Time Windows**: `scheduler.py` manages morning/afternoon/evening posting slots
+- **Modularity**: Each module has clear responsibilities, easy to extend
 
-Files to reference
-- `README.md` — currently just a header; update only after confirming the user's intent.
+## Development guidelines
+- Always test with `--dry-run true` before production runs
+- Environment variables loaded from `.env` (never commit credentials)
+- Config in `config.yaml` for behavior customization
+- Both auth modes are equally supported—don't assume one over the other
+- Learning is optional (can be disabled in config)
+- Follow X Developer Policy: label account as automated, no mass actions, respect rate limits
 
-Finish and feedback
-- After making a change, include a short checklist in the PR description describing what was added and how to run the happy-path test.
-- Ask the user: "Is there any existing CI, target platform, or coding style I should follow?"
+## When editing code
+- Preserve dual auth support (both Tweepy and OAuth 2.0 must work)
+- Maintain modular structure (don't merge unrelated functionality)
+- Keep rate limiting and policy compliance in all API interactions
+- Test configuration changes with dry-run mode first
+- Update `README.md` if adding features or changing setup
+- Ensure backward compatibility with both auth modes
 
-If anything here is unclear or you want the agent to proceed with a specific language scaffold, reply with the target language and desired minimal feature set.
+## Legacy agents (reference only)
+- `_archive/agent-x/` — Original Tweepy-based with learning (superseded by unified)
+- `_archive/x-agent/` — OAuth 2.0 PKCE with safety features (superseded by unified)
+- Both are kept for reference in `_archive/` directory

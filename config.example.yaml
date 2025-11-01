@@ -1,0 +1,79 @@
+# X Agent Unified - Configuration
+
+# === AUTHENTICATION ===
+# Mode: "tweepy" or "oauth2"
+auth_mode: tweepy
+
+# === PLAN TIER ===
+# Options: free, basic, pro
+plan: free
+
+# === TOPICS ===
+# Topics for content generation (used with learning)
+topics:
+  - power-platform
+  - data-viz
+  - automation
+  - ai
+
+# === SEARCH QUERIES ===
+# Queries for interaction mode
+queries:
+  - query: '(Power BI OR "Power Platform") lang:en -is:retweet -is:reply'
+    actions: [like, reply]
+  - query: '("data visualization" OR DAX) lang:en -is:retweet -is:reply'
+    actions: [like, reply, follow]
+  - query: '("Power Apps" OR "Power Automate") lang:en -is:retweet -is:reply'
+    actions: [like, reply]
+
+# === SCHEDULING ===
+schedule:
+  # Time windows for posting
+  windows:
+    - morning    # 9am-12pm
+    - afternoon  # 1pm-5pm
+    - evening    # 6pm-9pm
+
+# === CADENCE ===
+cadence:
+  # Days of week (1=Monday, 7=Sunday)
+  weekdays: [1, 2, 3, 4, 5]
+
+# === LIMITS PER WINDOW ===
+max_per_window:
+  post: 1
+  reply: 3
+  like: 10
+  follow: 3
+  repost: 1
+
+# === TIMING ===
+# Jitter bounds in seconds [min, max]
+jitter_seconds: [8, 20]
+
+# === LEARNING ===
+# Thompson Sampling optimization
+learning:
+  enabled: true
+
+# === BUDGET ===
+budget:
+  # Safety buffer percentage (5% = stop at 95% of cap)
+  buffer_pct: 0.05
+  
+  # Optional: custom caps (overrides plan defaults)
+  # custom_read_cap: 200
+  # custom_write_cap: 1000
+
+# === FEATURE FLAGS ===
+feature_flags:
+  # Control specific features
+  allow_likes: auto    # auto, on, off
+  allow_follows: auto  # auto, on, off
+  allow_media: off     # auto, on, off
+
+# === WATCHLIST ===
+# Optional: monitor specific users (low-cost reads)
+# watchlist_user_ids:
+#   - "123456789"
+#   - "987654321"

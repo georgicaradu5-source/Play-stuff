@@ -1,0 +1,12 @@
+# X Agent Unified - Dependencies
+
+# Core dependencies
+requests>=2.31.0
+pyyaml>=6.0.1
+python-dotenv>=1.0.0
+
+# Tweepy mode (OAuth 1.0a)
+tweepy>=4.14.0
+
+# Optional: for enhanced features
+# chromadb>=0.5.0  # Vector similarity search

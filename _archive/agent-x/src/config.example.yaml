@@ -1,0 +1,32 @@
+topics:
+  - power-platform
+  - data-viz
+  - automation
+
+queries:
+  # English
+  - '(Power BI OR "Power Platform") lang:en -is:retweet -is:reply'
+  - '("Power Apps" OR "Power Automate") lang:en -is:retweet -is:reply'
+  - '("data visualization" OR "Power BI" OR DAX) lang:en -is:retweet -is:reply'
+  - '("Power BI") lang:en has:images -is:retweet -is:reply'
+  - '("automation" OR "workflow automation" OR "Power Automate") lang:en -is:retweet -is:reply'
+  # Romanian
+  - '(Power BI OR "Power Platform") lang:ro -is:retweet -is:reply'
+  - '("vizualizare date" OR "Power BI" OR DAX) lang:ro -is:retweet -is:reply'
+  - '("automatizare" OR "Power Automate") lang:ro -is:retweet -is:reply'
+
+cadence:
+  weekdays: [1, 2, 3, 4, 5]  # 1=Mon .. 7=Sun
+  windows:
+    - morning
+    - afternoon
+    - evening
+
+max_per_window:
+  post: 1
+  reply: 3
+  like: 10
+  follow: 3
+  repost: 1
+
+jitter_seconds: [8, 20]
