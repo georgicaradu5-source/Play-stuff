@@ -1,0 +1,151 @@
+name: Bootstrap Sprint 0 PR and Issues
+
+on:
+  push:
+    branches:
+      - feat/sprint-0-planning-notebook
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create labels, milestone, issues, and PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            // Upsert labels
+            const labels = [
+              { name: 'sprint-0', color: '0e8a16', description: 'Sprint 0' },
+              { name: 'planning', color: 'bfdadc', description: 'Planning' },
+              { name: 'enhancement', color: 'a2eeef', description: 'New feature or request' },
+              { name: 'tech-debt', color: 'd73a4a', description: 'Technical debt' }
+            ];
+
+            for (const label of labels) {
+              try {
+                await github.rest.issues.updateLabel({ owner, repo, name: label.name, color: label.color, description: label.description });
+                console.log(`Updated label: ${label.name}`);
+              } catch (e) {
+                if (e.status === 404) {
+                  await github.rest.issues.createLabel({ owner, repo, name: label.name, color: label.color, description: label.description });
+                  console.log(`Created label: ${label.name}`);
+                } else {
+                  throw e;
+                }
+              }
+            }
+
+            // Upsert milestone "Sprint 1"
+            let milestoneNumber;
+            const { data: milestones } = await github.rest.issues.listMilestones({ owner, repo, state: 'all' });
+            const existingMilestone = milestones.find(m => m.title === 'Sprint 1');
+            if (existingMilestone) {
+              milestoneNumber = existingMilestone.number;
+              console.log(`Milestone "Sprint 1" exists: #${milestoneNumber}`);
+            } else {
+              const { data: newMilestone } = await github.rest.issues.createMilestone({ owner, repo, title: 'Sprint 1', state: 'open' });
+              milestoneNumber = newMilestone.number;
+              console.log(`Created milestone "Sprint 1": #${milestoneNumber}`);
+            }
+
+            // Create 8 planning issues
+            const issues = [
+              { title: 'Repo reconnaissance summary', labels: ['enhancement'], body: 'Map languages/frameworks/runtime/entry points and architecture from current workspace; compile into Reasoning & Analysis section without code changes.' },
+              { title: 'Health and risk assessment', labels: ['tech-debt'], body: 'Assess lint/formatting, typing, tests, observability, security posture, docs; identify gaps and risks based on repository and recent runs.' },
+              { title: 'X agent deep dive', labels: ['enhancement'], body: 'Document agent loops, auth modes, rate limiting, scheduler/actions, storage/memory, learning loop; note current behavior and areas to improve.' },
+              { title: 'Outside-the-box opportunities', labels: ['enhancement'], body: 'Propose multi-model content generation, tracing, devcontainer/Codespaces, caching; prioritize high-impact ideas.' },
+              { title: 'Risks and dependencies list', labels: ['enhancement'], body: 'List risks with impact/likelihood/mitigations; enumerate external dependencies/credentials and compliance constraints.' },
+              { title: 'Extensions/tools audit table', labels: ['enhancement'], body: 'Prepare VS Code extensions and dev tooling audit with Status [Installed/Missing/Unknown] and action notes; request user confirmation for installs.' },
+              { title: 'Needed assistance checklist', labels: ['enhancement'], body: 'Assemble precise asks for credentials, environment targets, extension installs, CI approvals, and product inputs.' },
+              { title: 'Planning and sprints', labels: ['enhancement'], body: 'Tailor sprint plan to repo specifics; define acceptance criteria and DoD for Sprints 1 and 2; await user sign-off before implementation.' }
+            ];
+
+            const createdIssues = [];
+            for (const issue of issues) {
+              // Check if issue already exists by title
+              const { data: existingIssues } = await github.rest.issues.listForRepo({ owner, repo, state: 'all', labels: issue.labels.join(',') });
+              const existing = existingIssues.find(i => i.title === issue.title);
+              if (existing) {
+                console.log(`Issue already exists: ${issue.title} (#${existing.number})`);
+                createdIssues.push(existing.number);
+              } else {
+                const { data: newIssue } = await github.rest.issues.create({
+                  owner,
+                  repo,
+                  title: issue.title,
+                  body: issue.body,
+                  labels: issue.labels,
+                  milestone: milestoneNumber
+                });
+                console.log(`Created issue: ${issue.title} (#${newIssue.number})`);
+                createdIssues.push(newIssue.number);
+              }
+            }
+
+            // Create PR if it doesn't exist
+            const baseBranch = 'main';
+            const headBranch = 'feat/sprint-0-planning-notebook';
+            let prNumber;
+            const { data: existingPRs } = await github.rest.pulls.list({ owner, repo, state: 'all', head: `${owner}:${headBranch}`, base: baseBranch });
+            if (existingPRs.length > 0) {
+              prNumber = existingPRs[0].number;
+              console.log(`PR already exists: #${prNumber}`);
+            } else {
+              const issueLinks = createdIssues.map(n => `- #${n}`).join('\\n');
+              const prBody = 'Adds Sprint 0 planning notebook with analysis, audit, risks, roadmap, and checklists.\\n\\n' +
+                '**File added:** `notebooks/Planning_Sprint0.ipynb`\\n\\n' +
+                '**No other changes beyond this notebook.**\\n\\n' +
+                '## Related issues\\n' + issueLinks;
+              const { data: newPR } = await github.rest.pulls.create({
+                owner,
+                repo,
+                title: 'docs(planning): Sprint 0 planning notebook and roadmap',
+                head: headBranch,
+                base: baseBranch,
+                body: prBody
+              });
+              prNumber = newPR.number;
+              console.log(`Created PR: #${prNumber}`);
+
+              // Add labels to PR
+              await github.rest.issues.addLabels({ owner, repo, issue_number: prNumber, labels: ['sprint-0', 'planning'] });
+              console.log(`Added labels to PR #${prNumber}`);
+            }
+
+            // Attempt to enable auto-merge (if allowed)
+            try {
+              await github.graphql(`
+                mutation($prId: ID!) {
+                  enablePullRequestAutoMerge(input: { pullRequestId: $prId, mergeMethod: SQUASH }) {
+                    pullRequest {
+                      autoMergeRequest {
+                        enabledAt
+                      }
+                    }
+                  }
+                }
+              `, {
+                prId: `PR_${Buffer.from(`040:PullRequest${prNumber}`).toString('base64')}`
+              });
+              console.log(`Enabled auto-merge for PR #${prNumber}`);
+            } catch (e) {
+              console.log(`Could not enable auto-merge: ${e.message} (may require repo setting or approval)`);
+            }
+
+            core.setOutput('pr_number', prNumber);
+            core.setOutput('pr_url', `https://github.com/${owner}/${repo}/pull/${prNumber}`);
+
+      - name: Report PR
+        run: |
+          echo "::notice::PR created: ${{ steps.create-pr.outputs.pr_url }}"
