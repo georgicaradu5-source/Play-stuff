@@ -91,15 +91,20 @@ class UnifiedAuth:
         self._me_user_id: Optional[str] = None
 
     @classmethod
-    def from_env(cls) -> UnifiedAuth:
-        """Create auth client from environment variables."""
-        mode = os.getenv("X_AUTH_MODE", "tweepy")
+    def from_env(cls, mode: Optional[AuthMode] = None) -> "UnifiedAuth":
+        """Create auth client from environment variables.
         
-        if mode not in ["tweepy", "oauth2"]:
-            raise ValueError(f"Invalid X_AUTH_MODE: {mode}. Use 'tweepy' or 'oauth2'")
+        Accepts an optional mode parameter for compatibility with callers
+        that explicitly pass the desired auth mode. If not provided, the
+        mode is read from the X_AUTH_MODE environment variable (default: tweepy).
+        """
+        resolved_mode: str = (mode or os.getenv("X_AUTH_MODE", "tweepy"))  # type: ignore
+        
+        if resolved_mode not in ["tweepy", "oauth2"]:
+            raise ValueError(f"Invalid X_AUTH_MODE: {resolved_mode}. Use 'tweepy' or 'oauth2'")
         
         return cls(
-            mode=mode,  # type: ignore
+            mode=resolved_mode,  # type: ignore
             # Tweepy
             api_key=os.getenv("X_API_KEY"),
             api_secret=os.getenv("X_API_SECRET"),

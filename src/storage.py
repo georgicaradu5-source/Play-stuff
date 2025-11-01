@@ -113,9 +113,9 @@ class Storage:
             self.conn.execute("""
                 CREATE TABLE IF NOT EXISTS rate_limits (
                     endpoint TEXT PRIMARY KEY,
-                    limit INTEGER,
+                    limit_total INTEGER,
                     remaining INTEGER,
-                    reset INTEGER,
+                    reset_epoch INTEGER,
                     dt TEXT
                 )
             """)
@@ -129,9 +129,9 @@ class Storage:
                     method TEXT,
                     status INTEGER,
                     params TEXT,
-                    limit INTEGER,
+                    limit_total INTEGER,
                     remaining INTEGER,
-                    reset INTEGER
+                    reset_epoch INTEGER
                 )
             """)
 
@@ -188,7 +188,7 @@ class Storage:
         if text:
             self.store_text_hash(text, post_id, dt)
         
-        return cursor.lastrowid
+        return int(cursor.lastrowid or 0)
 
     def get_recent_actions(self, kind: Optional[str] = None, limit: int = 100) -> list[dict]:
         """Get recent actions."""
