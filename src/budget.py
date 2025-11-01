@@ -11,6 +11,10 @@ try:
 except ImportError:
     Storage = None  # type: ignore
 
+from logger import get_logger
+
+logger = get_logger(__name__)
+
 
 PlanType = Literal["free", "basic", "pro"]
 

@@ -8,5 +8,14 @@ python-dotenv>=1.0.0
 # Tweepy mode (OAuth 1.0a)
 tweepy>=4.14.0
 
+# Testing dependencies
+pytest>=7.4.0
+pytest-mock>=3.11.0
+pytest-cov>=4.1.0
+responses>=0.23.0  # Mock HTTP requests
+
+# Configuration validation
+pydantic>=2.0.0
+
 # Optional: for enhanced features
 # chromadb>=0.5.0  # Vector similarity search

@@ -9,6 +9,9 @@ from typing import Any, Optional
 from actions import act_on_search, choose_template
 from storage import Storage
 from x_client import XClient
+from logger import get_logger
+
+logger = get_logger(__name__)
 
 
 # Time windows for posting
@@ -54,12 +57,12 @@ def run_post_action(
     
     # Check for duplicates
     if storage.is_text_duplicate(text, days=7):
-        print(f"⚠️  Duplicate text detected, skipping post")
+        logger.warning("Duplicate text detected, skipping post")
         return
     
     # Create post
     if dry_run:
-        print(f"[DRY RUN] create_post(text='{text[:50]}...', topic={topic}, slot={slot})")
+        logger.debug(f"[DRY RUN] create_post(text='{text[:50]}...', topic={topic}, slot={slot})")
         post_id = "dry-run-post"
     else:
         # Check budget first
@@ -67,6 +70,7 @@ def run_post_action(
         budget_mgr = BudgetManager(storage=storage, plan=config.get("plan", "free"))  # type: ignore
         can_write, msg = budget_mgr.can_write(1)
         if not can_write:
+            logger.warning(f"Budget check failed: {msg}")
             print(f"❌ {msg}")
             return
         
@@ -86,6 +90,7 @@ def run_post_action(
         # Update budget
         budget_mgr.add_writes(1)
         
+        logger.info(f"Posted: {post_id} (topic={topic}, slot={slot})")
         print(f"✓ Posted: {post_id} (topic={topic}, slot={slot})")
 
 
@@ -103,6 +108,7 @@ def run_interact_actions(
     # Get queries from config
     queries = config.get("queries", [])
     if not queries:
+        logger.warning("No queries configured for interaction mode")
         print("⚠️  No queries configured for interaction mode")
         return
     

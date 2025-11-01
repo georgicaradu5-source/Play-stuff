@@ -7,6 +7,10 @@ import time
 from datetime import datetime
 from typing import Any, Callable, Optional, TypeVar
 
+from logger import get_logger
+
+logger = get_logger(__name__)
+
 
 T = TypeVar("T")
 
@@ -73,6 +77,7 @@ class RateLimiter:
         can_call, wait_seconds = self.can_call(endpoint, min_remaining)
         
         if not can_call and wait_seconds:
+            logger.warning(f"Rate limit low for {endpoint}. Waiting {wait_seconds}s...")
             print(f"⏳ Rate limit low for {endpoint}. Waiting {wait_seconds}s...")
             time.sleep(wait_seconds + 1)  # Add 1s buffer
 
@@ -100,9 +105,11 @@ class RateLimiter:
                         jitter = random.uniform(0, 1)
                         delay = base_delay + jitter
                         
+                        logger.warning(f"Rate limited (attempt {attempt + 1}/{max_retries}). Waiting {delay:.1f}s...")
                         print(f"⚠️  Rate limited (attempt {attempt + 1}/{max_retries}). Waiting {delay:.1f}s...")
                         time.sleep(delay)
                     else:
+                        logger.error("Max retries reached for rate limit")
                         print(f"❌ Max retries reached for rate limit")
                         raise
                 else:
