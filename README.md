@@ -1,5 +1,8 @@
 # X Agent - Unified Production-Ready Autonomous X (Twitter) Agent
 
+[![CI](https://github.com/georgicaradu5-source/Play-stuff/actions/workflows/ci.yml/badge.svg)](https://github.com/georgicaradu5-source/Play-stuff/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/georgicaradu5-source/Play-stuff/actions/workflows/codeql.yml/badge.svg)](https://github.com/georgicaradu5-source/Play-stuff/actions/workflows/codeql.yml)
+
 A fully unified, production-ready autonomous agent for X (Twitter) that combines the best features from both implementations. Supports **both OAuth 1.0a (Tweepy) and OAuth 2.0 PKCE** authentication methods.
 
 ## 🎯 Unified Features
@@ -283,7 +286,70 @@ learning:
 - **API.md** - API reference and examples
 - **LEARNING.md** - Thompson Sampling details
 
-## 🔐 Compliance
+## �️ Local Development
+
+### Pre-commit Hooks
+
+Install pre-commit hooks to automatically check code quality before commits:
+
+```bash
+# Install pre-commit
+pip install pre-commit
+
+# Install hooks
+pre-commit install
+
+# Run manually on all files
+pre-commit run --all-files
+```
+
+### Linting and Formatting
+
+```bash
+# Run Ruff linter
+ruff check src tests
+
+# Auto-fix issues
+ruff check --fix src tests
+
+# Format code
+ruff format src tests
+```
+
+### Type Checking
+
+```bash
+# Run mypy type checker
+mypy src --config-file=mypy.ini
+```
+
+### Testing
+
+```bash
+# Run tests with coverage
+pytest --cov=src --cov-report=term --cov-report=html tests/
+
+# View coverage report
+# Open htmlcov/index.html in browser
+
+# Run specific test file
+pytest tests/test_auth.py
+
+# Run tests matching pattern
+pytest -k "test_rate_limiter"
+```
+
+### CI/CD
+
+CI runs on every push and PR with the following checks:
+
+- **Linting**: Ruff on Python 3.11/3.12 (Ubuntu + Windows)
+- **Type Checking**: mypy with basic type checking mode
+- **Testing**: pytest with ≥80% coverage requirement
+- **Security**: CodeQL analysis weekly and on PRs
+- **Dependencies**: Dependabot for pip and GitHub Actions
+
+## �🔐 Compliance
 
 - ✅ Only official X API (v2 + v1.1 media)
 - ✅ Both auth methods supported
