@@ -3,12 +3,12 @@
 from __future__ import annotations
 
 import os
-from typing import Any
+from typing import Any, cast
 
 try:
     import requests
 except ImportError:
-    requests = None  # type: ignore
+    requests = None
 
 from auth import UnifiedAuth
 from reliability import DEFAULT_TIMEOUT, request_with_retries
@@ -37,7 +37,9 @@ class XClient:
         if mode not in ["tweepy", "oauth2"]:
             raise ValueError(f"Invalid X_AUTH_MODE: {mode}. Use 'tweepy' or 'oauth2'")
 
-        auth = UnifiedAuth.from_env(mode)  # type: ignore
+        # Cast is safe because we just validated mode is in ["tweepy", "oauth2"]
+        from auth import AuthMode
+        auth = UnifiedAuth.from_env(cast(AuthMode, mode))
         return cls(auth, dry_run)
 
     # ============================================================================
@@ -148,7 +150,7 @@ class XClient:
                 kwargs["quote_tweet_id"] = quote_tweet_id
 
             resp = client.create_tweet(**kwargs)
-            return {"data": {"id": str(resp.data["id"]), "text": text}}  # type: ignore
+            return {"data": {"id": str(resp.data["id"]), "text": text}}
         else:
             if requests is None:
                 raise RuntimeError("requests library not installed")
@@ -176,6 +178,8 @@ class XClient:
             print(f"[DRY RUN] search_recent(query='{query}', max_results={max_results})")
             return []
 
+        results: list[dict[str, Any]] = []
+
         if self.auth.mode == "tweepy":
             client = self.auth.get_tweepy_client()
             resp = client.search_recent_tweets(
@@ -189,7 +193,6 @@ class XClient:
             tweets = resp.data or []
             users = {u.id: u for u in (resp.includes.get("users", []) if resp.includes else [])}
 
-            results: list[dict[str, Any]] = []
             for t in tweets:
                 author = users.get(t.author_id) if hasattr(t, "author_id") else None
                 results.append({
@@ -219,7 +222,6 @@ class XClient:
             users_list = data.get("includes", {}).get("users", [])
             users = {u["id"]: u for u in users_list}
 
-            results: list[dict[str, Any]] = []
             for t in tweets:
                 author = users.get(t.get("author_id", ""))
                 results.append({
@@ -271,7 +273,7 @@ class XClient:
         if self.auth.mode == "tweepy":
             client = self.auth.get_tweepy_client()
             resp = client.delete_tweet(tweet_id)
-            return resp.data.get("deleted", False) if resp.data else False  # type: ignore
+            return resp.data.get("deleted", False) if resp.data else False
         else:
             if requests is None:
                 raise RuntimeError("requests library not installed")
@@ -295,7 +297,7 @@ class XClient:
         if self.auth.mode == "tweepy":
             client = self.auth.get_tweepy_client()
             resp = client.like(tweet_id)
-            return resp.data.get("liked", False) if resp.data else False  # type: ignore
+            return resp.data.get("liked", False) if resp.data else False
         else:
             if requests is None:
                 raise RuntimeError("requests library not installed")
@@ -322,7 +324,7 @@ class XClient:
         if self.auth.mode == "tweepy":
             client = self.auth.get_tweepy_client()
             resp = client.unlike(tweet_id)
-            return resp.data.get("liked", False) if resp.data else True  # type: ignore
+            return resp.data.get("liked", False) if resp.data else True
         else:
             if requests is None:
                 raise RuntimeError("requests library not installed")
@@ -345,7 +347,7 @@ class XClient:
         if self.auth.mode == "tweepy":
             client = self.auth.get_tweepy_client()
             resp = client.retweet(tweet_id)
-            return resp.data.get("retweeted", False) if resp.data else False  # type: ignore
+            return resp.data.get("retweeted", False) if resp.data else False
         else:
             if requests is None:
                 raise RuntimeError("requests library not installed")
@@ -372,7 +374,7 @@ class XClient:
         if self.auth.mode == "tweepy":
             client = self.auth.get_tweepy_client()
             resp = client.unretweet(tweet_id)
-            return not (resp.data.get("retweeted", True) if resp.data else False)  # type: ignore
+            return not (resp.data.get("retweeted", True) if resp.data else False)
         else:
             if requests is None:
                 raise RuntimeError("requests library not installed")
@@ -394,7 +396,7 @@ class XClient:
         if self.auth.mode == "tweepy":
             client = self.auth.get_tweepy_client()
             resp = client.follow_user(user_id)
-            return resp.data.get("following", False) if resp.data else False  # type: ignore
+            return resp.data.get("following", False) if resp.data else False
         else:
             if requests is None:
                 raise RuntimeError("requests library not installed")
