@@ -255,20 +255,22 @@ nox -s test
 nox -s all  # runs all three in sequence
 ```
 
-## � Telemetry (optional)
+## 📡 Telemetry (optional)
 
-The agent can emit OpenTelemetry traces and include W3C TraceContext IDs in logs.
+The agent can emit OpenTelemetry traces and include W3C TraceContext IDs in logs. See [docs/telemetry.md](docs/telemetry.md) for full instructions.
 
 - Enable tracing by setting an environment variable:
 
   ```powershell
-  # Windows PowerShell
-  $env:ENABLE_TELEMETRY = "true"
+  # Windows PowerShell (canonical)
+  $env:TELEMETRY_ENABLED = "true"
+  # Backward-compatible: $env:ENABLE_TELEMETRY = "true"
   ```
 
   ```bash
-  # macOS/Linux
-  export ENABLE_TELEMETRY=true
+  # macOS/Linux (canonical)
+  export TELEMETRY_ENABLED=true
+  # Backward-compatible: export ENABLE_TELEMETRY=true
   ```
 
 - Optional configuration:
@@ -281,7 +283,7 @@ The agent can emit OpenTelemetry traces and include W3C TraceContext IDs in logs
 When enabled, logs include `[trace_id=… span_id=…]` for any active span. If OpenTelemetry is not
 installed, the agent falls back to a no-op tracer automatically.
 
-## �📚 Key Improvements
+## 📚 Key Improvements
 
 ### Over agent-x
 - ✅ OAuth 2.0 PKCE support (optional)
@@ -347,10 +349,9 @@ learning:
 ## 📖 Documentation
 
 - **README.md** - This file (overview)
-- **QUICKSTART.md** - 5-minute setup guide
-- **MIGRATION.md** - Migration from old agents
-- **API.md** - API reference and examples
-- **LEARNING.md** - Thompson Sampling details
+- **[docs/guides/QUICKSTART.md](docs/guides/QUICKSTART.md)** - 5-minute setup guide
+- **[docs/telemetry.md](docs/telemetry.md)** - Observability and tracing
+- **[docs/guides/](docs/guides/)** - Additional guides (first tweet, read budget, migration)
 
 ## 🔐 Compliance
 
@@ -365,6 +366,7 @@ learning:
 ## 🤝 Contributing
 
 This unified agent combines:
+
 - **agent-x**: Tweepy-based with learning loop
 - **x-agent**: OAuth 2.0 with comprehensive safety
 

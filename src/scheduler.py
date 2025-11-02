@@ -10,6 +10,7 @@ from typing import Any
 from actions import act_on_search, choose_template
 from logger import get_logger
 from storage import Storage
+from telemetry import start_span
 from x_client import XClient
 
 logger = get_logger(__name__)
@@ -41,58 +42,72 @@ def run_post_action(
     dry_run: bool,
 ) -> None:
     """Execute a post action based on config."""
-    # Get time window
-    windows = config.get("schedule", {}).get("windows", ["morning", "afternoon", "evening"])
-    slot = current_slot(windows) or "morning"
+    with start_span("scheduler.run_post_action") as span:
+        # Get time window
+        windows = config.get("schedule", {}).get("windows", ["morning", "afternoon", "evening"])
+        slot = current_slot(windows) or "morning"
 
-    # Get topic (with learning if enabled)
-    topics = config.get("topics", ["automation"])
-    if config.get("learning", {}).get("enabled", False):
-        # Use bandit to choose topic
-        topic = storage.bandit_choose(topics)
-    else:
-        topic = random.choice(topics)
+        # Get topic (with learning if enabled)
+        topics = config.get("topics", ["automation"])
+        if config.get("learning", {}).get("enabled", False):
+            # Use bandit to choose topic
+            topic = storage.bandit_choose(topics)
+        else:
+            topic = random.choice(topics)
 
-    # Generate post
-    text, _media_path = choose_template(topic), None
+        # Span attributes
+        try:
+            span.set_attribute("slot", slot)
+            span.set_attribute("topic", topic)
+            span.set_attribute("dry_run", dry_run)
+        except Exception:
+            pass
 
-    # Check for duplicates
-    if storage.is_text_duplicate(text, days=7):
-        logger.warning("Duplicate text detected, skipping post")
-        return
+        # Generate post
+        text, _media_path = choose_template(topic), None
 
-    # Create post
-    if dry_run:
-        logger.debug(f"[DRY RUN] create_post(text='{text[:50]}...', topic={topic}, slot={slot})")
-        post_id = "dry-run-post"
-    else:
-        # Check budget first
-        from budget import BudgetManager
-        budget_mgr = BudgetManager(storage=storage, plan=config.get("plan", "free"))
-        can_write, msg = budget_mgr.can_write(1)
-        if not can_write:
-            logger.warning(f"Budget check failed: {msg}")
-            print(f"❌ {msg}")
+        # Check for duplicates
+        if storage.is_text_duplicate(text, days=7):
+            logger.warning("Duplicate text detected, skipping post")
+            try:
+                span.set_attribute("duplicate", True)
+            except Exception:
+                pass
             return
 
-        resp = client.create_post(text)
-        post_id = resp.get("data", {}).get("id", "unknown")
+        # Create post
+        if dry_run:
+            logger.debug(f"[DRY RUN] create_post(text='{text[:50]}...', topic={topic}, slot={slot})")
+            post_id = "dry-run-post"
+        else:
+            # Check budget first
+            from budget import BudgetManager
 
-        # Log action
-        storage.log_action(
-            kind="post",
-            post_id=post_id,
-            text=text,
-            topic=topic,
-            slot=slot,
-            media=0,
-        )
+            budget_mgr = BudgetManager(storage=storage, plan=config.get("plan", "free"))
+            can_write, msg = budget_mgr.can_write(1)
+            if not can_write:
+                logger.warning(f"Budget check failed: {msg}")
+                print(f"❌ {msg}")
+                return
 
-        # Update budget
-        budget_mgr.add_writes(1)
+            resp = client.create_post(text)
+            post_id = resp.get("data", {}).get("id", "unknown")
 
-        logger.info(f"Posted: {post_id} (topic={topic}, slot={slot})")
-        print(f"✓ Posted: {post_id} (topic={topic}, slot={slot})")
+            # Log action
+            storage.log_action(
+                kind="post",
+                post_id=post_id,
+                text=text,
+                topic=topic,
+                slot=slot,
+                media=0,
+            )
+
+            # Update budget
+            budget_mgr.add_writes(1)
+
+            logger.info(f"Posted: {post_id} (topic={topic}, slot={slot})")
+            print(f"✓ Posted: {post_id} (topic={topic}, slot={slot})")
 
 
 def run_interact_actions(
@@ -102,56 +117,71 @@ def run_interact_actions(
     dry_run: bool,
 ) -> None:
     """Execute interaction actions (search, like, reply, etc.)."""
-    # Get user ID
-    me_data = client.get_me()
-    me_user_id = me_data.get("data", {}).get("id", "unknown")
+    with start_span("scheduler.run_interact_actions") as span:
+        # Get user ID
+        me_data = client.get_me()
+        me_user_id = me_data.get("data", {}).get("id", "unknown")
 
-    # Get queries from config
-    queries = config.get("queries", [])
-    if not queries:
-        logger.warning("No queries configured for interaction mode")
-        print("⚠️  No queries configured for interaction mode")
-        return
+        # Get queries from config
+        queries = config.get("queries", [])
+        if not queries:
+            logger.warning("No queries configured for interaction mode")
+            print("⚠️  No queries configured for interaction mode")
+            return
 
-    # Get limits
-    limits = config.get("max_per_window", {
-        "reply": 3,
-        "like": 10,
-        "follow": 3,
-        "repost": 1,
-    })
-
-    # Feature flags
-    feature_flags = config.get("feature_flags", {})
-    if str(feature_flags.get("allow_likes", "auto")).lower() == "off":
-        limits["like"] = 0
-    if str(feature_flags.get("allow_follows", "auto")).lower() == "off":
-        limits["follow"] = 0
-
-    # Jitter bounds
-    jitter_bounds = tuple(config.get("jitter_seconds", [8, 20]))
-
-    # Execute for each query
-    for query_item in queries:
-        if isinstance(query_item, dict):
-            query = query_item.get("query", "")
-        else:
-            query = str(query_item)
-
-        if not query:
-            continue
-
-        print(f"\n🔍 Searching: {query[:50]}...")
-        remaining = act_on_search(
-            client=client,
-            storage=storage,
-            query=query,
-            limits=limits.copy(),
-            jitter_bounds=jitter_bounds,
-            dry_run=dry_run,
-            me_user_id=me_user_id,
+        # Get limits
+        limits = config.get(
+            "max_per_window",
+            {
+                "reply": 3,
+                "like": 10,
+                "follow": 3,
+                "repost": 1,
+            },
         )
-        print(f"   Remaining limits: {remaining}")
+
+        # Feature flags
+        feature_flags = config.get("feature_flags", {})
+        if str(feature_flags.get("allow_likes", "auto")).lower() == "off":
+            limits["like"] = 0
+        if str(feature_flags.get("allow_follows", "auto")).lower() == "off":
+            limits["follow"] = 0
+
+        # Jitter bounds
+        jitter_bounds = tuple(config.get("jitter_seconds", [8, 20]))
+
+        try:
+            span.set_attribute("dry_run", dry_run)
+            span.set_attribute("queries_count", len(queries))
+        except Exception:
+            pass
+
+        # Execute for each query
+        for query_item in queries:
+            if isinstance(query_item, dict):
+                query = query_item.get("query", "")
+            else:
+                query = str(query_item)
+
+            if not query:
+                continue
+
+            with start_span("scheduler.interact.search") as qspan:
+                try:
+                    qspan.set_attribute("query", query)
+                except Exception:
+                    pass
+                print(f"\n🔍 Searching: {query[:50]}...")
+                remaining = act_on_search(
+                    client=client,
+                    storage=storage,
+                    query=query,
+                    limits=limits.copy(),
+                    jitter_bounds=jitter_bounds,
+                    dry_run=dry_run,
+                    me_user_id=me_user_id,
+                )
+                print(f"   Remaining limits: {remaining}")
 
 
 def run_scheduler(
@@ -162,27 +192,34 @@ def run_scheduler(
     dry_run: bool,
 ) -> None:
     """Main scheduler entry point."""
-    # Check weekday filter
-    weekdays = config.get("cadence", {}).get("weekdays", [1, 2, 3, 4, 5])
-    today = datetime.today().isoweekday()
-    if today not in weekdays and not dry_run:
-        print(f"⏸️  Outside configured weekdays ({weekdays}), exiting")
-        return
+    with start_span("scheduler.run") as span:
+        # Check weekday filter
+        weekdays = config.get("cadence", {}).get("weekdays", [1, 2, 3, 4, 5])
+        today = datetime.today().isoweekday()
+        try:
+            span.set_attribute("mode", mode)
+            span.set_attribute("dry_run", dry_run)
+            span.set_attribute("weekday", today)
+        except Exception:
+            pass
+        if today not in weekdays and not dry_run:
+            print(f"⏸️  Outside configured weekdays ({weekdays}), exiting")
+            return
 
-    print(f"\n{'='*60}")
-    print(f"🤖 X Agent Unified - {mode.upper()} mode")
-    print(f"{'='*60}")
-    print(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"Dry run: {dry_run}")
-    print(f"{'='*60}\n")
+        print(f"\n{'=' * 60}")
+        print(f"🤖 X Agent Unified - {mode.upper()} mode")
+        print(f"{'=' * 60}")
+        print(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        print(f"Dry run: {dry_run}")
+        print(f"{'=' * 60}\n")
 
-    # Execute based on mode
-    if mode in ("post", "both"):
-        run_post_action(client, storage, config, dry_run)
+        # Execute based on mode
+        if mode in ("post", "both"):
+            run_post_action(client, storage, config, dry_run)
 
-    if mode in ("interact", "both"):
-        run_interact_actions(client, storage, config, dry_run)
+        if mode in ("interact", "both"):
+            run_interact_actions(client, storage, config, dry_run)
 
-    print(f"\n{'='*60}")
-    print("✓ Scheduler completed")
-    print(f"{'='*60}\n")
+        print(f"\n{'=' * 60}")
+        print("✓ Scheduler completed")
+        print(f"{'=' * 60}\n")

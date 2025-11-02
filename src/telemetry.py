@@ -2,101 +2,76 @@
 OpenTelemetry tracing integration for X Agent.
 
 Provides optional distributed tracing with W3C TraceContext propagation.
-Disabled by default; enable via ENABLE_TELEMETRY=true environment variable.
+Disabled by default; enable via TELEMETRY_ENABLED=true (or legacy ENABLE_TELEMETRY=true).
 """
 
 from __future__ import annotations
 
 import logging
 import os
-from typing import TYPE_CHECKING, Any
+from contextlib import AbstractContextManager
+from typing import TYPE_CHECKING, Any, Literal
 
 if TYPE_CHECKING:
     from opentelemetry.sdk.trace import TracerProvider
     from opentelemetry.trace import Tracer
 
+from src.telemetry_core.factory import create_telemetry
+from src.telemetry_core.noop import NoOpTelemetry
+from src.telemetry_core.types import Telemetry
+
 logger = logging.getLogger(__name__)
 
 _tracer_provider: TracerProvider | None = None
 _telemetry_enabled: bool = False
+_telemetry_impl: Telemetry | None = None
 
 
 def init_telemetry() -> None:
     """
-    Initialize OpenTelemetry tracing based on environment variables.
+    Initialize telemetry based on environment variables using the provider factory.
 
-    Environment variables:
-    - ENABLE_TELEMETRY: Set to 'true' to enable tracing (default: false)
-    - OTEL_SERVICE_NAME: Service name for traces (default: 'x-agent')
-    - OTEL_EXPORTER_OTLP_ENDPOINT: OTLP HTTP endpoint (optional; if unset, uses in-memory/no-op)
-    - OTEL_TRACES_SAMPLER: Sampling strategy (default: 'parentbased_always_on')
+    Env vars:
+    - TELEMETRY_ENABLED / ENABLE_TELEMETRY: 'true' to enable (default: false)
+    - TELEMETRY_PROVIDER: provider name ('opentelemetry')
+    - TELEMETRY_DEBUG: 'true' for debug logs on provider selection
+    - OTEL_SERVICE_NAME, OTEL_EXPORTER_OTLP_ENDPOINT: standard OTel envs
 
-    If telemetry is disabled or OTel packages are not installed, configures a no-op provider.
+    If the provider cannot be loaded or dependencies are missing, falls back to NoOp.
     """
-    global _tracer_provider, _telemetry_enabled
+    global _tracer_provider, _telemetry_enabled, _telemetry_impl
 
-    enable_telemetry = os.getenv("ENABLE_TELEMETRY", "false").lower() == "true"
+    primary = os.getenv("TELEMETRY_ENABLED")
+    legacy = os.getenv("ENABLE_TELEMETRY")
 
-    if not enable_telemetry:
-        logger.debug("Telemetry disabled (ENABLE_TELEMETRY != true)")
+    enabled = (primary or legacy or "").strip().lower() == "true"
+    debug = os.getenv("TELEMETRY_DEBUG", "false").lower() == "true"
+
+    if not enabled:
+        if debug:
+            logger.debug("Telemetry disabled (TELEMETRY_ENABLED/ENABLE_TELEMETRY != true)")
+        _telemetry_impl = NoOpTelemetry()
         _telemetry_enabled = False
         _configure_noop_provider()
         return
 
+    provider_name = os.getenv("TELEMETRY_PROVIDER", "opentelemetry").strip().lower()
+
     try:
-        from opentelemetry import trace
-        from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
-        from opentelemetry.sdk.resources import Resource
-        from opentelemetry.sdk.trace import TracerProvider
-        from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter
-        from opentelemetry.sdk.trace.sampling import ALWAYS_ON, ParentBasedTraceIdRatio
-
-        _telemetry_enabled = True
-
-        service_name = os.getenv("OTEL_SERVICE_NAME", "x-agent")
-        otlp_endpoint = os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT")
-        sampler_name = os.getenv("OTEL_TRACES_SAMPLER", "parentbased_always_on").lower()
-
-        # Configure sampler
-        if sampler_name == "always_on":
-            sampler: Any = ALWAYS_ON
-        elif sampler_name.startswith("parentbased_traceidratio"):
-            # Extract ratio if specified, default to 1.0
-            ratio = 1.0
-            if "/" in sampler_name:
-                try:
-                    ratio = float(sampler_name.split("/")[-1])
-                except ValueError:
-                    pass
-            sampler = ParentBasedTraceIdRatio(ratio)
-        else:  # default: parentbased_always_on
-            sampler = ALWAYS_ON
-
-        resource = Resource.create({"service.name": service_name})
-        _tracer_provider = TracerProvider(resource=resource, sampler=sampler)
-
-        # Configure exporter
-        if otlp_endpoint:
-            logger.info(f"Telemetry enabled with OTLP endpoint: {otlp_endpoint}")
-            exporter = OTLPSpanExporter(endpoint=otlp_endpoint)
-            _tracer_provider.add_span_processor(BatchSpanProcessor(exporter))
-        else:
-            logger.info("Telemetry enabled with in-memory/console exporter (no OTLP endpoint)")
-            # Use console exporter for local dev/testing
-            _tracer_provider.add_span_processor(BatchSpanProcessor(ConsoleSpanExporter()))
-
-        trace.set_tracer_provider(_tracer_provider)
-        logger.info(f"OpenTelemetry tracing initialized (service: {service_name}, sampler: {sampler_name})")
-
-    except ImportError as e:
-        logger.warning(
-            f"Telemetry enabled but OpenTelemetry packages not installed: {e}. "
-            "Install with: pip install -e .[telemetry]"
-        )
-        _telemetry_enabled = False
-        _configure_noop_provider()
+        impl = create_telemetry(provider=provider_name)
+        _telemetry_impl = impl
+        # Mark enabled only if not NoOp
+        _telemetry_enabled = not isinstance(impl, NoOpTelemetry)
+        if debug:
+            logger.debug(
+                "Telemetry requested: provider=%s, enabled=%s",
+                provider_name,
+                _telemetry_enabled,
+            )
     except Exception as e:
-        logger.error(f"Failed to initialize telemetry: {e}", exc_info=True)
+        # Defensive: never break runtime
+        logger.warning("Telemetry initialization failed; falling back to NoOp: %s", e)
+        _telemetry_impl = NoOpTelemetry()
         _telemetry_enabled = False
         _configure_noop_provider()
 
@@ -136,6 +111,15 @@ def get_tracer(name: str | None = None) -> Tracer:
         return _NoOpTracer()  # type: ignore[return-value]
 
 
+def get_telemetry() -> Telemetry:
+    """Return the current Telemetry implementation (NoOp when disabled)."""
+    global _telemetry_impl
+    if _telemetry_impl is None:
+        # Lazy init to safe default
+        _telemetry_impl = NoOpTelemetry()
+    return _telemetry_impl
+
+
 def is_telemetry_enabled() -> bool:
     """Check if telemetry is currently enabled and initialized."""
     return _telemetry_enabled
@@ -168,3 +152,26 @@ class _NoOpSpan:
 
     def end(self) -> None:
         pass
+
+
+def start_span(name: str) -> AbstractContextManager[Any]:
+    """Return a context manager that starts a span as current when available.
+
+    - If OpenTelemetry is installed, uses tracer.start_as_current_span(name).
+    - Otherwise, returns a no-op context manager whose __enter__ yields _NoOpSpan.
+    """
+    try:
+        from opentelemetry import trace
+
+        tracer = trace.get_tracer("x-agent")
+        return tracer.start_as_current_span(name)
+    except ImportError:
+
+        class _NoOpCM:
+            def __enter__(self) -> _NoOpSpan:
+                return _NoOpSpan()
+
+            def __exit__(self, *args) -> Literal[False]:
+                return False
+
+        return _NoOpCM()

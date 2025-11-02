@@ -1,0 +1,86 @@
+name: Bootstrap Sprint 2 Planning PR
+
+on:
+  push:
+    branches:
+      - feat/sprint-2-planning-notebook
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: bootstrap-sprint2-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Upsert labels
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { owner, repo } = context.repo;
+            const labels = [
+              { name: 'sprint-2', color: '0e8a16', description: 'Sprint 2 work' },
+              { name: 'planning', color: 'c5def5', description: 'Planning/Docs' }
+            ];
+            for (const l of labels) {
+              try {
+                await github.rest.issues.getLabel({ owner, repo, name: l.name });
+              } catch (e) {
+                if (e.status === 404) {
+                  await github.rest.issues.createLabel({ owner, repo, name: l.name, color: l.color, description: l.description });
+                } else {
+                  core.warning(`Label lookup failed for ${l.name}: ${e}`);
+                }
+              }
+            }
+      - name: Create or update PR
+        id: pr
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { owner, repo } = context.repo;
+            const head = context.ref.replace('refs/heads/', '');
+            const base = 'main';
+            // Check for existing open PR from this branch
+            const { data: prs } = await github.rest.pulls.list({ owner, repo, state: 'open', head: `${owner}:${head}`, base });
+            let pr;
+            if (prs && prs.length > 0) {
+              pr = prs[0];
+            } else {
+              const title = 'Sprint 2 Planning: Observability, Reliability, Automation';
+              const body = 'This auto-generated PR adds the Sprint 2 planning notebook at `notebooks/Sprint_2_Plan.ipynb` and bootstraps labels.\n\nRequired once for private repos: Actions → General → Workflow permissions = Read and write. Optional: enable auto-merge.\n\nDoD for this PR: planning content only; no code behavior changes.';
+              const created = await github.rest.pulls.create({ owner, repo, title, head, base, body, draft: false });
+              pr = created.data;
+            }
+            // Add labels
+            try {
+              await github.rest.issues.addLabels({ owner, repo, issue_number: pr.number, labels: ['sprint-2', 'planning'] });
+            } catch (e) {
+              core.warning(`Adding labels failed: ${e}`);
+            }
+            core.setOutput('number', pr.number);
+            core.setOutput('url', pr.html_url);
+      - name: Attempt to enable auto-merge (optional)
+        if: steps.pr.outputs.number != ''
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            try {
+              const pullNumber = Number(core.getInput('pr_number')) || Number('${{ steps.pr.outputs.number }}');
+              const { owner, repo } = context.repo;
+              // GraphQL enablePullRequestAutoMerge requires repo setting and permissions; ignore failures gracefully
+              const q = `mutation($owner:String!, $repo:String!, $number:Int!) {\n                enablePullRequestAutoMerge(input: { pullRequestId: getPR(id: $number) }) {\n                  clientMutationId\n                }\n              }`;
+              // We cannot easily resolve node id here without another call; skip actual enabling to avoid errors.
+              core.info('Auto-merge not enabled by script (repo setting dependent). If desired, enable at repository level.');
+            } catch (e) {
+              core.warning(`Auto-merge attempt skipped/failed: ${e}`);
+            }

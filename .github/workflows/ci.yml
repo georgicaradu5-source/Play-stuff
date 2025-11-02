@@ -68,3 +68,97 @@ jobs:
       - name: Run tests with coverage (fail if <80%)
         run: |
           pytest -q --maxfail=1 --disable-warnings --cov=src --cov-fail-under=80
+
+  test-telemetry-no-extras:
+    name: Tests (TELEMETRY_ENABLED=true, no extras)
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ["3.11", "3.12"]
+    env:
+      TELEMETRY_ENABLED: "true"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+          cache-dependency-path: 'requirements.txt'
+
+      - name: Install dependencies (project + tools)
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then python -m pip install -r requirements.txt; fi
+          python -m pip install ruff mypy pytest pytest-cov
+
+      - name: Ruff check
+        run: ruff check .
+
+      - name: Mypy
+        run: mypy src || (echo "Mypy failures" && exit 1)
+
+      - name: Run tests with coverage (fallback path)
+        run: |
+          pytest -q --maxfail=1 --disable-warnings --cov=src --cov-fail-under=80
+
+  test-telemetry-with-extras:
+    name: Tests (with telemetry extras)
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.12"]
+    env:
+      TELEMETRY_ENABLED: "true"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+          cache-dependency-path: 'pyproject.toml'
+
+      - name: Install dependencies (with telemetry extras)
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e .[dev,telemetry]
+
+      - name: Ruff check
+        run: ruff check .
+
+      - name: Mypy
+        run: mypy src || (echo "Mypy failures" && exit 1)
+
+      - name: Run tests with coverage (extras installed)
+        run: |
+          pytest -q --maxfail=1 --disable-warnings --cov=src --cov-fail-under=80
+
+  security-audit:
+    name: Security (pip-audit) — non-blocking
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install project (no extras) and pip-audit
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then python -m pip install -r requirements.txt; fi
+          python -m pip install . pip-audit
+
+      - name: Run pip-audit (advisory only)
+        run: |
+          pip-audit -r requirements.txt || true
