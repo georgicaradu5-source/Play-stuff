@@ -1,5 +1,7 @@
 # X Agent - Unified Production-Ready Autonomous X (Twitter) Agent
 
+[![CI](https://github.com/georgicaradu5-source/Play-stuff/actions/workflows/ci.yml/badge.svg)](https://github.com/georgicaradu5-source/Play-stuff/actions/workflows/ci.yml)
+
 A fully unified, production-ready autonomous agent for X (Twitter) that combines the best features from both implementations. Supports **both OAuth 1.0a (Tweepy) and OAuth 2.0 PKCE** authentication methods.
 
 ## 🎯 Unified Features
@@ -246,6 +248,25 @@ python tests/test_learning.py
 - ✅ Time-window scheduling
 - ✅ Template-based content
 - ✅ Simpler onboarding option
+
+## 🔒 Reliability
+
+This project includes a small reliability layer that hardens OAuth2 (raw HTTP) calls while
+keeping Tweepy-based flows unchanged. Key points:
+
+- Timeouts: all raw HTTP calls use an explicit default timeout (DEFAULT_TIMEOUT = 10s) for
+  connect/read to avoid hanging network calls.
+- Retries: bounded retries are performed with exponential backoff and jitter. Retryable
+  statuses are 429 and 500–504.
+- Rate-limit handling: when a 429 response includes an `x-rate-limit-reset` header, the
+  client will wait until the reset time (capped) before retrying to be polite to the API.
+- Idempotency: POST requests automatically include a deterministic `Idempotency-Key`
+  derived from the JSON payload (sha256 of canonical JSON). GET and DELETE are not
+  automatically idempotent by header.
+
+Rationale: these changes make OAuth2 network interactions safer and more policy-compliant
+under transient failures and rate limits. Dry-run behavior is unchanged; Tweepy mode is
+untouched and continues to rely on its own retry logic.
 
 ## 🎯 Best Practices
 
