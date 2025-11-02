@@ -68,7 +68,7 @@ def run_post_action(
     else:
         # Check budget first
         from budget import BudgetManager
-        budget_mgr = BudgetManager(storage=storage, plan=config.get("plan", "free"))  # type: ignore
+        budget_mgr = BudgetManager(storage=storage, plan=config.get("plan", "free"))
         can_write, msg = budget_mgr.can_write(1)
         if not can_write:
             logger.warning(f"Budget check failed: {msg}")
@@ -129,7 +129,7 @@ def run_interact_actions(
         limits["follow"] = 0
 
     # Jitter bounds
-    jitter_bounds = tuple(config.get("jitter_seconds", [8, 20]))  # type: ignore
+    jitter_bounds = tuple(config.get("jitter_seconds", [8, 20]))
 
     # Execute for each query
     for query_item in queries:

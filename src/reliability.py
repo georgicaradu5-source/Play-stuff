@@ -22,7 +22,7 @@ from typing import Any
 try:
     import requests
 except ImportError:  # pragma: no cover
-    requests = None  # type: ignore
+    requests = None
 
 
 DEFAULT_TIMEOUT = 10.0  # seconds
