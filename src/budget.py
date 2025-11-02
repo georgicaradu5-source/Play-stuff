@@ -2,9 +2,8 @@
 
 from __future__ import annotations
 
-import os
 from datetime import datetime
-from typing import Literal, Optional
+from typing import Literal
 
 try:
     from storage import Storage
@@ -31,14 +30,14 @@ class BudgetManager:
 
     def __init__(
         self,
-        storage: Optional[Storage] = None,
+        storage: Storage | None = None,
         plan: PlanType = "free",
         buffer_pct: float = 0.05,
-        custom_read_cap: Optional[int] = None,
-        custom_write_cap: Optional[int] = None,
+        custom_read_cap: int | None = None,
+        custom_write_cap: int | None = None,
     ):
         """Initialize budget manager.
-        
+
         Args:
             storage: Storage instance for persistence
             plan: Plan tier (free, basic, pro)
@@ -49,16 +48,16 @@ class BudgetManager:
         if storage is None and Storage is not None:
             from storage import Storage as StorageClass
             storage = StorageClass()
-        
+
         self.storage = storage
         self.plan = plan
         self.buffer_pct = buffer_pct
-        
+
         # Use custom caps or plan defaults
         base_caps = self.PLAN_CAPS[plan]
         self.read_cap = custom_read_cap or base_caps["reads"]
         self.write_cap = custom_write_cap or base_caps["writes"]
-        
+
         # Apply safety buffer
         self.soft_read_cap = int(self.read_cap * (1 - buffer_pct))
         self.soft_write_cap = int(self.write_cap * (1 - buffer_pct))
@@ -70,7 +69,7 @@ class BudgetManager:
     def get_usage(self) -> dict:
         """Get current month usage."""
         period = self._current_period()
-        
+
         if self.storage:
             usage = self.storage.get_monthly_usage(period)
             reads = usage.get("read_count", 0)
@@ -78,7 +77,7 @@ class BudgetManager:
         else:
             reads = 0
             writes = 0
-        
+
         return {
             "period": period,
             "plan": self.plan,
@@ -96,33 +95,33 @@ class BudgetManager:
         """Check if READ operation is within budget."""
         usage = self.get_usage()
         new_total = usage["reads"] + posts_count
-        
+
         if new_total > self.read_cap:
             return False, f"Hard cap exceeded: {new_total} > {self.read_cap}"
-        
+
         if new_total > self.soft_read_cap:
             return False, f"Soft cap exceeded: {new_total} > {self.soft_read_cap} (buffer: {self.buffer_pct*100}%)"
-        
+
         return True, f"OK: {new_total}/{self.soft_read_cap} reads"
 
     def can_write(self, count: int = 1) -> tuple[bool, str]:
         """Check if WRITE operation is within budget."""
         usage = self.get_usage()
         new_total = usage["writes"] + count
-        
+
         if new_total > self.write_cap:
             return False, f"Hard cap exceeded: {new_total} > {self.write_cap}"
-        
+
         if new_total > self.soft_write_cap:
             return False, f"Soft cap exceeded: {new_total} > {self.soft_write_cap} (buffer: {self.buffer_pct*100}%)"
-        
+
         return True, f"OK: {new_total}/{self.soft_write_cap} writes"
 
     def add_reads(self, posts_count: int) -> None:
         """Record READ operations (posts returned from API)."""
         if not self.storage:
             return
-        
+
         period = self._current_period()
         self.storage.update_monthly_usage(period, read_count=posts_count)
 
@@ -130,7 +129,7 @@ class BudgetManager:
         """Record WRITE operations (creates/deletes)."""
         if not self.storage:
             return
-        
+
         period = self._current_period()
         self.storage.update_monthly_usage(period, create_count=count)
 
@@ -151,9 +150,9 @@ class BudgetManager:
         print(f"  Soft cap: {self.soft_write_cap:,} (buffer: {self.buffer_pct*100:.0f}%)")
 
     @classmethod
-    def from_config(cls, config: dict, storage: Optional[Storage] = None) -> BudgetManager:
+    def from_config(cls, config: dict, storage: Storage | None = None) -> BudgetManager:
         """Create BudgetManager from config dict.
-        
+
         Example config:
         {
             "plan": "free",
@@ -176,7 +175,7 @@ _CREATE_CAP = 500
 _READ_CAP = 100
 
 
-def configure_caps(posts_create_cap: Optional[int], posts_read_cap: Optional[int]) -> None:
+def configure_caps(posts_create_cap: int | None, posts_read_cap: int | None) -> None:
     """Configure global caps (agent-x compatibility)."""
     global _CREATE_CAP, _READ_CAP
     if posts_create_cap:
@@ -185,9 +184,9 @@ def configure_caps(posts_create_cap: Optional[int], posts_read_cap: Optional[int
         _READ_CAP = int(posts_read_cap)
 
 
-def add_create(n: int = 1, cap: Optional[int] = None) -> None:
+def add_create(n: int = 1, cap: int | None = None) -> None:
     """Add create count with cap check (agent-x compatibility).
-    
+
     Note: This is a simplified version for backward compatibility.
     For full budget management, use BudgetManager class.
     """
@@ -197,9 +196,9 @@ def add_create(n: int = 1, cap: Optional[int] = None) -> None:
     print(f"[COMPAT] add_create({n}) against cap {cap}")
 
 
-def add_reads(posts_returned: int, cap: Optional[int] = None) -> None:
+def add_reads(posts_returned: int, cap: int | None = None) -> None:
     """Add read count with cap check (agent-x compatibility).
-    
+
     Note: This is a simplified version for backward compatibility.
     For full budget management, use BudgetManager class.
     """

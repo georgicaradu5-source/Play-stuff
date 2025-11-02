@@ -3,10 +3,8 @@
 from __future__ import annotations
 
 import random
-from typing import Any, Optional
 
 from storage import Storage
-
 
 TEMPLATES = {
     "power-platform": [
@@ -52,7 +50,7 @@ def choose_template(topic: str) -> str:
     return random.choice(candidates)
 
 
-def make_post(topic: str, slot: str, allow_media: bool = False) -> tuple[str, Optional[str]]:
+def make_post(topic: str, slot: str, allow_media: bool = False) -> tuple[str, str | None]:
     """Generate post text and optional media path."""
     text = choose_template(topic)
     media_path = None
@@ -79,7 +77,7 @@ def act_on_search(
 ) -> dict[str, int]:
     """Perform reply, like, follow actions up to limits."""
     import time
-    
+
     remaining = {k: int(v) for k, v in limits.items()}
     posts = client.search_recent(query, max_results=20)
     random.shuffle(posts)
@@ -87,10 +85,10 @@ def act_on_search(
     for p in posts:
         if all(v <= 0 for v in remaining.values()):
             break
-        
+
         pid = p["id"]
         author_id = p.get("author_id")
-        
+
         # Skip self
         if author_id and str(author_id) == str(me_user_id):
             continue
@@ -109,7 +107,7 @@ def act_on_search(
         for a in actions:
             if remaining.get(a, 0) <= 0:
                 continue
-            
+
             if a == "reply":
                 if not storage.already_acted(pid, "reply"):
                     reply_text = helpful_reply()
@@ -121,7 +119,7 @@ def act_on_search(
                         storage.log_action(kind="reply", post_id=pid, ref_id=rid, text=reply_text)
                     remaining["reply"] -= 1
                     time.sleep(random.uniform(*jitter_bounds))
-            
+
             elif a == "like":
                 if not storage.already_acted(pid, "like"):
                     if dry_run:
@@ -131,7 +129,7 @@ def act_on_search(
                         storage.log_action(kind="like", post_id=pid)
                     remaining["like"] -= 1
                     time.sleep(random.uniform(*jitter_bounds))
-            
+
             elif a == "follow" and author_id:
                 if not storage.already_acted(str(author_id), "follow"):
                     if dry_run:
@@ -141,7 +139,7 @@ def act_on_search(
                         storage.log_action(kind="follow", post_id=str(author_id))
                     remaining["follow"] -= 1
                     time.sleep(random.uniform(*jitter_bounds))
-            
+
             elif a == "repost":
                 if not storage.already_acted(pid, "repost"):
                     if dry_run:
