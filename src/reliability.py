@@ -83,7 +83,7 @@ def request_with_retries(
             if attempt >= retries:
                 raise
             # Exponential backoff with jitter for timeouts
-            delay = min(backoff_cap, backoff_base * (2 ** attempt)) + random.uniform(0, 0.5)
+            delay = min(backoff_cap, backoff_base * (2**attempt)) + random.uniform(0, 0.5)
             sleep_fn(delay)
             attempt += 1
             continue
@@ -105,7 +105,7 @@ def request_with_retries(
             wait = max(0.0, min(backoff_cap, float(reset_at - now)))
         else:
             # Exponential backoff with jitter
-            wait = min(backoff_cap, backoff_base * (2 ** attempt)) + random.uniform(0, 0.5)
+            wait = min(backoff_cap, backoff_base * (2**attempt)) + random.uniform(0, 0.5)
 
         sleep_fn(wait)
         attempt += 1

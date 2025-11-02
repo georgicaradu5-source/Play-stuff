@@ -66,7 +66,6 @@ def attach_tracecontext_to_logs(logger: logging.Logger | None = None) -> None:
             # Default format with trace context
             handler.setFormatter(
                 logging.Formatter(
-                    "%(asctime)s - %(name)s - %(levelname)s - %(message)s "
-                    "[trace_id=%(trace_id)s span_id=%(span_id)s]"
+                    "%(asctime)s - %(name)s - %(levelname)s - %(message)s [trace_id=%(trace_id)s span_id=%(span_id)s]"
                 )
             )

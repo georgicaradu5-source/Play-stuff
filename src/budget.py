@@ -47,6 +47,7 @@ class BudgetManager:
         """
         if storage is None and Storage is not None:
             from storage import Storage as StorageClass
+
             storage = StorageClass()
 
         self.storage = storage
@@ -100,7 +101,7 @@ class BudgetManager:
             return False, f"Hard cap exceeded: {new_total} > {self.read_cap}"
 
         if new_total > self.soft_read_cap:
-            return False, f"Soft cap exceeded: {new_total} > {self.soft_read_cap} (buffer: {self.buffer_pct*100}%)"
+            return False, f"Soft cap exceeded: {new_total} > {self.soft_read_cap} (buffer: {self.buffer_pct * 100}%)"
 
         return True, f"OK: {new_total}/{self.soft_read_cap} reads"
 
@@ -113,7 +114,7 @@ class BudgetManager:
             return False, f"Hard cap exceeded: {new_total} > {self.write_cap}"
 
         if new_total > self.soft_write_cap:
-            return False, f"Soft cap exceeded: {new_total} > {self.soft_write_cap} (buffer: {self.buffer_pct*100}%)"
+            return False, f"Soft cap exceeded: {new_total} > {self.soft_write_cap} (buffer: {self.buffer_pct * 100}%)"
 
         return True, f"OK: {new_total}/{self.soft_write_cap} writes"
 
@@ -144,10 +145,10 @@ class BudgetManager:
         print(f"Plan: {usage['plan'].upper()}")
         print(f"\nREADS:  {usage['reads']:,} / {usage['read_cap']:,} ({usage['read_pct']:.1f}%)")
         print(f"  Remaining: {usage['read_remaining']:,}")
-        print(f"  Soft cap: {self.soft_read_cap:,} (buffer: {self.buffer_pct*100:.0f}%)")
+        print(f"  Soft cap: {self.soft_read_cap:,} (buffer: {self.buffer_pct * 100:.0f}%)")
         print(f"\nWRITES: {usage['writes']:,} / {usage['write_cap']:,} ({usage['write_pct']:.1f}%)")
         print(f"  Remaining: {usage['write_remaining']:,}")
-        print(f"  Soft cap: {self.soft_write_cap:,} (buffer: {self.buffer_pct*100:.0f}%)")
+        print(f"  Soft cap: {self.soft_write_cap:,} (buffer: {self.buffer_pct * 100:.0f}%)")
 
     @classmethod
     def from_config(cls, config: dict, storage: Storage | None = None) -> BudgetManager:
