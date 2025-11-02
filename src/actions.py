@@ -3,8 +3,12 @@
 from __future__ import annotations
 
 import random
+from typing import TYPE_CHECKING
 
 from storage import Storage
+
+if TYPE_CHECKING:  # pragma: no cover - for type hints only
+    from x_client import XClient
 
 TEMPLATES = {
     "power-platform": [
@@ -67,7 +71,7 @@ def helpful_reply(base_text: str = "") -> str:
 
 
 def act_on_search(
-    client,
+    client: XClient,
     storage: Storage,
     query: str,
     limits: dict[str, int],
