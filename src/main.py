@@ -11,7 +11,7 @@ from typing import Any
 try:
     import yaml
 except ImportError:
-    yaml = None  # type: ignore
+    yaml = None
 
 from logger import configure_logging, get_logger
 
@@ -39,7 +39,7 @@ def load_config(path: str, validate: bool = True) -> dict[str, Any]:
     # Try to validate with Pydantic if available and requested
     if validate:
         try:
-            from config_schema import validate_config
+            from config_schema import validate_config  # type: ignore[attr-defined]
 
             is_valid, error_msg, config_obj = validate_config(path)
             if is_valid and config_obj:
@@ -166,7 +166,8 @@ def main():
         sys.exit(1)
 
     # Configure logging from config
-    configure_logging(config)
+    log_level = config.get("logging", {}).get("level", "INFO")
+    configure_logging(log_level)
     logger = get_logger(__name__)
 
     # Override plan if specified
@@ -196,8 +197,21 @@ def main():
 
         logger.info("Starting OAuth 2.0 PKCE authorization flow...")
         print("\n🔐 Starting OAuth 2.0 PKCE authorization flow...")
-        auth = UnifiedAuth.from_env("oauth2")  # type: ignore
-        success = auth.authorize_oauth2()
+        auth = UnifiedAuth.from_env("oauth2")
+        
+        # X API scopes for posting, reading, liking, following
+        scopes = [
+            "tweet.read",
+            "tweet.write",
+            "users.read",
+            "offline.access",
+            "like.read",
+            "like.write",
+            "follows.read",
+            "follows.write",
+        ]
+        
+        success = auth.authorize_oauth2(scopes)
 
         if success:
             logger.info("Authorization successful! Token saved.")
