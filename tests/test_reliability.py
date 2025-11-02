@@ -8,7 +8,7 @@ class FakeHTTPError(Exception):
     pass
 
 
-class FakeTimeout(Exception):
+class FakeTimeoutError(Exception):
     pass
 
 
@@ -36,7 +36,7 @@ def make_fake_requests(sequence, raise_timeout_first=False):
         state["calls"] += 1
         state["last_headers"] = headers or {}
         if raise_timeout_first and state["calls"] == 1:
-            raise FakeTimeout("timeout")
+            raise FakeTimeoutError("timeout")
         item = sequence[min(state["calls"] - 1, len(sequence) - 1)]
         if isinstance(item, Exception):
             raise item
@@ -44,7 +44,7 @@ def make_fake_requests(sequence, raise_timeout_first=False):
 
     fake_requests = SimpleNamespace(
         request=request,
-        Timeout=FakeTimeout,
+    Timeout=FakeTimeoutError,
         HTTPError=FakeHTTPError,
     )
     return fake_requests, state

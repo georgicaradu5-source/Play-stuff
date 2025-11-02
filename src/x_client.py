@@ -11,7 +11,7 @@ except ImportError:
     requests = None  # type: ignore
 
 from auth import UnifiedAuth
-from reliability import request_with_retries, DEFAULT_TIMEOUT
+from reliability import DEFAULT_TIMEOUT, request_with_retries
 
 
 class XClient:
