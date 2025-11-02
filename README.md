@@ -233,6 +233,18 @@ python tests/live_test.py --confirm
 python tests/test_learning.py
 ```
 
+## 🧑‍💻 Local dev tips
+
+Type checking (parity with CI):
+
+```bash
+# macOS/Linux
+./scripts/mypy.sh
+
+# Windows PowerShell
+./scripts/mypy.ps1
+```
+
 ## 📚 Key Improvements
 
 ### Over agent-x
