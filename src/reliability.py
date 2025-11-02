@@ -16,7 +16,8 @@ import hashlib
 import json
 import random
 import time
-from typing import Any, Callable, Mapping
+from collections.abc import Callable, Mapping
+from typing import Any
 
 try:
     import requests
