@@ -14,6 +14,8 @@ except ImportError:
     yaml = None
 
 from logger import configure_logging, get_logger
+from logging_setup import attach_tracecontext_to_logs
+from telemetry import init_telemetry
 
 logger = get_logger(__name__)
 
@@ -168,6 +170,9 @@ def main():
     # Configure logging from config
     log_level = config.get("logging", {}).get("level", "INFO")
     configure_logging(log_level)
+    # Inject W3C TraceContext IDs into logs and initialize telemetry (optional)
+    attach_tracecontext_to_logs()
+    init_telemetry()
     logger = get_logger(__name__)
 
     # Override plan if specified
@@ -198,7 +203,7 @@ def main():
         logger.info("Starting OAuth 2.0 PKCE authorization flow...")
         print("\n🔐 Starting OAuth 2.0 PKCE authorization flow...")
         auth = UnifiedAuth.from_env("oauth2")
-        
+
         # X API scopes for posting, reading, liking, following
         scopes = [
             "tweet.read",
@@ -210,7 +215,7 @@ def main():
             "follows.read",
             "follows.write",
         ]
-        
+
         success = auth.authorize_oauth2(scopes)
 
         if success:
@@ -240,10 +245,12 @@ def main():
             budget_mgr.print_budget()
         elif args.safety == "print-limits":
             from rate_limiter import RateLimiter
+
             rate_limiter = RateLimiter()
             rate_limiter.print_limits()
         elif args.safety == "print-learning":
             from learn import print_bandit_stats
+
             print_bandit_stats(storage)
         sys.exit(0)
 
@@ -307,6 +314,7 @@ def main():
         logger.error(f"Error in scheduler: {e}", exc_info=True)
         print(f"\n❌ Error: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)
     finally:

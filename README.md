@@ -255,7 +255,33 @@ nox -s test
 nox -s all  # runs all three in sequence
 ```
 
-## 📚 Key Improvements
+## � Telemetry (optional)
+
+The agent can emit OpenTelemetry traces and include W3C TraceContext IDs in logs.
+
+- Enable tracing by setting an environment variable:
+
+  ```powershell
+  # Windows PowerShell
+  $env:ENABLE_TELEMETRY = "true"
+  ```
+
+  ```bash
+  # macOS/Linux
+  export ENABLE_TELEMETRY=true
+  ```
+
+- Optional configuration:
+  - `OTEL_SERVICE_NAME` (default: `x-agent`)
+  - `OTEL_EXPORTER_OTLP_ENDPOINT` e.g. `http://localhost:4318/v1/traces` (for OTLP/HTTP)
+  - `OTEL_TRACES_SAMPLER` values:
+    - `always_on`
+    - `parentbased_traceidratio/<ratio>` (e.g. `parentbased_traceidratio/0.2`)
+
+When enabled, logs include `[trace_id=… span_id=…]` for any active span. If OpenTelemetry is not
+installed, the agent falls back to a no-op tracer automatically.
+
+## �📚 Key Improvements
 
 ### Over agent-x
 - ✅ OAuth 2.0 PKCE support (optional)
