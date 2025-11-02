@@ -25,7 +25,6 @@ For OAuth2 (raw HTTP) code paths, the client adds a small reliability layer to i
 - POST requests include a deterministic `Idempotency-Key` derived from the JSON payload to enable safe retries; GET/DELETE do not include this header.
 
 This layer does not affect Tweepy (OAuth 1.0a) paths, which use their own internal retry behavior.
-
 ## Quick Start
 
 ### 1. Install telemetry extras (optional)

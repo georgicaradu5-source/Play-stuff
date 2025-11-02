@@ -408,8 +408,7 @@ class XClient:
                 "Content-Type": "application/json",
             }
             payload = {"target_user_id": user_id}
-            resp = requests.post(url, headers=headers, json=payload)
-            resp.raise_for_status()
+            resp = request_with_retries("POST", url, headers=headers, json_body=payload, timeout=DEFAULT_TIMEOUT)
             data = resp.json()
             return data.get("data", {}).get("following", False)
 
