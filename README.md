@@ -245,6 +245,16 @@ Type checking (parity with CI):
 ./scripts/mypy.ps1
 ```
 
+Nox sessions (optional, unified tasks):
+
+```bash
+# Lint, type-check, and test via nox
+nox -s lint
+nox -s type
+nox -s test
+nox -s all  # runs all three in sequence
+```
+
 ## 📚 Key Improvements
 
 ### Over agent-x
