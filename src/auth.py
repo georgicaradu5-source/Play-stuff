@@ -17,7 +17,7 @@ import requests
 try:
     import tweepy
 except ImportError:
-    tweepy = None  # type: ignore
+    tweepy = None
 
 try:
     from dotenv import load_dotenv
@@ -183,6 +183,7 @@ class UnifiedAuth:
             data = resp.json()
             self._me_user_id = data["data"]["id"]
 
+        assert self._me_user_id is not None
         return self._me_user_id
 
     # === OAuth 2.0 PKCE Methods ===
@@ -239,6 +240,7 @@ class UnifiedAuth:
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
 
         if self.client_secret:
+            assert self.client_id is not None
             auth = (self.client_id, self.client_secret)
             resp = requests.post(self.TOKEN_URL, data=data, headers=headers, auth=auth)
         else:
@@ -251,6 +253,7 @@ class UnifiedAuth:
         self.oauth2_refresh_token = token_data.get("refresh_token")
 
         self._save_tokens(token_data)
+        assert self.oauth2_access_token is not None
         return self.oauth2_access_token
 
     def refresh_oauth2_token(self) -> str:
@@ -272,6 +275,7 @@ class UnifiedAuth:
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
 
         if self.client_secret:
+            assert self.client_id is not None
             auth = (self.client_id, self.client_secret)
             resp = requests.post(self.TOKEN_URL, data=data, headers=headers, auth=auth)
         else:
@@ -284,6 +288,7 @@ class UnifiedAuth:
         self.oauth2_refresh_token = token_data.get("refresh_token", self.oauth2_refresh_token)
 
         self._save_tokens(token_data)
+        assert self.oauth2_access_token is not None
         return self.oauth2_access_token
 
     def get_oauth2_access_token(self) -> str:
