@@ -9,7 +9,7 @@ import os
 import secrets
 import webbrowser
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from typing import Literal, Optional
+from typing import Literal
 from urllib.parse import parse_qs, urlencode, urlparse
 
 import requests
@@ -31,7 +31,7 @@ AuthMode = Literal["tweepy", "oauth2"]
 
 class OAuthCallbackHandler(BaseHTTPRequestHandler):
     """HTTP server to capture OAuth 2.0 callback."""
-    auth_code: Optional[str] = None
+    auth_code: str | None = None
 
     def do_GET(self) -> None:
         query = parse_qs(urlparse(self.path).query)
@@ -59,50 +59,50 @@ class UnifiedAuth:
         self,
         mode: AuthMode,
         # Tweepy (OAuth 1.0a)
-        api_key: Optional[str] = None,
-        api_secret: Optional[str] = None,
-        access_token: Optional[str] = None,
-        access_secret: Optional[str] = None,
+        api_key: str | None = None,
+        api_secret: str | None = None,
+        access_token: str | None = None,
+        access_secret: str | None = None,
         # OAuth 2.0 PKCE
-        client_id: Optional[str] = None,
-        client_secret: Optional[str] = None,
+        client_id: str | None = None,
+        client_secret: str | None = None,
         redirect_uri: str = "http://localhost:8080/callback",
         token_file: str = ".token.json",
     ):
         self.mode = mode
-        
+
         # Tweepy credentials
         self.api_key = api_key
         self.api_secret = api_secret
         self.access_token = access_token
         self.access_secret = access_secret
-        
+
         # OAuth 2.0 credentials
         self.client_id = client_id
         self.client_secret = client_secret
         self.redirect_uri = redirect_uri
         self.token_file = token_file
-        self.oauth2_access_token: Optional[str] = None
-        self.oauth2_refresh_token: Optional[str] = None
-        
+        self.oauth2_access_token: str | None = None
+        self.oauth2_refresh_token: str | None = None
+
         # Tweepy clients (lazy init)
-        self._tweepy_client: Optional[object] = None
-        self._tweepy_api: Optional[object] = None
-        self._me_user_id: Optional[str] = None
+        self._tweepy_client: object | None = None
+        self._tweepy_api: object | None = None
+        self._me_user_id: str | None = None
 
     @classmethod
-    def from_env(cls, mode: Optional[AuthMode] = None) -> "UnifiedAuth":
+    def from_env(cls, mode: AuthMode | None = None) -> UnifiedAuth:
         """Create auth client from environment variables.
-        
+
         Accepts an optional mode parameter for compatibility with callers
         that explicitly pass the desired auth mode. If not provided, the
         mode is read from the X_AUTH_MODE environment variable (default: tweepy).
         """
         resolved_mode: str = (mode or os.getenv("X_AUTH_MODE", "tweepy"))  # type: ignore
-        
+
         if resolved_mode not in ["tweepy", "oauth2"]:
             raise ValueError(f"Invalid X_AUTH_MODE: {resolved_mode}. Use 'tweepy' or 'oauth2'")
-        
+
         return cls(
             mode=resolved_mode,  # type: ignore
             # Tweepy
@@ -123,14 +123,14 @@ class UnifiedAuth:
         """Get Tweepy v2 client (lazy init)."""
         if self.mode != "tweepy":
             raise RuntimeError("Not in Tweepy mode")
-        
+
         if tweepy is None:
             raise RuntimeError("Tweepy not installed. Install: pip install tweepy>=4.14.0")
-        
+
         if self._tweepy_client is None:
             if not all([self.api_key, self.api_secret, self.access_token, self.access_secret]):
                 raise RuntimeError("Missing Tweepy credentials in environment")
-            
+
             self._tweepy_client = tweepy.Client(
                 consumer_key=self.api_key,
                 consumer_secret=self.api_secret,
@@ -138,21 +138,21 @@ class UnifiedAuth:
                 access_token_secret=self.access_secret,
                 wait_on_rate_limit=False,
             )
-        
+
         return self._tweepy_client
 
     def get_tweepy_api(self):
         """Get Tweepy v1.1 API (for media upload)."""
         if self.mode != "tweepy":
             raise RuntimeError("Not in Tweepy mode")
-        
+
         if tweepy is None:
             raise RuntimeError("Tweepy not installed")
-        
+
         if self._tweepy_api is None:
             if not all([self.api_key, self.api_secret, self.access_token, self.access_secret]):
                 raise RuntimeError("Missing Tweepy credentials")
-            
+
             auth = tweepy.OAuth1UserHandler(
                 self.api_key,
                 self.api_secret,
@@ -160,14 +160,14 @@ class UnifiedAuth:
                 self.access_secret,
             )
             self._tweepy_api = tweepy.API(auth)
-        
+
         return self._tweepy_api
 
     def get_me_user_id(self) -> str:
         """Get authenticated user ID (works for both modes)."""
         if self._me_user_id:
             return self._me_user_id
-        
+
         if self.mode == "tweepy":
             client = self.get_tweepy_client()
             me = client.get_me(user_fields=["id"]).data
@@ -182,7 +182,7 @@ class UnifiedAuth:
             resp.raise_for_status()
             data = resp.json()
             self._me_user_id = data["data"]["id"]
-        
+
         return self._me_user_id
 
     # === OAuth 2.0 PKCE Methods ===
@@ -199,7 +199,7 @@ class UnifiedAuth:
         """Start OAuth 2.0 flow and return access token."""
         if self.mode != "oauth2":
             raise RuntimeError("Not in OAuth 2.0 mode")
-        
+
         verifier, challenge = self._generate_pkce_pair()
         state = secrets.token_urlsafe(32)
 
@@ -214,7 +214,7 @@ class UnifiedAuth:
         }
         auth_url = f"{self.AUTH_URL}?{urlencode(params)}"
 
-        print(f"Opening browser for authorization...")
+        print("Opening browser for authorization...")
         webbrowser.open(auth_url)
 
         server = HTTPServer(("localhost", 8080), OAuthCallbackHandler)
@@ -237,7 +237,7 @@ class UnifiedAuth:
         }
 
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
-        
+
         if self.client_secret:
             auth = (self.client_id, self.client_secret)
             resp = requests.post(self.TOKEN_URL, data=data, headers=headers, auth=auth)
@@ -257,7 +257,7 @@ class UnifiedAuth:
         """Refresh OAuth 2.0 access token."""
         if self.mode != "oauth2":
             raise RuntimeError("Not in OAuth 2.0 mode")
-        
+
         if not self.oauth2_refresh_token:
             self._load_tokens()
             if not self.oauth2_refresh_token:
@@ -270,7 +270,7 @@ class UnifiedAuth:
         }
 
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
-        
+
         if self.client_secret:
             auth = (self.client_id, self.client_secret)
             resp = requests.post(self.TOKEN_URL, data=data, headers=headers, auth=auth)
@@ -290,7 +290,7 @@ class UnifiedAuth:
         """Get valid OAuth 2.0 access token."""
         if self.mode != "oauth2":
             raise RuntimeError("Not in OAuth 2.0 mode")
-        
+
         if self.oauth2_access_token:
             return self.oauth2_access_token
 
@@ -310,7 +310,7 @@ class UnifiedAuth:
         if not os.path.exists(self.token_file):
             return
 
-        with open(self.token_file, "r") as f:
+        with open(self.token_file) as f:
             token_data = json.load(f)
 
         self.oauth2_access_token = token_data.get("access_token")

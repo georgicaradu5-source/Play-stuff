@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import os
-from typing import Any, Optional
+from typing import Any
 
 try:
     import requests
@@ -15,7 +15,7 @@ from auth import UnifiedAuth
 
 class XClient:
     """Unified X API client with dual auth support.
-    
+
     Supports both:
     - Tweepy mode: Uses Tweepy's OAuth 1.0a client
     - OAuth2 mode: Uses raw requests with OAuth 2.0 PKCE
@@ -27,7 +27,7 @@ class XClient:
     def __init__(self, auth: UnifiedAuth, dry_run: bool = False):
         self.auth = auth
         self.dry_run = dry_run
-        self.me_id: Optional[str] = None
+        self.me_id: str | None = None
 
     @classmethod
     def from_env(cls, dry_run: bool = False) -> XClient:
@@ -35,7 +35,7 @@ class XClient:
         mode = os.getenv("X_AUTH_MODE", "tweepy")
         if mode not in ["tweepy", "oauth2"]:
             raise ValueError(f"Invalid X_AUTH_MODE: {mode}. Use 'tweepy' or 'oauth2'")
-        
+
         auth = UnifiedAuth.from_env(mode)  # type: ignore
         return cls(auth, dry_run)
 
@@ -68,10 +68,10 @@ class XClient:
             token = self.auth.access_token
             if not token:
                 raise RuntimeError("Not authenticated. Run with --authorize first.")
-            
+
             if requests is None:
                 raise RuntimeError("requests library not installed")
-            
+
             url = f"{self.BASE_URL_V2}/users/me"
             headers = {
                 "Authorization": f"Bearer {token}",
@@ -81,10 +81,10 @@ class XClient:
             resp = requests.get(url, headers=headers, params=params)
             resp.raise_for_status()
             result = resp.json()
-            
+
             if "data" in result and "id" in result["data"]:
                 self.me_id = result["data"]["id"]
-            
+
             return result
 
     def get_user_by_username(self, username: str) -> dict[str, Any]:
@@ -113,7 +113,7 @@ class XClient:
         else:
             if requests is None:
                 raise RuntimeError("requests library not installed")
-            
+
             url = f"{self.BASE_URL_V2}/users/by/username/{username}"
             headers = {"Authorization": f"Bearer {self.auth.access_token}"}
             params = {"user.fields": "id,username,name,description,public_metrics"}
@@ -128,9 +128,9 @@ class XClient:
     def create_post(
         self,
         text: str,
-        reply_to: Optional[str] = None,
-        media_ids: Optional[list[str]] = None,
-        quote_tweet_id: Optional[str] = None,
+        reply_to: str | None = None,
+        media_ids: list[str] | None = None,
+        quote_tweet_id: str | None = None,
     ) -> dict[str, Any]:
         """Create a post (tweet)."""
         if self.dry_run:
@@ -140,34 +140,34 @@ class XClient:
         if self.auth.mode == "tweepy":
             client = self.auth.get_tweepy_client()
             kwargs: dict[str, Any] = {"text": text}
-            
+
             if reply_to:
                 kwargs["in_reply_to_tweet_id"] = reply_to
             if media_ids:
                 kwargs["media_ids"] = media_ids
             if quote_tweet_id:
                 kwargs["quote_tweet_id"] = quote_tweet_id
-            
+
             resp = client.create_tweet(**kwargs)
             return {"data": {"id": str(resp.data["id"]), "text": text}}  # type: ignore
         else:
             if requests is None:
                 raise RuntimeError("requests library not installed")
-            
+
             url = f"{self.BASE_URL_V2}/tweets"
             headers = {
                 "Authorization": f"Bearer {self.auth.access_token}",
                 "Content-Type": "application/json",
             }
             payload: dict[str, Any] = {"text": text}
-            
+
             if reply_to:
                 payload["reply"] = {"in_reply_to_tweet_id": reply_to}
             if media_ids:
                 payload["media"] = {"media_ids": media_ids}
             if quote_tweet_id:
                 payload["quote_tweet_id"] = quote_tweet_id
-            
+
             resp = requests.post(url, headers=headers, json=payload)
             resp.raise_for_status()
             return resp.json()
@@ -187,10 +187,10 @@ class XClient:
                 tweet_fields=["id", "author_id", "public_metrics"],
                 user_fields=["id", "username"],
             )
-            
+
             tweets = resp.data or []
             users = {u.id: u for u in (resp.includes.get("users", []) if resp.includes else [])}
-            
+
             results: list[dict[str, Any]] = []
             for t in tweets:
                 author = users.get(t.author_id) if hasattr(t, "author_id") else None
@@ -204,7 +204,7 @@ class XClient:
         else:
             if requests is None:
                 raise RuntimeError("requests library not installed")
-            
+
             url = f"{self.BASE_URL_V2}/tweets/search/recent"
             headers = {"Authorization": f"Bearer {self.auth.access_token}"}
             params = {
@@ -217,11 +217,11 @@ class XClient:
             resp = requests.get(url, headers=headers, params=params)
             resp.raise_for_status()
             data = resp.json()
-            
+
             tweets = data.get("data", [])
             users_list = data.get("includes", {}).get("users", [])
             users = {u["id"]: u for u in users_list}
-            
+
             results: list[dict[str, Any]] = []
             for t in tweets:
                 author = users.get(t.get("author_id", ""))
@@ -258,7 +258,7 @@ class XClient:
         else:
             if requests is None:
                 raise RuntimeError("requests library not installed")
-            
+
             url = f"{self.BASE_URL_V2}/tweets/{tweet_id}"
             headers = {"Authorization": f"Bearer {self.auth.access_token}"}
             params = {"tweet.fields": "id,text,author_id,public_metrics"}
@@ -279,7 +279,7 @@ class XClient:
         else:
             if requests is None:
                 raise RuntimeError("requests library not installed")
-            
+
             url = f"{self.BASE_URL_V2}/tweets/{tweet_id}"
             headers = {"Authorization": f"Bearer {self.auth.access_token}"}
             resp = requests.delete(url, headers=headers)
@@ -304,10 +304,10 @@ class XClient:
         else:
             if requests is None:
                 raise RuntimeError("requests library not installed")
-            
+
             if not self.me_id:
                 self.get_me()  # Populate me_id
-            
+
             url = f"{self.BASE_URL_V2}/users/{self.me_id}/likes"
             headers = {
                 "Authorization": f"Bearer {self.auth.access_token}",
@@ -332,10 +332,10 @@ class XClient:
         else:
             if requests is None:
                 raise RuntimeError("requests library not installed")
-            
+
             if not self.me_id:
                 self.get_me()
-            
+
             url = f"{self.BASE_URL_V2}/users/{self.me_id}/likes/{tweet_id}"
             headers = {"Authorization": f"Bearer {self.auth.access_token}"}
             resp = requests.delete(url, headers=headers)
@@ -356,10 +356,10 @@ class XClient:
         else:
             if requests is None:
                 raise RuntimeError("requests library not installed")
-            
+
             if not self.me_id:
                 self.get_me()
-            
+
             url = f"{self.BASE_URL_V2}/users/{self.me_id}/retweets"
             headers = {
                 "Authorization": f"Bearer {self.auth.access_token}",
@@ -384,10 +384,10 @@ class XClient:
         else:
             if requests is None:
                 raise RuntimeError("requests library not installed")
-            
+
             if not self.me_id:
                 self.get_me()
-            
+
             url = f"{self.BASE_URL_V2}/users/{self.me_id}/retweets/{tweet_id}"
             headers = {"Authorization": f"Bearer {self.auth.access_token}"}
             resp = requests.delete(url, headers=headers)
@@ -407,10 +407,10 @@ class XClient:
         else:
             if requests is None:
                 raise RuntimeError("requests library not installed")
-            
+
             if not self.me_id:
                 self.get_me()
-            
+
             url = f"{self.BASE_URL_V2}/users/{self.me_id}/following"
             headers = {
                 "Authorization": f"Bearer {self.auth.access_token}",

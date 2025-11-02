@@ -5,11 +5,10 @@ from __future__ import annotations
 import hashlib
 import os
 import sqlite3
+from collections.abc import Sequence
 from contextlib import contextmanager
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Optional, Sequence
-
 
 DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "agent_unified.db")
 
@@ -160,21 +159,21 @@ class Storage:
     def log_action(
         self,
         kind: str,
-        post_id: Optional[str] = None,
-        ref_id: Optional[str] = None,
-        text: Optional[str] = None,
-        topic: Optional[str] = None,
-        slot: Optional[str] = None,
+        post_id: str | None = None,
+        ref_id: str | None = None,
+        text: str | None = None,
+        topic: str | None = None,
+        slot: str | None = None,
         media: int = 0,
         status: str = "success",
-        rate_limit_remaining: Optional[int] = None,
-        rate_limit_reset: Optional[int] = None,
-        dt: Optional[str] = None,
+        rate_limit_remaining: int | None = None,
+        rate_limit_reset: int | None = None,
+        dt: str | None = None,
     ) -> int:
         """Log an action to the database."""
         if dt is None:
             dt = datetime.utcnow().isoformat()
-        
+
         cursor = self.conn.execute(
             """
             INSERT INTO actions (post_id, kind, dt, ref_id, text, topic, slot, media, status, rate_limit_remaining, rate_limit_reset)
@@ -183,14 +182,14 @@ class Storage:
             (post_id, kind, dt, ref_id, text, topic, slot, media, status, rate_limit_remaining, rate_limit_reset),
         )
         self.conn.commit()
-        
+
         # Also store text hash if text provided
         if text:
             self.store_text_hash(text, post_id, dt)
-        
+
         return int(cursor.lastrowid or 0)
 
-    def get_recent_actions(self, kind: Optional[str] = None, limit: int = 100) -> list[dict]:
+    def get_recent_actions(self, kind: str | None = None, limit: int = 100) -> list[dict]:
         """Get recent actions."""
         if kind:
             cursor = self.conn.execute(
@@ -224,26 +223,26 @@ class Storage:
         retweet_count: int = 0,
         quote_count: int = 0,
         impression_count: int = 0,
-        reward: Optional[float] = None,
+        reward: float | None = None,
     ) -> None:
         """Update metrics for a post."""
         last_updated = datetime.utcnow().isoformat()
-        
+
         if reward is None:
             # Calculate reward if not provided
             reward = (like_count * 1.0 + reply_count * 2.0 + retweet_count * 3.0 + quote_count * 2.5) / 100.0
-        
+
         with self.conn:
             self.conn.execute(
                 """
-                INSERT OR REPLACE INTO metrics 
+                INSERT OR REPLACE INTO metrics
                 (post_id, like_count, reply_count, retweet_count, quote_count, impression_count, reward, last_updated)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (post_id, like_count, reply_count, retweet_count, quote_count, impression_count, reward, last_updated),
             )
 
-    def get_metrics(self, post_id: str) -> Optional[dict]:
+    def get_metrics(self, post_id: str) -> dict | None:
         """Get metrics for a post."""
         cursor = self.conn.execute(
             "SELECT * FROM metrics WHERE post_id = ?",
@@ -259,7 +258,7 @@ class Storage:
         reply_count: int,
         retweet_count: int,
         quote_count: int,
-        impression_count: Optional[int],
+        impression_count: int | None,
         reward: float,
     ) -> None:
         """Upsert metrics (agent-x compatibility)."""
@@ -291,14 +290,14 @@ class Storage:
     def update_monthly_usage(self, period: str, create_count: int = 0, read_count: int = 0) -> None:
         """Update monthly usage counts."""
         last_updated = datetime.utcnow().isoformat()
-        
+
         with self.conn:
             cursor = self.conn.execute(
                 "SELECT create_count, read_count FROM usage_monthly WHERE period = ?",
                 (period,),
             )
             row = cursor.fetchone()
-            
+
             if row:
                 new_creates = row[0] + create_count
                 new_reads = row[1] + read_count
@@ -316,16 +315,16 @@ class Storage:
     # TEXT DEDUPLICATION
     # ============================================================================
 
-    def store_text_hash(self, text: str, post_id: Optional[str] = None, dt: Optional[str] = None) -> None:
+    def store_text_hash(self, text: str, post_id: str | None = None, dt: str | None = None) -> None:
         """Store text hash for deduplication."""
         text_hash = hashlib.sha256(text.encode()).hexdigest()
         text_norm = normalize_text(text)
         created_at = dt or datetime.utcnow().isoformat()
-        
+
         with self.conn:
             self.conn.execute(
                 """
-                INSERT OR REPLACE INTO text_hashes (text_hash, post_id, dt, text, text_norm, created_at) 
+                INSERT OR REPLACE INTO text_hashes (text_hash, post_id, dt, text, text_norm, created_at)
                 VALUES (?, ?, ?, ?, ?, ?)
                 """,
                 (text_hash, post_id, created_at, text, text_norm, created_at),
@@ -343,17 +342,17 @@ class Storage:
         )
         if cursor.fetchone():
             return True
-        
+
         # Jaccard similarity check (agent-x approach)
         text_norm = normalize_text(text)
         tokens = set(text_norm.split())
-        
+
         cursor = self.conn.execute(
             "SELECT text_norm FROM text_hashes WHERE created_at > ? ORDER BY created_at DESC LIMIT 200",
             (cutoff,),
         )
         recent_texts = [row[0] for row in cursor.fetchall()]
-        
+
         for recent in recent_texts:
             rtokens = set(recent.split())
             if not rtokens:
@@ -361,7 +360,7 @@ class Storage:
             j = len(tokens & rtokens) / max(1, len(tokens | rtokens))
             if j >= jaccard_threshold:
                 return True
-        
+
         return False
 
     def get_recent_texts(self, days: int = 7) -> list[str]:
@@ -386,12 +385,12 @@ class Storage:
             cursor = self.conn.execute("SELECT alpha, beta FROM bandit WHERE arm=?", (arm,))
             row = cursor.fetchone()
             alpha, beta = (float(row[0]), float(row[1])) if row else (1.0, 1.0)
-            
+
             # Beta distribution sampling via gamma variates
             a = random.gammavariate(alpha, 1.0)
             b = random.gammavariate(beta, 1.0)
             results[arm] = a / (a + b) if (a + b) > 0 else 0.5
-        
+
         # Return arm with max sampled value
         return max(results, key=results.get)  # type: ignore
 
@@ -399,18 +398,18 @@ class Storage:
         """Update bandit arm with reward."""
         reward = max(0.0, min(1.0, reward))
         last_updated = datetime.utcnow().isoformat()
-        
+
         with self.conn:
             cursor = self.conn.execute("SELECT alpha, beta FROM bandit WHERE arm=?", (arm,))
             row = cursor.fetchone()
             alpha, beta = (float(row[0]), float(row[1])) if row else (1.0, 1.0)
-            
+
             alpha += reward
             beta += (1.0 - reward)
-            
+
             self.conn.execute(
                 """
-                INSERT INTO bandit(arm, alpha, beta, last_updated) VALUES(?,?,?,?) 
+                INSERT INTO bandit(arm, alpha, beta, last_updated) VALUES(?,?,?,?)
                 ON CONFLICT(arm) DO UPDATE SET alpha=?, beta=?, last_updated=?
                 """,
                 (arm, alpha, beta, last_updated, alpha, beta, last_updated),

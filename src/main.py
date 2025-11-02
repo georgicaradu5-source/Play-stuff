@@ -20,11 +20,11 @@ logger = get_logger(__name__)
 
 def load_config(path: str, validate: bool = True) -> dict[str, Any]:
     """Load configuration from YAML file with optional validation.
-    
+
     Args:
         path: Path to configuration file
         validate: If True, validate using Pydantic schema
-    
+
     Returns:
         Configuration dictionary
     """
@@ -32,15 +32,15 @@ def load_config(path: str, validate: bool = True) -> dict[str, Any]:
         logger.warning(f"Config file not found: {path}")
         logger.info("Using default configuration")
         return get_default_config()
-    
+
     if yaml is None:
         raise RuntimeError("PyYAML not installed. Run: pip install pyyaml")
-    
+
     # Try to validate with Pydantic if available and requested
     if validate:
         try:
             from config_schema import validate_config
-            
+
             is_valid, error_msg, config_obj = validate_config(path)
             if is_valid and config_obj:
                 logger.debug(f"Config validated successfully from {path}")
@@ -53,9 +53,9 @@ def load_config(path: str, validate: bool = True) -> dict[str, Any]:
             logger.debug("Pydantic not available, skipping validation")
         except Exception as e:
             logger.warning(f"Validation error: {e}, falling back to basic loading")
-    
+
     # Basic loading (backward compatibility)
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         config = yaml.safe_load(f) or {}
         logger.debug(f"Loaded config from {path}")
         return config
@@ -98,7 +98,7 @@ def main():
     parser = argparse.ArgumentParser(
         description="X Agent Unified - Production-ready X (Twitter) agent with dual auth support"
     )
-    
+
     # Mode selection
     parser.add_argument(
         "--mode",
@@ -106,7 +106,7 @@ def main():
         default="both",
         help="Operating mode: post, interact, or both",
     )
-    
+
     # Dry run
     parser.add_argument(
         "--dry-run",
@@ -114,14 +114,14 @@ def main():
         default=False,
         help="Run without making actual API calls (default: false)",
     )
-    
+
     # OAuth 2.0 authorization
     parser.add_argument(
         "--authorize",
         action="store_true",
         help="Perform OAuth 2.0 PKCE authorization flow (OAuth2 mode only)",
     )
-    
+
     # Learning operations
     parser.add_argument(
         "--settle",
@@ -129,77 +129,76 @@ def main():
         metavar="POST_ID",
         help="Fetch metrics for a specific post and update learning (requires POST_ID)",
     )
-    
+
     parser.add_argument(
         "--settle-all",
         action="store_true",
         help="Fetch metrics for all owned posts and update learning",
     )
-    
+
     # Safety/diagnostics
     parser.add_argument(
         "--safety",
         choices=["print-budget", "print-limits", "print-learning"],
         help="Print safety/diagnostic information",
     )
-    
+
     # Configuration
     parser.add_argument(
         "--config",
         default="config.yaml",
         help="Path to configuration file (default: config.yaml)",
     )
-    
+
     parser.add_argument(
         "--plan",
         choices=["free", "basic", "pro"],
         help="Override plan tier from config",
     )
-    
+
     args = parser.parse_args()
-    
+
     # Load configuration (with validation)
     try:
         config = load_config(args.config, validate=True)
     except Exception as e:
-        logger.error(f"Failed to load config: {e}")
         print(f"❌ Failed to load configuration: {e}")
         sys.exit(1)
-    
+
     # Configure logging from config
     configure_logging(config)
     logger = get_logger(__name__)
-    
+
     # Override plan if specified
     if args.plan:
         config["plan"] = args.plan
         logger.info(f"Plan overridden to: {args.plan}")
-    
+
     # Get auth mode
     auth_mode = os.getenv("X_AUTH_MODE", config.get("auth_mode", "tweepy"))
     logger.debug(f"Auth mode: {auth_mode}")
-    
+
     # Import modules
     from auth import UnifiedAuth
     from budget import BudgetManager
     from storage import Storage
     from x_client import XClient
-    
+
     # Initialize storage
     storage = Storage()
-    
+
     # Handle OAuth 2.0 authorization
     if args.authorize:
         if auth_mode != "oauth2":
             logger.error("--authorize requires X_AUTH_MODE=oauth2")
             print("❌ --authorize requires X_AUTH_MODE=oauth2")
             sys.exit(1)
-        
+
         logger.info("Starting OAuth 2.0 PKCE authorization flow...")
         print("\n🔐 Starting OAuth 2.0 PKCE authorization flow...")
         auth = UnifiedAuth.from_env("oauth2")  # type: ignore
         success = auth.authorize_oauth2()
-        
+
         if success:
             logger.info("Authorization successful! Token saved.")
             print("✓ Authorization successful! Token saved.")
@@ -208,7 +207,7 @@ def main():
             logger.error("Authorization failed")
             print("❌ Authorization failed")
             sys.exit(1)
-    
+
     # Initialize client
     try:
         logger.debug(f"Initializing client (dry_run={args.dry_run})")
@@ -219,7 +218,7 @@ def main():
         if auth_mode == "oauth2":
             print("\n💡 If using OAuth 2.0, run with --authorize first")
         sys.exit(1)
-    
+
     # Handle safety/diagnostic commands
     if args.safety:
         if args.safety == "print-budget":
@@ -233,15 +232,15 @@ def main():
             from learn import print_bandit_stats
             print_bandit_stats(storage)
         sys.exit(0)
-    
+
     # Handle learning operations
     if args.settle:
-        from learn import settle
         from budget import BudgetManager
-        
+        from learn import settle
+
         logger.info(f"Fetching metrics for post: {args.settle}")
         print(f"\n📊 Fetching metrics for post: {args.settle}")
-        
+
         # Determine arm (topic|slot|media)
         actions = storage.get_recent_actions(kind="post", limit=1)
         arm = "default|morning|False"  # Default
@@ -252,7 +251,7 @@ def main():
                 media = action.get("media", 0)
                 arm = f"{topic}|{slot}|{int(media) > 0}"
                 break
-        
+
         try:
             settle(client, storage, args.settle, arm)
             logger.info("Metrics settled successfully")
@@ -262,20 +261,20 @@ def main():
             print(f"❌ Failed to settle: {e}")
             sys.exit(1)
         sys.exit(0)
-    
+
     if args.settle_all:
         from learn import settle_all
-        
+
         logger.info("Settling all owned posts...")
         print("\n📊 Settling all owned posts...")
         count = settle_all(client, storage, default_arm="default|morning|False")
         logger.info(f"Settled {count} posts")
         print(f"✓ Settled {count} posts")
         sys.exit(0)
-    
+
     # Run main scheduler
     from scheduler import run_scheduler
-    
+
     try:
         logger.info(f"Starting scheduler (mode={args.mode}, dry_run={args.dry_run})")
         run_scheduler(
