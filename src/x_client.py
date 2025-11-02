@@ -11,6 +11,7 @@ except ImportError:
     requests = None  # type: ignore
 
 from auth import UnifiedAuth
+from reliability import request_with_retries, DEFAULT_TIMEOUT
 
 
 class XClient:
@@ -78,8 +79,7 @@ class XClient:
                 "Content-Type": "application/json",
             }
             params = {"user.fields": "id,username,name,description"}
-            resp = requests.get(url, headers=headers, params=params)
-            resp.raise_for_status()
+            resp = request_with_retries("GET", url, headers=headers, params=params, timeout=DEFAULT_TIMEOUT)
             result = resp.json()
 
             if "data" in result and "id" in result["data"]:
@@ -117,8 +117,7 @@ class XClient:
             url = f"{self.BASE_URL_V2}/users/by/username/{username}"
             headers = {"Authorization": f"Bearer {self.auth.access_token}"}
             params = {"user.fields": "id,username,name,description,public_metrics"}
-            resp = requests.get(url, headers=headers, params=params)
-            resp.raise_for_status()
+            resp = request_with_retries("GET", url, headers=headers, params=params, timeout=DEFAULT_TIMEOUT)
             return resp.json()
 
     # ============================================================================
@@ -168,8 +167,7 @@ class XClient:
             if quote_tweet_id:
                 payload["quote_tweet_id"] = quote_tweet_id
 
-            resp = requests.post(url, headers=headers, json=payload)
-            resp.raise_for_status()
+            resp = request_with_retries("POST", url, headers=headers, json_body=payload, timeout=DEFAULT_TIMEOUT)
             return resp.json()
 
     def search_recent(self, query: str, max_results: int = 20) -> list[dict[str, Any]]:
@@ -214,8 +212,7 @@ class XClient:
                 "tweet.fields": "id,author_id,public_metrics",
                 "user.fields": "id,username",
             }
-            resp = requests.get(url, headers=headers, params=params)
-            resp.raise_for_status()
+            resp = request_with_retries("GET", url, headers=headers, params=params, timeout=DEFAULT_TIMEOUT)
             data = resp.json()
 
             tweets = data.get("data", [])
@@ -262,8 +259,7 @@ class XClient:
             url = f"{self.BASE_URL_V2}/tweets/{tweet_id}"
             headers = {"Authorization": f"Bearer {self.auth.access_token}"}
             params = {"tweet.fields": "id,text,author_id,public_metrics"}
-            resp = requests.get(url, headers=headers, params=params)
-            resp.raise_for_status()
+            resp = request_with_retries("GET", url, headers=headers, params=params, timeout=DEFAULT_TIMEOUT)
             return resp.json()
 
     def delete_post(self, tweet_id: str) -> bool:
@@ -282,8 +278,7 @@ class XClient:
 
             url = f"{self.BASE_URL_V2}/tweets/{tweet_id}"
             headers = {"Authorization": f"Bearer {self.auth.access_token}"}
-            resp = requests.delete(url, headers=headers)
-            resp.raise_for_status()
+            resp = request_with_retries("DELETE", url, headers=headers, timeout=DEFAULT_TIMEOUT)
             data = resp.json()
             return data.get("data", {}).get("deleted", False)
 
@@ -314,8 +309,7 @@ class XClient:
                 "Content-Type": "application/json",
             }
             payload = {"tweet_id": tweet_id}
-            resp = requests.post(url, headers=headers, json=payload)
-            resp.raise_for_status()
+            resp = request_with_retries("POST", url, headers=headers, json_body=payload, timeout=DEFAULT_TIMEOUT)
             data = resp.json()
             return data.get("data", {}).get("liked", False)
 
@@ -338,8 +332,7 @@ class XClient:
 
             url = f"{self.BASE_URL_V2}/users/{self.me_id}/likes/{tweet_id}"
             headers = {"Authorization": f"Bearer {self.auth.access_token}"}
-            resp = requests.delete(url, headers=headers)
-            resp.raise_for_status()
+            resp = request_with_retries("DELETE", url, headers=headers, timeout=DEFAULT_TIMEOUT)
             data = resp.json()
             return data.get("data", {}).get("liked", False)
 
@@ -366,8 +359,7 @@ class XClient:
                 "Content-Type": "application/json",
             }
             payload = {"tweet_id": tweet_id}
-            resp = requests.post(url, headers=headers, json=payload)
-            resp.raise_for_status()
+            resp = request_with_retries("POST", url, headers=headers, json_body=payload, timeout=DEFAULT_TIMEOUT)
             data = resp.json()
             return data.get("data", {}).get("retweeted", False)
 
@@ -390,8 +382,7 @@ class XClient:
 
             url = f"{self.BASE_URL_V2}/users/{self.me_id}/retweets/{tweet_id}"
             headers = {"Authorization": f"Bearer {self.auth.access_token}"}
-            resp = requests.delete(url, headers=headers)
-            resp.raise_for_status()
+            request_with_retries("DELETE", url, headers=headers, timeout=DEFAULT_TIMEOUT)
             return True
 
     def follow_user(self, user_id: str) -> bool:
