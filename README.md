@@ -1,5 +1,7 @@
 # X Agent - Unified Production-Ready Autonomous X (Twitter) Agent
 
+[![CI](https://github.com/georgicaradu5-source/Play-stuff/actions/workflows/ci.yml/badge.svg)](https://github.com/georgicaradu5-source/Play-stuff/actions/workflows/ci.yml)
+
 A fully unified, production-ready autonomous agent for X (Twitter) that combines the best features from both implementations. Supports **both OAuth 1.0a (Tweepy) and OAuth 2.0 PKCE** authentication methods.
 
 ## 🎯 Unified Features
