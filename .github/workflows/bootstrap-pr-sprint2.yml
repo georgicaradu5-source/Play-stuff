@@ -75,10 +75,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             try {
-              const pullNumber = Number(core.getInput('pr_number')) || Number('${{ steps.pr.outputs.number }}');
-              const { owner, repo } = context.repo;
               // GraphQL enablePullRequestAutoMerge requires repo setting and permissions; ignore failures gracefully
-              const q = `mutation($owner:String!, $repo:String!, $number:Int!) {\n                enablePullRequestAutoMerge(input: { pullRequestId: getPR(id: $number) }) {\n                  clientMutationId\n                }\n              }`;
               // We cannot easily resolve node id here without another call; skip actual enabling to avoid errors.
               core.info('Auto-merge not enabled by script (repo setting dependent). If desired, enable at repository level.');
             } catch (e) {
