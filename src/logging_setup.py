@@ -25,7 +25,7 @@ def attach_tracecontext_to_logs(logger: logging.Logger | None = None) -> None:
     """
     old_factory = logging.getLogRecordFactory()
 
-    def record_factory(*args, **kwargs):  # type: ignore
+    def record_factory(*args, **kwargs):
         record = old_factory(*args, **kwargs)
 
         # Inject trace context if available

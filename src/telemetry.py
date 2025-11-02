@@ -59,7 +59,7 @@ def init_telemetry() -> None:
 
         # Configure sampler
         if sampler_name == "always_on":
-            sampler = ALWAYS_ON
+            sampler: Any = ALWAYS_ON
         elif sampler_name.startswith("parentbased_traceidratio"):
             # Extract ratio if specified, default to 1.0
             ratio = 1.0
@@ -68,7 +68,7 @@ def init_telemetry() -> None:
                     ratio = float(sampler_name.split("/")[-1])
                 except ValueError:
                     pass
-            sampler: Any = ParentBasedTraceIdRatio(ratio)
+            sampler = ParentBasedTraceIdRatio(ratio)
         else:  # default: parentbased_always_on
             sampler = ALWAYS_ON
 
@@ -133,7 +133,7 @@ def get_tracer(name: str | None = None) -> Tracer:
         return trace.get_tracer(tracer_name)
     except ImportError:
         # Return a minimal no-op tracer
-        return _NoOpTracer()
+        return _NoOpTracer()  # type: ignore[return-value]
 
 
 def is_telemetry_enabled() -> bool:
@@ -144,26 +144,26 @@ def is_telemetry_enabled() -> bool:
 class _NoOpTracer:
     """Minimal no-op tracer when OpenTelemetry is not available."""
 
-    def start_span(self, name: str, **kwargs):  # type: ignore
+    def start_span(self, name: str, **kwargs):
         return _NoOpSpan()
 
 
 class _NoOpSpan:
     """Minimal no-op span when OpenTelemetry is not available."""
 
-    def __enter__(self):  # type: ignore
+    def __enter__(self):
         return self
 
-    def __exit__(self, *args):  # type: ignore
+    def __exit__(self, *args):
         pass
 
-    def set_attribute(self, key: str, value: any) -> None:  # type: ignore
+    def set_attribute(self, key: str, value: Any) -> None:
         pass
 
     def add_event(self, name: str, attributes: dict | None = None) -> None:
         pass
 
-    def set_status(self, status: any) -> None:  # type: ignore
+    def set_status(self, status: Any) -> None:
         pass
 
     def end(self) -> None:
