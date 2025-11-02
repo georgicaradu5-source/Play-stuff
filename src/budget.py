@@ -163,7 +163,7 @@ class BudgetManager:
         """
         return cls(
             storage=storage,
-            plan=config.get("plan", "free"),  # type: ignore
+            plan=config.get("plan", "free"),
             buffer_pct=config.get("buffer_pct", 0.05),
             custom_read_cap=config.get("custom_read_cap"),
             custom_write_cap=config.get("custom_write_cap"),
