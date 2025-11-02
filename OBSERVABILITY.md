@@ -15,6 +15,17 @@ X Agent supports optional distributed tracing using OpenTelemetry with W3C Trace
 - **Flexible exporters**: Console output (default) or OTLP HTTP endpoint for production
 - **Hermetic testing**: In-memory exporters for unit tests (no network calls)
 
+### Reliability (HTTP robustness)
+
+For OAuth2 (raw HTTP) code paths, the client adds a small reliability layer to improve robustness under transient failures and rate limits:
+
+- Explicit default timeout of 10 seconds on HTTP calls.
+- Bounded retries with exponential backoff and jitter for retryable statuses: 429, 500–504.
+- If a 429 response includes `x-rate-limit-reset`, the client waits until reset time (capped) before retrying.
+- POST requests include a deterministic `Idempotency-Key` derived from the JSON payload to enable safe retries; GET/DELETE do not include this header.
+
+This layer does not affect Tweepy (OAuth 1.0a) paths, which use their own internal retry behavior.
+
 ## Quick Start
 
 ### 1. Install telemetry extras (optional)
@@ -196,7 +207,7 @@ Trace IDs and span IDs follow the [W3C Trace Context](https://www.w3.org/TR/trac
 
 Example log output:
 
-```
+```text
 2025-11-02 10:30:15 - x_client - INFO - Posted tweet [trace_id=4bf92f3577b34da6a3ce929d0e0e4736 span_id=00f067aa0ba902b7]
 ```
 
