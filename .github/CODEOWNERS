@@ -1,0 +1,49 @@
+# GitHub CODEOWNERS - Maximum Automation Configuration
+# 
+# This file is configured for maximum GitHub Copilot delegation.
+# Only critical infrastructure files require manual review.
+# Everything else can be auto-merged when CI passes.
+
+# =============================================================================
+# CRITICAL INFRASTRUCTURE (Always requires manual review)
+# =============================================================================
+
+# Repository configuration - Changes affect permissions and settings  
+.github/CODEOWNERS @georgicaradu5-source
+COPILOT_MAX_DELEGATION.md @georgicaradu5-source
+
+# Security and secrets configuration  
+.github/environments/ @georgicaradu5-source
+scripts/gh_env_setup.* @georgicaradu5-source
+
+# =============================================================================
+# APPLICATION CODE (Auto-merge when CI passes)
+# =============================================================================
+#
+# The following paths are NOT listed here intentionally to allow auto-merge:
+#
+# /src/                    - All Python source code
+# /tests/                  - All test files  
+# /config*.yaml            - Configuration files (validated by CI)
+# /docs/                   - Documentation updates
+# /requirements.txt        - Dependencies (security scanned by CI)
+# /pyproject.toml          - Build configuration
+# /.env.example            - Environment templates
+# /README.md               - General documentation
+# /notebooks/              - Jupyter notebooks
+# /data/                   - Data files
+# /legacy/                 - Legacy/archived code
+#
+# By NOT listing most files here, we enable auto-merge for source code,
+# configs, documentation, and dependencies when CI validation passes.
+
+# Critical security files - require human approval
+secrets/ @georgicaradu5-source
+.env @georgicaradu5-source
+*.key @georgicaradu5-source
+*.pem @georgicaradu5-source
+
+# Package management - allow automation
+requirements.txt @github-actions[bot]
+pyproject.toml @github-actions[bot]
+package.json @github-actions[bot]

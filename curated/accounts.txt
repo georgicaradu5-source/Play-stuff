@@ -1,0 +1,10 @@
+# Maximum automation curated accounts
+# Add influential accounts to monitor
+
+# Tech leaders and influencers
+microsoft
+satyanadella  
+github
+openai
+elonmusk
+sundarpichai

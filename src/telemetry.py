@@ -16,9 +16,9 @@ if TYPE_CHECKING:
     from opentelemetry.sdk.trace import TracerProvider
     from opentelemetry.trace import Tracer
 
-from src.telemetry_core.factory import create_telemetry
-from src.telemetry_core.noop import NoOpTelemetry
-from src.telemetry_core.types import Telemetry
+from telemetry_core.factory import create_telemetry
+from telemetry_core.noop import NoOpTelemetry
+from telemetry_core.types import Telemetry
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +39,7 @@ def init_telemetry() -> None:
 
     If the provider cannot be loaded or dependencies are missing, falls back to NoOp.
     """
-    global _tracer_provider, _telemetry_enabled, _telemetry_impl
+    global _telemetry_enabled, _telemetry_impl
 
     primary = os.getenv("TELEMETRY_ENABLED")
     legacy = os.getenv("ENABLE_TELEMETRY")

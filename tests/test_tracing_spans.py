@@ -13,8 +13,8 @@ otel_export = pytest.importorskip(
     reason="OpenTelemetry SDK exporter not installed",
 )
 
-from scheduler import run_scheduler
-from x_client import XClient
+from scheduler import run_scheduler  # noqa: E402
+from x_client import XClient  # noqa: E402
 
 
 def _setup_tracer():

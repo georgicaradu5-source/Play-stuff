@@ -88,6 +88,20 @@ x-agent-unified/
 | Token Refresh | Manual | Automatic |
 | Best For | Quick start, personal | Production, apps |
 
+> **📝 Note**: For live posting, use `X_AUTH_MODE=tweepy`. OAuth 2.0 mode supports read operations and may require additional X Developer App configuration for write access.
+
+### Authentication Mode Examples
+
+```powershell
+# Live posting (Tweepy mode)
+$env:X_AUTH_MODE = 'tweepy'
+python src/main.py --mode post --plan free
+
+# Dry-run testing (OAuth2 recommended)  
+$env:X_AUTH_MODE = 'oauth2'
+python src/main.py --dry-run --mode both
+```
+
 ## ⚙️ Configuration
 
 ```yaml
@@ -379,3 +393,4 @@ MIT License - See LICENSE file
 ---
 
 **Choose your auth, keep your budget, learn what works. Simple.**
+
