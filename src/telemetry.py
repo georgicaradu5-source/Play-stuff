@@ -39,7 +39,7 @@ def init_telemetry() -> None:
 
     If the provider cannot be loaded or dependencies are missing, falls back to NoOp.
     """
-    global _tracer_provider, _telemetry_enabled, _telemetry_impl
+    global _telemetry_enabled, _telemetry_impl
 
     primary = os.getenv("TELEMETRY_ENABLED")
     legacy = os.getenv("ENABLE_TELEMETRY")
