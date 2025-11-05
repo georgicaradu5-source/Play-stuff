@@ -1,0 +1,30 @@
+{
+  "name": "X Agent Dev",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/common-utils:2": {}
+  },
+  "postCreateCommand": "pip install -r requirements.txt",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "python.testing.pytestEnabled": true,
+        "python.testing.pytestArgs": ["tests"],
+        "python.analysis.typeCheckingMode": "basic"
+      },
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-toolsai.jupyter",
+        "GitHub.vscode-pull-request-github",
+        "cschleiden.vscode-github-actions",
+        "redhat.vscode-yaml",
+        "ms-azuretools.vscode-cosmosdb"
+      ]
+    }
+  },
+  "remoteUser": "vscode"
+}

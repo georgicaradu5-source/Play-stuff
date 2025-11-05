@@ -1,0 +1,19 @@
+name-template: "v$NEXT_PATCH_VERSION"
+tag-template: "v$NEXT_PATCH_VERSION"
+categories:
+  - title: "🚀 Features"
+    labels: ["enhancement"]
+  - title: "🐛 Fixes"
+    labels: ["bug"]
+  - title: "🧰 Maintenance"
+    labels: ["chore", "tech-debt"]
+  - title: "🛠️ CI/CD"
+    labels: ["ci"]
+change-template: "- $TITLE (#$NUMBER)"
+exclude-labels: ["skip-release"]
+template: |
+  ## Changes
+  $CHANGES
+
+  ## Notes
+  - Automated draft generated; adjust categories or add highlights before publishing.

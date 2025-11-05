@@ -17,8 +17,10 @@ def test_telemetry_disabled_by_default():
     from src.telemetry import init_telemetry, is_telemetry_enabled
 
     with patch.dict(os.environ, {}, clear=False):
-        if "ENABLE_TELEMETRY" in os.environ:
-            del os.environ["ENABLE_TELEMETRY"]
+        # Remove both legacy and new env flags if present to simulate fully disabled state
+        for var in ("ENABLE_TELEMETRY", "TELEMETRY_ENABLED"):
+            if var in os.environ:
+                del os.environ[var]
 
         init_telemetry()
         assert not is_telemetry_enabled()
@@ -28,7 +30,7 @@ def test_telemetry_disabled_explicitly():
     """When ENABLE_TELEMETRY=false, telemetry is disabled."""
     from src.telemetry import init_telemetry, is_telemetry_enabled
 
-    with patch.dict(os.environ, {"ENABLE_TELEMETRY": "false"}):
+    with patch.dict(os.environ, {"ENABLE_TELEMETRY": "false", "TELEMETRY_ENABLED": "false"}):
         init_telemetry()
         assert not is_telemetry_enabled()
 

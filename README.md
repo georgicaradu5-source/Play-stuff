@@ -1,8 +1,37 @@
 # X Agent - Unified Production-Ready Autonomous X (Twitter) Agent
 
 [![CI](https://github.com/georgicaradu5-source/Play-stuff/actions/workflows/ci.yml/badge.svg)](https://github.com/georgicaradu5-source/Play-stuff/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/georgicaradu5-source/Play-stuff/actions/workflows/codeql.yml/badge.svg)](https://github.com/georgicaradu5-source/Play-stuff/actions/workflows/codeql.yml)
+[![Release Draft](https://img.shields.io/badge/release-drafter-blue?logo=github)](https://github.com/georgicaradu5-source/Play-stuff/releases)
+[![Dev Container Ready](https://img.shields.io/badge/devcontainer-ready-success?logo=visualstudiocode)](.devcontainer/devcontainer.json)
+[![Open in GitHub Codespaces](https://img.shields.io/badge/Codespaces-open-blue?logo=github)](https://codespaces.new/georgicaradu5-source/Play-stuff)
 
 A fully unified, production-ready autonomous agent for X (Twitter) that combines the best features from both implementations. Supports **both OAuth 1.0a (Tweepy) and OAuth 2.0 PKCE** authentication methods.
+
+## ✅ Production readiness
+
+- Required branch checks enforced: unit tests and dry‑run safety gate
+- Automated security scanning (CodeQL) and dependency updates (Dependabot)
+- Draft release notes generated on each push to `main` (Release Drafter)
+- See the full checklist in [docs/PRODUCTION_READINESS.md](docs/PRODUCTION_READINESS.md)
+
+### Dev Container
+
+Open in GitHub Codespaces or locally with the provided Dev Container (`.devcontainer/devcontainer.json`) to get:
+
+- Python 3.12 base image with preinstalled system tools (git, sqlite3, jq)
+- Pre-installed: `pytest`, `nox`, `ruff`, `mypy`, `gh` CLI
+- Auto-configured pytest test discovery and recommended VS Code extensions
+
+Launch: VS Code → "Reopen in Container" (or [create a new Codespace](https://codespaces.new/georgicaradu5-source/Play-stuff)). Then:
+```bash
+make dev        # Install project dependencies
+make test       # Run unit tests
+make dry-run    # Safe dry-run with both modes
+make peek       # View recent actions from DB
+```
+
+VS Code tasks are also available (Terminal → Run Task): "Run Tests", "Dry-Run Agent", "Print Budget", "Print Rate Limits", "Peek Recent Actions".
 
 ## 🎯 Unified Features
 

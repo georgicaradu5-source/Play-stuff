@@ -10,15 +10,12 @@ Complete guide for setting up GitHub environments with maximum automation and mi
 - **Protection**: None (auto-deploys from PRs)
 - **Usage**: Automatic testing, CI/CD validation
 
+# GitHub Environments — staging and production
 ### Production Environment  
 - **Purpose**: Live X agent automation
 - **Secrets**: Production X API credentials
-- **Protection**: Requires human approval (single-click)
-- **Usage**: Live posting, interactions, autonomous operation
 
 ## ⚡ Quick Setup (Automated)
-
-### Option 1: PowerShell (Windows)
 ```powershell
 # Run interactive setup script
 .\scripts\gh_env_setup.ps1
@@ -43,13 +40,9 @@ If you prefer manual control or the scripts don't work:
 ### 1. Create Environments
 
 ```bash
-# Create staging environment (no protection)
-gh api -X PUT repos/<owner>/<repo>/environments/staging -H "Accept: application/vnd.github+json"
-
 # Create production environment 
 gh api -X PUT repos/<owner>/<repo>/environments/production -H "Accept: application/vnd.github+json"
 ```
-
 ### 2. Set Secrets for Each Environment
 
 Replace `<owner>` and `<repo>` with your actual values, and set your actual secret values:
