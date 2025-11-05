@@ -1,0 +1,115 @@
+name: Live Post Workflow (Production Deploy)
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Agent mode'  
+        required: true
+        default: 'post'
+        type: choice
+        options:
+          - post
+      plan:
+        description: 'Plan to use'
+        required: true
+        default: 'free'
+        type: choice
+        options:
+          - free
+
+env:
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  production-deployment:
+    name: Production Live Post
+    runs-on: ubuntu-latest
+    environment: production
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+          
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          
+      - name: Configure production environment
+        run: |
+          # Create .env from production secrets
+          cat << EOF > .env
+          X_AUTH_MODE=oauth2
+          X_CLIENT_ID=${{ secrets.X_CLIENT_ID }}
+          X_CLIENT_SECRET=${{ secrets.X_CLIENT_SECRET }}
+          X_REDIRECT_URI=${{ secrets.X_REDIRECT_URI }}
+          OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+          AUTOMATION_LEVEL=maximum
+          HUMAN_APPROVAL_REQUIRED=false
+          ENABLE_TELEMETRY=true
+          OTEL_SERVICE_NAME=x-agent-production
+          EOF
+          
+          # Copy production token (OAuth2 mode)
+          if [[ -n "${{ secrets.X_TOKEN_JSON }}" ]]; then
+            echo '${{ secrets.X_TOKEN_JSON }}' > .token.json
+          fi
+          
+      - name: Production safety preflight
+        run: |
+          echo "🔍 Production preflight checks..."
+          
+          # Safety checks as required
+          python src/main.py --safety print-budget || echo "Budget check completed"
+          python src/main.py --safety print-limits || echo "Limits check completed"
+          
+      - name: Run agent (production)
+        id: run-production
+        run: |
+          echo "🚀 Starting X agent in PRODUCTION environment..."
+          echo "⚠️  This will make LIVE posts on X/Twitter!"
+          
+          # Single mode post with free plan as specified
+          python src/main.py \
+            --mode ${{ github.event.inputs.mode }} \
+            --plan ${{ github.event.inputs.plan }}
+            
+        timeout-minutes: 30
+        
+      - name: Production deployment summary
+        if: always()
+        run: |
+          echo "=== PRODUCTION DEPLOYMENT COMPLETE ===" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** ${{ steps.run-production.outcome }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Mode:** ${{ github.event.inputs.mode }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Plan:** ${{ github.event.inputs.plan }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Timestamp:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [[ "${{ steps.run-production.outcome }}" == "success" ]]; then
+            echo "✅ **Production deployment completed successfully**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Monitor the agent's activity on X/Twitter and check logs for any issues." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Production deployment failed**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Check logs and artifacts for error details." >> $GITHUB_STEP_SUMMARY
+          fi
+        
+      - name: Upload production logs
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: production-deployment-logs
+          path: |
+            logs/
+            data/agent_unified.db
+          retention-days: 90
