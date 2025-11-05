@@ -4,6 +4,8 @@
 
 A fully unified, production-ready autonomous agent for X (Twitter) that combines the best features from both implementations. Supports **both OAuth 1.0a (Tweepy) and OAuth 2.0 PKCE** authentication methods.
 
+<!-- M4 Governance Test -->
+
 ## 🎯 Unified Features
 
 ### From Both Implementations
