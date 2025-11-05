@@ -123,7 +123,7 @@ jobs:
         run: |
           echo "🔍 Testing safe config (dry-run mode)..."
           echo "This validates the config works without making any API calls"
-          python src/main.py --config config.safe.yaml --dry-run --mode both
+          python src/main.py --config config.safe.yaml --dry-run true --mode both
           
       - name: Configuration schema validation
         run: |
