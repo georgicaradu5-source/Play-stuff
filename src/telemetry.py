@@ -16,9 +16,9 @@ if TYPE_CHECKING:
     from opentelemetry.sdk.trace import TracerProvider
     from opentelemetry.trace import Tracer
 
-from src.telemetry_core.factory import create_telemetry
-from src.telemetry_core.noop import NoOpTelemetry
-from src.telemetry_core.types import Telemetry
+from telemetry_core.factory import create_telemetry
+from telemetry_core.noop import NoOpTelemetry
+from telemetry_core.types import Telemetry
 
 logger = logging.getLogger(__name__)
 
