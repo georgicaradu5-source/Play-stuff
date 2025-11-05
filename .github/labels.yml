@@ -1,0 +1,82 @@
+# GitHub Labels for Maximum Automation
+
+# Automation Control Labels
+- name: "auto-merge"
+  color: "0e8a16"
+  description: "Automatically merge this PR when checks pass"
+
+- name: "auto-deploy" 
+  color: "0e8a16"
+  description: "Automatically deploy when merged to main"
+
+- name: "needs-human-review"
+  color: "d73a49"
+  description: "Requires manual human review before merge"
+
+- name: "emergency-stop"
+  color: "b60205"
+  description: "Stop all automation for this item"
+
+- name: "breaking-change"
+  color: "d93f0b"
+  description: "Breaking change requiring careful review"
+
+# Dependency Management
+- name: "dependencies"
+  color: "0366d6"
+  description: "Dependency updates"
+
+- name: "security"
+  color: "d73a49" 
+  description: "Security-related changes"
+
+# Automation Status
+- name: "automated"
+  color: "0e8a16"
+  description: "Created or modified by automation"
+
+- name: "bot"
+  color: "0e8a16"
+  description: "Created by a bot"
+
+- name: "ci-failure"
+  color: "d73a49"
+  description: "CI/CD pipeline failure"
+
+# Priority Levels  
+- name: "priority-critical"
+  color: "b60205"
+  description: "Critical priority - immediate attention needed"
+
+- name: "priority-high"
+  color: "d93f0b" 
+  description: "High priority"
+
+- name: "priority-medium"
+  color: "fbca04"
+  description: "Medium priority"
+
+- name: "priority-low" 
+  color: "0e8a16"
+  description: "Low priority"
+
+# Content Types
+- name: "enhancement"
+  color: "a2eeef"
+  description: "New feature or enhancement"
+
+- name: "bug"
+  color: "d73a49"
+  description: "Something isn't working"
+
+- name: "documentation"
+  color: "0075ca"
+  description: "Improvements or additions to documentation"
+
+- name: "maintenance"
+  color: "fbca04" 
+  description: "Routine maintenance tasks"
+
+- name: "refactoring"
+  color: "a2eeef"
+  description: "Code refactoring without functional changes"
