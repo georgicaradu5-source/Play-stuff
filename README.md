@@ -48,6 +48,8 @@ VS Code tasks are also available (Terminal → Run Task): "Run Tests", "Dry-Run 
 
 ## 📦 Quick Start
 
+> **💡 New here?** See **[docs/guides/QUICKSTART.md](docs/guides/QUICKSTART.md)** for a complete step-by-step setup guide with screenshots and troubleshooting tips.
+
 ### Installation
 ```powershell
 # Windows
@@ -107,6 +109,19 @@ x-agent-unified/
 ├── .env                     # Credentials
 └── README.md
 ```
+
+### Legacy Code Reference
+
+The `legacy/` directory contains archived planning documents and deprecated configurations from the project's development phases. This includes:
+
+- **`legacy/planning/`** — Sprint planning, analysis, and unification documentation that guided the merge of agent-x and x-agent into the current unified implementation
+- **`first-tweet-config.yaml`** — Early minimal configuration (superseded by examples in root)
+
+**All work described in legacy planning docs is complete.** The current production implementation in `src/` includes all planned features (dual auth, learning loop, time-window scheduling, budget management). For migration context and historical perspective, see **[M4_TO_M5_TRANSITION.md](M4_TO_M5_TRANSITION.md)**.
+
+The original agent implementations are preserved in `_archive/` for reference:
+- `_archive/agent-x/` — Original Tweepy-based agent with learning loop
+- `_archive/x-agent/` — Original OAuth2-based agent with advanced safety
 
 ## 🔑 Authentication Comparison
 
