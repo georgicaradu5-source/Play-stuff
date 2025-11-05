@@ -1,7 +1,7 @@
 import nox
 
 # Reuse venvs to speed up local runs
-nox.options.reuse_venv = True
+nox.options.reuse_venv = 'yes'
 
 
 def _install_dev(session: nox.Session) -> None:
