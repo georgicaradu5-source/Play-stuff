@@ -66,9 +66,9 @@ jobs:
       - name: Mypy
         run: mypy src || (echo "Mypy failures" && exit 1)
 
-      - name: Run tests with coverage (fail if <80%)
+      - name: Run tests with coverage (fail if <42%)
         run: |
-          pytest -q --maxfail=1 --disable-warnings --cov=src --cov-report=xml --cov-report=term --cov-fail-under=37
+          pytest -q --maxfail=1 --disable-warnings --cov=src --cov-report=xml --cov-report=term --cov-fail-under=42
 
       - name: Upload coverage artifact
         if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.12'
@@ -77,6 +77,14 @@ jobs:
           name: coverage-report
           path: coverage.xml
           retention-days: 30
+
+      - name: Upload coverage to Codecov
+        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.12'
+        uses: codecov/codecov-action@v4
+        with:
+          files: coverage.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
 
   test-telemetry-no-extras:
     name: Tests (TELEMETRY_ENABLED=true, no extras)
@@ -113,7 +121,7 @@ jobs:
 
       - name: Run tests with coverage (fallback path)
         run: |
-          pytest -q --maxfail=1 --disable-warnings --cov=src --cov-report=xml --cov-report=term --cov-fail-under=37
+          pytest -q --maxfail=1 --disable-warnings --cov=src --cov-report=xml --cov-report=term --cov-fail-under=42
 
   test-telemetry-with-extras:
     name: Tests (with telemetry extras)
@@ -147,7 +155,7 @@ jobs:
 
       - name: Run tests with coverage (extras installed)
         run: |
-          pytest -q --maxfail=1 --disable-warnings --cov=src --cov-report=xml --cov-report=term --cov-fail-under=37
+          pytest -q --maxfail=1 --disable-warnings --cov=src --cov-report=xml --cov-report=term --cov-fail-under=42
 
       - name: Upload coverage artifact (telemetry extras)
         uses: actions/upload-artifact@v4
@@ -155,6 +163,13 @@ jobs:
           name: coverage-report-telemetry-extras
           path: coverage.xml
           retention-days: 30
+
+      - name: Upload coverage to Codecov (telemetry extras)
+        uses: codecov/codecov-action@v4
+        with:
+          files: coverage.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
 
   security-audit:
     name: Security (pip-audit) — non-blocking
