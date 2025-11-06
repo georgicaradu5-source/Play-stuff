@@ -25,11 +25,11 @@ except ImportError:
     PYDANTIC_AVAILABLE = False
     BaseModel = object  # type: ignore[misc,assignment]
 
-    def Field(*args: Any, **kwargs: Any) -> None:  # type: ignore[misc] # noqa: N802
+    def Field(*args: Any, **kwargs: Any) -> None:  # type: ignore[misc,no-redef] # noqa: N802
         """Fallback Field when Pydantic not available."""
         return None
 
-    def field_validator(*args: Any, **kwargs: Any) -> Any:  # type: ignore[misc]
+    def field_validator(*args: Any, **kwargs: Any) -> Any:  # type: ignore[misc,no-redef]
         """Fallback field_validator when Pydantic not available."""
 
         def decorator(f: Any) -> Any:
@@ -37,7 +37,7 @@ except ImportError:
 
         return decorator
 
-    def model_validator(*args: Any, **kwargs: Any) -> Any:  # type: ignore[misc]
+    def model_validator(*args: Any, **kwargs: Any) -> Any:  # type: ignore[misc,no-redef]
         """Fallback model_validator when Pydantic not available."""
 
         def decorator(f: Any) -> Any:
@@ -281,8 +281,8 @@ class ConfigSettings(BaseModel):
     jitter_seconds: tuple[int, int] = Field(..., description="Jitter bounds [min, max] in seconds")
     learning: LearningConfig = Field(..., description="Learning configuration")
     budget: BudgetConfig = Field(..., description="Budget configuration")
-    logging: LoggingConfig = Field(default_factory=LoggingConfig, description="Logging configuration")
-    feature_flags: FeatureFlagsConfig = Field(default_factory=FeatureFlagsConfig, description="Feature flags")
+    logging: LoggingConfig = Field(default_factory=LoggingConfig, description="Logging configuration")  # type: ignore[arg-type]
+    feature_flags: FeatureFlagsConfig = Field(default_factory=FeatureFlagsConfig, description="Feature flags")  # type: ignore[arg-type]
     # Optional extended configuration sections
     rate_limits: RateLimitsConfig | None = Field(None, description="Optional rate limit configuration")
     personas: dict[str, PersonaConfig] | None = Field(None, description="Optional persona configurations")
