@@ -354,3 +354,234 @@ def test_invalid_yaml():
 
     # Clean up
     temp_path.unlink()
+
+
+def test_rate_limits_optional_section(minimal_valid_config):
+    """Test that rate_limits section is optional and validates correctly."""
+    minimal_valid_config["rate_limits"] = {
+        "read_per_15min": 15000,
+        "write_per_24hr": 50,
+        "custom_endpoints": {
+            "/2/tweets": {"limit": 100, "window": "15min"},
+            "/2/users/by": {"limit": 300, "window": "15min"},
+        },
+    }
+
+    with tempfile.NamedTemporaryFile(
+        mode="w", suffix=".yaml", delete=False, encoding="utf-8"
+    ) as f:
+        yaml.dump(minimal_valid_config, f)
+        temp_path = Path(f.name)
+
+    is_valid, error, config = validate_config(temp_path)
+
+    assert is_valid, f"rate_limits should validate. Error: {error}"
+    assert config is not None
+    assert config.rate_limits is not None
+    assert config.rate_limits.read_per_15min == 15000
+    assert config.rate_limits.write_per_24hr == 50
+    assert "/2/tweets" in config.rate_limits.custom_endpoints
+    assert config.rate_limits.custom_endpoints["/2/tweets"].limit == 100
+    assert config.rate_limits.custom_endpoints["/2/tweets"].window == "15min"
+
+    temp_path.unlink()
+
+
+def test_personas_optional_section(minimal_valid_config):
+    """Test that personas section is optional and validates correctly."""
+    minimal_valid_config["personas"] = {
+        "default": {"tone": "friendly", "expertise": ["Python", "AI"], "style": "casual"},
+        "professional": {"tone": "formal", "expertise": ["Enterprise Software"]},
+    }
+
+    with tempfile.NamedTemporaryFile(
+        mode="w", suffix=".yaml", delete=False, encoding="utf-8"
+    ) as f:
+        yaml.dump(minimal_valid_config, f)
+        temp_path = Path(f.name)
+
+    is_valid, error, config = validate_config(temp_path)
+
+    assert is_valid, f"personas should validate. Error: {error}"
+    assert config is not None
+    assert config.personas is not None
+    assert "default" in config.personas
+    assert config.personas["default"].tone == "friendly"
+    assert "Python" in config.personas["default"].expertise
+    assert config.personas["default"].style == "casual"
+    assert "professional" in config.personas
+    assert config.personas["professional"].tone == "formal"
+
+    temp_path.unlink()
+
+
+def test_monitoring_optional_section(minimal_valid_config):
+    """Test that monitoring section is optional and validates correctly."""
+    minimal_valid_config["monitoring"] = {
+        "enable_telemetry": True,
+        "log_retention_days": 90,
+        "metrics_export": {"endpoint": "http://localhost:4317", "interval_seconds": 60},
+    }
+
+    with tempfile.NamedTemporaryFile(
+        mode="w", suffix=".yaml", delete=False, encoding="utf-8"
+    ) as f:
+        yaml.dump(minimal_valid_config, f)
+        temp_path = Path(f.name)
+
+    is_valid, error, config = validate_config(temp_path)
+
+    assert is_valid, f"monitoring should validate. Error: {error}"
+    assert config is not None
+    assert config.monitoring is not None
+    assert config.monitoring.enable_telemetry is True
+    assert config.monitoring.log_retention_days == 90
+    assert config.monitoring.metrics_export is not None
+    assert config.monitoring.metrics_export.endpoint == "http://localhost:4317"
+    assert config.monitoring.metrics_export.interval_seconds == 60
+
+    temp_path.unlink()
+
+
+def test_safety_optional_section(minimal_valid_config):
+    """Test that safety section is optional and validates correctly."""
+    minimal_valid_config["safety"] = {
+        "content_filter": {"enabled": True, "blocked_patterns": ["spam", "offensive"]},
+        "rate_check": {"enabled": True, "warn_threshold_pct": 0.85},
+    }
+
+    with tempfile.NamedTemporaryFile(
+        mode="w", suffix=".yaml", delete=False, encoding="utf-8"
+    ) as f:
+        yaml.dump(minimal_valid_config, f)
+        temp_path = Path(f.name)
+
+    is_valid, error, config = validate_config(temp_path)
+
+    assert is_valid, f"safety should validate. Error: {error}"
+    assert config is not None
+    assert config.safety is not None
+    assert config.safety.content_filter.enabled is True
+    assert "spam" in config.safety.content_filter.blocked_patterns
+    assert config.safety.rate_check.enabled is True
+    assert config.safety.rate_check.warn_threshold_pct == 0.85
+
+    temp_path.unlink()
+
+
+def test_autonomous_optional_section(minimal_valid_config):
+    """Test that autonomous section is optional and validates correctly."""
+    minimal_valid_config["autonomous"] = {
+        "decision_mode": "moderate",
+        "require_approval": ["follow", "repost"],
+        "auto_approve": ["like"],
+        "max_daily_decisions": 150,
+    }
+
+    with tempfile.NamedTemporaryFile(
+        mode="w", suffix=".yaml", delete=False, encoding="utf-8"
+    ) as f:
+        yaml.dump(minimal_valid_config, f)
+        temp_path = Path(f.name)
+
+    is_valid, error, config = validate_config(temp_path)
+
+    assert is_valid, f"autonomous should validate. Error: {error}"
+    assert config is not None
+    assert config.autonomous is not None
+    assert config.autonomous.decision_mode.value == "moderate"
+    assert "follow" in config.autonomous.require_approval
+    assert "like" in config.autonomous.auto_approve
+    assert config.autonomous.max_daily_decisions == 150
+
+    temp_path.unlink()
+
+
+def test_autonomous_invalid_action(minimal_valid_config):
+    """Test that autonomous section rejects invalid actions."""
+    minimal_valid_config["autonomous"] = {
+        "decision_mode": "conservative",
+        "require_approval": ["invalid_action"],
+        "auto_approve": ["like"],
+        "max_daily_decisions": 100,
+    }
+
+    with tempfile.NamedTemporaryFile(
+        mode="w", suffix=".yaml", delete=False, encoding="utf-8"
+    ) as f:
+        yaml.dump(minimal_valid_config, f)
+        temp_path = Path(f.name)
+
+    is_valid, error, config = validate_config(temp_path)
+
+    assert not is_valid
+    assert error is not None
+    assert "invalid_action" in error.lower()
+
+    temp_path.unlink()
+
+
+def test_all_optional_sections_together(minimal_valid_config):
+    """Test that all optional sections can be used together."""
+    minimal_valid_config.update({
+        "rate_limits": {
+            "read_per_15min": 10000,
+            "write_per_24hr": 40,
+            "custom_endpoints": {},
+        },
+        "personas": {"default": {"tone": "friendly", "expertise": ["AI"]}},
+        "monitoring": {"enable_telemetry": False, "log_retention_days": 30},
+        "safety": {
+            "content_filter": {"enabled": True, "blocked_patterns": []},
+            "rate_check": {"enabled": True, "warn_threshold_pct": 0.8},
+        },
+        "autonomous": {
+            "decision_mode": "conservative",
+            "require_approval": ["follow"],
+            "auto_approve": ["like"],
+            "max_daily_decisions": 100,
+        },
+    })
+
+    with tempfile.NamedTemporaryFile(
+        mode="w", suffix=".yaml", delete=False, encoding="utf-8"
+    ) as f:
+        yaml.dump(minimal_valid_config, f)
+        temp_path = Path(f.name)
+
+    is_valid, error, config = validate_config(temp_path)
+
+    assert is_valid, f"All optional sections together should validate. Error: {error}"
+    assert config is not None
+    assert config.rate_limits is not None
+    assert config.personas is not None
+    assert config.monitoring is not None
+    assert config.safety is not None
+    assert config.autonomous is not None
+
+    temp_path.unlink()
+
+
+def test_pydantic_unavailable_fallback(minimal_valid_config, monkeypatch):
+    """Test graceful fallback when Pydantic is not available."""
+    import config_schema
+
+    # Simulate Pydantic being unavailable
+    monkeypatch.setattr(config_schema, "PYDANTIC_AVAILABLE", False)
+
+    with tempfile.NamedTemporaryFile(
+        mode="w", suffix=".yaml", delete=False, encoding="utf-8"
+    ) as f:
+        yaml.dump(minimal_valid_config, f)
+        temp_path = Path(f.name)
+
+    is_valid, error, config = validate_config(temp_path)
+
+    # Should fail gracefully with helpful error message
+    assert not is_valid
+    assert error is not None
+    assert "pydantic" in error.lower()
+    assert "install" in error.lower()
+    assert config is None
+
+    temp_path.unlink()

@@ -88,6 +88,120 @@ class LogLevel(str, Enum):
     CRITICAL = "CRITICAL"
 
 
+class DecisionMode(str, Enum):
+    """Autonomous decision modes."""
+
+    CONSERVATIVE = "conservative"
+    MODERATE = "moderate"
+    AGGRESSIVE = "aggressive"
+
+
+class EndpointLimitConfig(BaseModel):
+    """Rate limit for a specific endpoint."""
+
+    limit: int = Field(..., ge=0, description="Request limit")
+    window: str = Field(..., description="Time window (e.g., '15min', '24hr')")
+
+
+class RateLimitsConfig(BaseModel):
+    """Rate limit configuration."""
+
+    read_per_15min: int = Field(..., ge=0, description="Read requests per 15 minutes")
+    write_per_24hr: int = Field(..., ge=0, description="Write requests per 24 hours")
+    custom_endpoints: dict[str, EndpointLimitConfig] = Field(
+        default_factory=dict, description="Custom endpoint rate limits"
+    )
+
+
+class PersonaConfig(BaseModel):
+    """Persona configuration for content style."""
+
+    tone: str = Field(..., description="Tone of voice (e.g., friendly, formal, casual)")
+    expertise: list[str] = Field(
+        default_factory=list, description="Areas of expertise"
+    )
+    style: str | None = Field(None, description="Writing style description")
+
+
+class MetricsExportConfig(BaseModel):
+    """Metrics export configuration."""
+
+    endpoint: str = Field(..., description="OTLP endpoint URL")
+    interval_seconds: int = Field(..., ge=1, description="Export interval in seconds")
+
+
+class MonitoringConfig(BaseModel):
+    """Monitoring and observability configuration."""
+
+    enable_telemetry: bool = Field(
+        default=False, description="Enable OpenTelemetry tracing"
+    )
+    log_retention_days: int = Field(
+        default=30, ge=1, description="Log retention period in days"
+    )
+    metrics_export: MetricsExportConfig | None = Field(
+        None, description="Optional metrics export configuration"
+    )
+
+
+class ContentFilterConfig(BaseModel):
+    """Content filtering configuration."""
+
+    enabled: bool = Field(default=True, description="Enable content filtering")
+    blocked_patterns: list[str] = Field(
+        default_factory=list, description="Patterns to block"
+    )
+
+
+class RateCheckConfig(BaseModel):
+    """Rate limit safety check configuration."""
+
+    enabled: bool = Field(default=True, description="Enable rate limit checks")
+    warn_threshold_pct: float = Field(
+        default=0.8, ge=0.0, le=1.0, description="Warning threshold percentage"
+    )
+
+
+class SafetyConfig(BaseModel):
+    """Safety and compliance configuration."""
+
+    content_filter: ContentFilterConfig = Field(
+        default_factory=ContentFilterConfig, description="Content filtering settings"
+    )
+    rate_check: RateCheckConfig = Field(
+        default_factory=RateCheckConfig, description="Rate limit check settings"
+    )
+
+
+class AutonomousConfig(BaseModel):
+    """Autonomous decision-making configuration."""
+
+    decision_mode: DecisionMode = Field(
+        default=DecisionMode.CONSERVATIVE, description="Decision-making mode"
+    )
+    require_approval: list[str] = Field(
+        default_factory=list, description="Actions requiring approval"
+    )
+    auto_approve: list[str] = Field(
+        default_factory=list, description="Actions automatically approved"
+    )
+    max_daily_decisions: int = Field(
+        default=100, ge=0, description="Maximum decisions per day"
+    )
+
+    @field_validator("require_approval", "auto_approve")
+    @classmethod
+    def validate_action_lists(cls, v: list[str]) -> list[str]:
+        """Ensure action lists contain valid actions."""
+        valid_actions = {"like", "reply", "follow", "repost", "post"}
+        for action in v:
+            if action not in valid_actions:
+                raise ValueError(
+                    f"Invalid action '{action}'. Must be one of: {valid_actions}"
+                )
+        return v
+
+
 class QueryConfig(BaseModel):
     """Search query configuration."""
 
@@ -218,6 +332,22 @@ class ConfigSettings(BaseModel):
     )
     feature_flags: FeatureFlagsConfig = Field(
         default_factory=FeatureFlagsConfig, description="Feature flags"
+    )
+    # Optional extended configuration sections
+    rate_limits: RateLimitsConfig | None = Field(
+        None, description="Optional rate limit configuration"
+    )
+    personas: dict[str, PersonaConfig] | None = Field(
+        None, description="Optional persona configurations"
+    )
+    monitoring: MonitoringConfig | None = Field(
+        None, description="Optional monitoring configuration"
+    )
+    safety: SafetyConfig | None = Field(
+        None, description="Optional safety configuration"
+    )
+    autonomous: AutonomousConfig | None = Field(
+        None, description="Optional autonomous configuration"
     )
 
     @field_validator("jitter_seconds")
