@@ -4,9 +4,10 @@
 requests>=2.31.0
 pyyaml>=6.0.1
 python-dotenv>=1.0.0
+urllib3>=2.5.0
 
 # Tweepy mode (OAuth 1.0a)
-tweepy>=4.14.0
+tweepy>=4.16.0
 
 # Testing dependencies
 pytest>=7.4.0
