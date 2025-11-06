@@ -65,6 +65,9 @@ class TimeWindow(str, Enum):
     MORNING = "morning"  # 9am-12pm
     AFTERNOON = "afternoon"  # 1pm-5pm
     EVENING = "evening"  # 6pm-9pm
+    EARLY_MORNING = "early-morning"  # 5am-8am
+    NIGHT = "night"  # 9pm-11pm
+    LATE_NIGHT = "late-night"  # 11pm-2am
 
 
 class FeatureToggle(str, Enum):

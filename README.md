@@ -181,6 +181,20 @@ Common validation errors:
 
 See **[docs/guides/QUICKSTART.md](docs/guides/QUICKSTART.md)** for detailed validation examples.
 
+### ASCII policy
+
+All Python source code under `src/` is maintained as ASCII-only to avoid Windows console encoding issues and simplify tooling. By default, the ASCII scanner checks `src/` only. Documentation may use limited Unicode for readability — include `docs/` explicitly if you want to scan docs too:
+
+```powershell
+# Code only
+python scripts/check_ascii.py --scan-dirs src
+
+# Code + docs
+python scripts/check_ascii.py --scan-dirs src docs
+```
+
+To enforce ASCII-only everywhere (including docs) in CI, adjust the workflow to include `docs/` as needed.
+
 ### Configuration Schema
 
 ```yaml

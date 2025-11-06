@@ -21,15 +21,32 @@ WINDOWS = {
     "morning": (dtime(9, 0), dtime(12, 0)),
     "afternoon": (dtime(13, 0), dtime(17, 0)),
     "evening": (dtime(18, 0), dtime(21, 0)),
+    # Optional extended windows
+    "early-morning": (dtime(5, 0), dtime(8, 0)),
+    "night": (dtime(21, 0), dtime(23, 0)),
+    "late-night": (dtime(23, 0), dtime(2, 0)),  # crosses midnight
 }
 
 
-def current_slot(windows: list[str]) -> str | None:
-    """Determine current time window."""
-    now = datetime.now().time()
+def _in_range(now: dtime, start: dtime, end: dtime) -> bool:
+    """Return True if now is within [start, end], supporting ranges across midnight."""
+    if start <= end:
+        return start <= now <= end
+    # Crosses midnight (e.g., 23:00 -> 02:00)
+    return now >= start or now <= end
+
+
+def current_slot(windows: list[str], now: dtime | None = None) -> str | None:
+    """Determine current time window.
+
+    Args:
+        windows: ordered list of window names to consider
+        now: optional current time for testing (defaults to system time)
+    """
+    now = now or datetime.now().time()
     for name in windows:
         start, end = WINDOWS.get(name, (None, None))
-        if start and end and start <= now <= end:
+        if start and end and _in_range(now, start, end):
             return name
     # Default to random if outside all windows
     return random.choice(windows) if windows else None

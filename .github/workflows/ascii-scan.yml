@@ -6,23 +6,24 @@ name: ASCII Compliance Check
 # encoding issues and ensure cross-platform compatibility.
 
 on:
+  workflow_dispatch:
+    inputs:
+      scope:
+        description: "Scan scope: code (src) or full (src+docs)"
+        required: false
+        default: "code"
   pull_request:
     paths:
       - 'src/**'
-      - 'docs/**'
       - '.github/workflows/ascii-scan.yml'
   push:
     branches:
       - main
     paths:
       - 'src/**'
-      - 'docs/**'
 
 jobs:
   ascii-scan:
-    # DISABLED: Remove this line to enable the workflow
-    if: false
-    
     name: Check for non-ASCII characters
     runs-on: ubuntu-latest
     
@@ -37,7 +38,13 @@ jobs:
       
       - name: Run ASCII compliance check
         run: |
-          python scripts/check_ascii.py
+          if [ "${{ github.event.inputs.scope }}" = "full" ]; then
+            python scripts/check_ascii.py --scan-dirs src docs
+          else
+            python scripts/check_ascii.py
+          fi
+        shell: bash
+        # To scan docs in PR/push, change the line above to include docs or trigger manual run with scope=full
       
       - name: Report results
         if: failure()

@@ -28,11 +28,15 @@ queries:
 
 # === SCHEDULING ===
 schedule:
-  # Time windows for posting
+  # Time windows for posting (add/remove as needed)
   windows:
-    - morning    # 9am-12pm
-    - afternoon  # 1pm-5pm
-    - evening    # 6pm-9pm
+    - morning        # 9am-12pm
+    - afternoon      # 1pm-5pm
+    - evening        # 6pm-9pm
+    # Extended (optional):
+    # - early-morning  # 5am-8am
+    # - night          # 9pm-11pm
+    # - late-night     # 11pm-2am
 
 # === CADENCE ===
 cadence:

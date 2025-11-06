@@ -17,7 +17,8 @@ Exit codes:
     2: Script error (missing dependencies, permissions, etc.)
 
 Configuration:
-    - Scans: src/, docs/
+    - Default scan scope: src/
+    - Optional: include docs/ via --scan-dirs src docs
     - Excludes: _archive/, legacy/, __pycache__, *.pyc, .git/
     - File types: .py, .md, .txt, .yaml, .yml, .toml, .ini, .cfg
 
@@ -56,12 +57,12 @@ class AsciiChecker:
         """Initialize the ASCII checker.
 
         Args:
-            scan_dirs: Directories to scan (default: src/, docs/)
+            scan_dirs: Directories to scan (default: src/)
             exclude_dirs: Directories to exclude (default: _archive/, legacy/, __pycache__)
             file_extensions: File types to scan (default: .py, .md, .txt, .yaml, .yml)
             fail_fast: Stop on first non-ASCII file (default: False)
         """
-        self.scan_dirs = scan_dirs or ["src", "docs"]
+        self.scan_dirs = scan_dirs or ["src"]
         self.exclude_dirs = exclude_dirs or ["_archive", "legacy", "__pycache__", ".git"]
         self.file_extensions = file_extensions or [
             ".py",
@@ -219,8 +220,8 @@ def main() -> int:
     parser.add_argument(
         "--scan-dirs",
         nargs="+",
-        default=["src", "docs"],
-        help="Directories to scan (default: src docs)",
+        default=["src"],
+        help="Directories to scan (default: src) - add docs explicitly if desired",
     )
     parser.add_argument(
         "--exclude-dirs",

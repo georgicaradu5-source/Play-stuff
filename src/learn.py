@@ -28,7 +28,7 @@ def settle(client: XClient, storage: Storage, post_id: str, arm: str) -> None:
     # Get tweet metrics
     tweet_data = client.get_tweet(post_id)
     if not tweet_data.get("data"):
-        print(f"⚠️  Could not fetch metrics for {post_id}")
+        print(f"[WARN] Could not fetch metrics for {post_id}")
         return
 
     metrics = tweet_data["data"].get("public_metrics", {})
@@ -62,7 +62,7 @@ def settle(client: XClient, storage: Storage, post_id: str, arm: str) -> None:
     # Update bandit arm
     storage.bandit_update(arm, reward)
 
-    print(f"✓ Settled {post_id}: reward={reward:.3f} (likes={like_count}, replies={reply_count}, RT={retweet_count})")
+    print(f"[OK] Settled {post_id}: reward={reward:.3f} (likes={like_count}, replies={reply_count}, RT={retweet_count})")
 
 
 def settle_all(
@@ -99,7 +99,7 @@ def settle_all(
             settle(client, storage, str(post_id), arm)
             count += 1
         except Exception as e:
-            print(f"⚠️  Failed to settle {post_id}: {e}")
+            print(f"[WARN] Failed to settle {post_id}: {e}")
             continue
 
     return count

@@ -299,6 +299,34 @@ def test_config_to_dict(minimal_valid_config):
     assert "topics" in config_dict
 
 
+def test_extended_time_windows(minimal_valid_config):
+    """Test that extended schedule windows are accepted by the schema."""
+    minimal_valid_config["schedule"]["windows"] = [
+        "early-morning",
+        "night",
+        "late-night",
+    ]
+
+    with tempfile.NamedTemporaryFile(
+        mode="w", suffix=".yaml", delete=False, encoding="utf-8"
+    ) as f:
+        yaml.dump(minimal_valid_config, f)
+        temp_path = Path(f.name)
+
+    is_valid, error, config = validate_config(temp_path)
+
+    assert is_valid, f"Extended windows should be valid. Error: {error}"
+    assert error is None
+    assert config is not None
+    assert [w.value for w in config.schedule.windows] == [
+        "early-morning",
+        "night",
+        "late-night",
+    ]
+
+    temp_path.unlink()
+
+
 def test_file_not_found():
     """Test validation of non-existent config file."""
     is_valid, error, config = validate_config("nonexistent.yaml")

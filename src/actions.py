@@ -15,11 +15,11 @@ TEMPLATES = {
         "Quick tip for Power Platform builders: keep flows modular and document triggers. Small wins compound.",
         "Power BI + Power Automate = fast insights and faster action. What combo do you use most?",
         "Power Apps component libraries save so much rebuild time. Investing in reusable patterns pays off.",
-        "DataverseDataverse relationships enable so much—start with the data model and the rest follows.",
+    "DataverseDataverse relationships enable so much - start with the data model and the rest follows.",
     ],
     "data-viz": [
         "Data viz tip: label directly, minimize legends. Clarity > cleverness.",
-        "DAX calculations can be powerful—keep measures tidy and reusable.",
+    "DAX calculations can be powerful - keep measures tidy and reusable.",
         "Interactive dashboards shine when they answer questions before users ask.",
         "Color choice matters: use contrast intentionally and test for accessibility.",
     ],
@@ -27,7 +27,7 @@ TEMPLATES = {
         "Automate the boring parts first. Start with high-frequency, low-risk tasks.",
         "Workflow automation shines when paired with good naming and error alerts.",
         "Build small, test early, then scale. Automation compounds when it's reliable.",
-        "Document your flows—future you (or your team) will thank you.",
+    "Document your flows - future you (or your team) will thank you.",
     ],
     "ai": [
         "AI is a tool, not magic. Frame the problem first, then pick the model.",
@@ -41,7 +41,7 @@ TEMPLATES = {
 REPLY_TEMPLATES = [
     "Nice point! What's your favorite resource on this?",
     "Interesting! How are you handling edge cases?",
-    "Love this—curious how you track success over time.",
+    "Love this - curious how you track success over time.",
     "Great insight! Have you documented this approach anywhere?",
     "This resonates. Any gotchas you hit along the way?",
     "Solid tip! How long did it take to see results?",

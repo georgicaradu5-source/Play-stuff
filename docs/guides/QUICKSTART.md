@@ -111,12 +111,15 @@ topics:
   - automation
 
 # Configure time windows (optional but recommended)
-windows:
-  enabled: true
-  times:
-    morning: [9, 12]
-    afternoon: [13, 17]
-    evening: [18, 21]
+schedule:
+  windows:
+    - morning      # 9am-12pm
+    - afternoon    # 1pm-5pm
+    - evening      # 6pm-9pm
+    # Optional extended windows:
+    # - early-morning  # 5am-8am
+    # - night          # 9pm-11pm
+    # - late-night     # 11pm-2am
 
 # Enable learning loop
 learning:
