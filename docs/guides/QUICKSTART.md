@@ -130,7 +130,44 @@ learning:
 - `windows`: Optimal posting times (leave enabled for free plan)
 - `learning.enabled`: Enables Thompson Sampling optimization
 
-## Step 4: Test with Dry-Run
+## Step 4: Validate Configuration (Optional)
+
+**Before first run**, validate your config file to catch errors early:
+
+```bash
+# Install Pydantic for validation (optional)
+pip install pydantic>=2.0
+
+# Validate config file
+python src/main.py --validate config.yaml --dry-run true
+```
+
+**Sample validation output:**
+
+```
+[INFO] Config validated successfully from config.yaml
+[OK] All settings are valid
+```
+
+**If validation fails**, you'll see clear error messages:
+
+```
+[ERROR] Configuration validation failed:
+  plan: Input should be 'free', 'basic' or 'pro'
+  schedule -> windows: Field required
+  jitter_seconds: jitter_seconds min (20) must be < max (8)
+```
+
+**Common validation errors:**
+- `auth_mode` must be `tweepy` or `oauth2`
+- `plan` must be `free`, `basic`, or `pro`
+- `weekdays` must be integers 1-7 (Monday-Sunday)
+- `jitter_seconds` must be `[min, max]` where min < max
+- `actions` in queries must be: `like`, `reply`, `follow`, or `repost`
+
+**Note**: Validation requires `pydantic>=2.0`. If not installed, the agent falls back to basic YAML loading.
+
+## Step 5: Test with Dry-Run
 
 **Always test first!** Dry-run mode simulates actions without making actual API calls.
 
@@ -149,7 +186,7 @@ python src/main.py --mode both --dry-run true
 [DRY-RUN] Metrics: 0 posts, 0 likes, 0 replies
 ```
 
-## Step 5: Run Live
+## Step 6: Run Live
 
 Once dry-run succeeds, run for real:
 
@@ -171,7 +208,7 @@ python src/main.py --mode interact --plan free
 4. Logs all actions to SQLite (`data/agent_unified.db`)
 5. Tracks engagement for learning loop
 
-## Step 6: Enable Learning (Optional but Recommended)
+## Step 7: Enable Learning (Optional but Recommended)
 
 After posts have been live for 24+ hours, settle metrics to improve future choices:
 

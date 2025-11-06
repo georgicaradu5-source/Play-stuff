@@ -1,0 +1,47 @@
+name: ASCII Compliance Check
+
+# DISABLED BY DEFAULT - Remove 'if: false' to enable
+# This workflow ensures all active source and documentation files
+# contain only ASCII characters (0x00-0x7F) to prevent Windows
+# encoding issues and ensure cross-platform compatibility.
+
+on:
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'docs/**'
+      - '.github/workflows/ascii-scan.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - 'docs/**'
+
+jobs:
+  ascii-scan:
+    # DISABLED: Remove this line to enable the workflow
+    if: false
+    
+    name: Check for non-ASCII characters
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: Run ASCII compliance check
+        run: |
+          python scripts/check_ascii.py
+      
+      - name: Report results
+        if: failure()
+        run: |
+          echo "::error::Non-ASCII characters found in source files"
+          echo "::error::Run 'python scripts/check_ascii.py' locally to see details"
+          echo "::error::See https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"

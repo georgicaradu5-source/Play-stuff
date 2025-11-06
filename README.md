@@ -148,6 +148,41 @@ python src/main.py --dry-run --mode both
 
 ## Configuration
 
+### Configuration Validation (Optional)
+
+Validate your `config.yaml` before running to catch errors early:
+
+```bash
+# Install Pydantic (if not already installed)
+pip install pydantic>=2.0
+
+# Validate configuration
+python src/main.py --validate config.yaml --dry-run true
+```
+
+**Successful validation:**
+```
+✓ Configuration validated successfully
+```
+
+**Failed validation:**
+```
+✗ Configuration validation failed:
+  - Field 'auth_mode': Value must be 'tweepy' or 'oauth2'
+  - Field 'jitter_seconds.min': Must be less than 'max'
+```
+
+Common validation errors:
+- Invalid `auth_mode` (must be `tweepy` or `oauth2`)
+- Invalid `plan` (must be `free`, `basic`, or `pro`)
+- Invalid `weekdays` (must be 1-7)
+- Invalid `actions` in queries (must be `like`, `reply`, `retweet`)
+- `jitter_seconds.min` >= `max`
+
+See **[docs/guides/QUICKSTART.md](docs/guides/QUICKSTART.md)** for detailed validation examples.
+
+### Configuration Schema
+
 ```yaml
 # Auth mode
 auth_mode: tweepy  # or oauth2
