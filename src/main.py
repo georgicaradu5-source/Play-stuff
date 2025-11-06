@@ -38,6 +38,24 @@ def load_config(path: str, validate: bool = True) -> dict[str, Any]:
     if yaml is None:
         raise RuntimeError("PyYAML not installed. Run: pip install pyyaml")
 
+    def _deep_merge(base: dict[str, Any], updates: dict[str, Any]) -> dict[str, Any]:
+        """Recursively merge updates into base without dropping unknown keys.
+
+        - For dict values: recurse
+        - For other types/lists: replace base value with update
+        """
+        for k, v in updates.items():
+            if isinstance(v, dict) and isinstance(base.get(k), dict):
+                base[k] = _deep_merge(dict(base[k]), v)
+            else:
+                base[k] = v
+        return base
+
+    # Load raw YAML first so unknown keys are preserved
+    with open(path, encoding="utf-8") as f:
+        raw_config = yaml.safe_load(f) or {}
+        logger.debug(f"Loaded config from {path}")
+
     # Try to validate with Pydantic if available and requested
     if validate:
         try:
@@ -46,21 +64,22 @@ def load_config(path: str, validate: bool = True) -> dict[str, Any]:
             is_valid, error_msg, config_obj = validate_config(path)
             if is_valid and config_obj:
                 logger.debug(f"Config validated successfully from {path}")
-                return config_obj.to_dict()
+                validated_dict = config_obj.to_dict()
+                # Merge validated fields back into original to preserve extra sections
+                merged = _deep_merge(dict(raw_config), validated_dict)
+                return merged
             elif error_msg:
                 logger.warning(f"Config validation failed: {error_msg}")
                 logger.info("Loading config without validation (backward compatibility)")
-                # Fall through to basic loading
+                return raw_config
         except ImportError:
             logger.debug("Pydantic not available, skipping validation")
         except Exception as e:
             logger.warning(f"Validation error: {e}, falling back to basic loading")
+            return raw_config
 
-    # Basic loading (backward compatibility)
-    with open(path, encoding="utf-8") as f:
-        config = yaml.safe_load(f) or {}
-        logger.debug(f"Loaded config from {path}")
-        return config
+    # No validation requested: return raw config
+    return raw_config
 
 
 def get_default_config() -> dict[str, Any]:

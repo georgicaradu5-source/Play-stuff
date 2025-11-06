@@ -184,16 +184,18 @@ class AsciiChecker:
             print(f"\n[FAIL] Found {len(self.matches)} non-ASCII characters in {total_files_with_issues} files:\n")
 
             for match in self.matches:
-                # Truncate long lines for readability
-                line_preview = match.line_content[:80]
-                if len(match.line_content) > 80:
-                    line_preview += "..."
+                # Produce ASCII-safe line preview using backslash escapes
+                safe_line = (
+                    match.line_content.encode("ascii", "backslashreplace").decode("ascii")
+                )
+                if len(safe_line) > 80:
+                    safe_line = safe_line[:80] + "..."
 
                 print(
                     f"  {match.file}:{match.line_num}:{match.char_position} "
                     f"(U+{match.char_value:04X})"
                 )
-                print(f"    {line_preview}")
+                print(f"    {safe_line}")
                 print()
 
             return 1

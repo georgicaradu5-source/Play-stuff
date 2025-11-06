@@ -162,12 +162,12 @@ python src/main.py --validate config.yaml --dry-run true
 
 **Successful validation:**
 ```
-✓ Configuration validated successfully
+[OK] Configuration validated successfully
 ```
 
 **Failed validation:**
 ```
-✗ Configuration validation failed:
+[FAIL] Configuration validation failed:
   - Field 'auth_mode': Value must be 'tweepy' or 'oauth2'
   - Field 'jitter_seconds.min': Must be less than 'max'
 ```
