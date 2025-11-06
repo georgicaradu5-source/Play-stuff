@@ -164,7 +164,7 @@ def main():
     try:
         config = load_config(args.config, validate=True)
     except Exception as e:
-        print(f"❌ Failed to load configuration: {e}")
+        print(f"[ERROR] Failed to load configuration: {e}")
         sys.exit(1)
 
     # Configure logging from config
@@ -197,11 +197,11 @@ def main():
     if args.authorize:
         if auth_mode != "oauth2":
             logger.error("--authorize requires X_AUTH_MODE=oauth2")
-            print("❌ --authorize requires X_AUTH_MODE=oauth2")
+            print("[ERROR] --authorize requires X_AUTH_MODE=oauth2")
             sys.exit(1)
 
         logger.info("Starting OAuth 2.0 PKCE authorization flow...")
-        print("\n🔐 Starting OAuth 2.0 PKCE authorization flow...")
+        print("\n[AUTH] Starting OAuth 2.0 PKCE authorization flow...")
         auth = UnifiedAuth.from_env("oauth2")
 
         # X API scopes for posting, reading, liking, following
@@ -220,11 +220,11 @@ def main():
 
         if success:
             logger.info("Authorization successful! Token saved.")
-            print("✓ Authorization successful! Token saved.")
+            print("[OK] Authorization successful! Token saved.")
             sys.exit(0)
         else:
             logger.error("Authorization failed")
-            print("❌ Authorization failed")
+            print("[ERROR] Authorization failed")
             sys.exit(1)
 
     # Initialize client
@@ -233,9 +233,9 @@ def main():
         client = XClient.from_env(dry_run=args.dry_run)
     except Exception as e:
         logger.error(f"Failed to initialize client: {e}", exc_info=True)
-        print(f"❌ Failed to initialize client: {e}")
+        print(f"[ERROR] Failed to initialize client: {e}")
         if auth_mode == "oauth2":
-            print("\n💡 If using OAuth 2.0, run with --authorize first")
+            print("\n[INFO] If using OAuth 2.0, run with --authorize first")
         sys.exit(1)
 
     # Handle safety/diagnostic commands
@@ -260,7 +260,7 @@ def main():
         from learn import settle
 
         logger.info(f"Fetching metrics for post: {args.settle}")
-        print(f"\n📊 Fetching metrics for post: {args.settle}")
+        print(f"\n[METRICS] Fetching metrics for post: {args.settle}")
 
         # Determine arm (topic|slot|media)
         actions = storage.get_recent_actions(kind="post", limit=1)
@@ -276,10 +276,10 @@ def main():
         try:
             settle(client, storage, args.settle, arm)
             logger.info("Metrics settled successfully")
-            print("✓ Metrics settled successfully")
+            print("[OK] Metrics settled successfully")
         except Exception as e:
             logger.error(f"Failed to settle: {e}", exc_info=True)
-            print(f"❌ Failed to settle: {e}")
+            print(f"[ERROR] Failed to settle: {e}")
             sys.exit(1)
         sys.exit(0)
 
@@ -287,10 +287,10 @@ def main():
         from learn import settle_all
 
         logger.info("Settling all owned posts...")
-        print("\n📊 Settling all owned posts...")
+        print("\n[METRICS] Settling all owned posts...")
         count = settle_all(client, storage, default_arm="default|morning|False")
         logger.info(f"Settled {count} posts")
-        print(f"✓ Settled {count} posts")
+        print(f"[OK] Settled {count} posts")
         sys.exit(0)
 
     # Run main scheduler
@@ -308,11 +308,11 @@ def main():
         logger.info("Scheduler completed successfully")
     except KeyboardInterrupt:
         logger.warning("Interrupted by user")
-        print("\n\n⚠️  Interrupted by user")
+        print("\n\n[WARNING] Interrupted by user")
         sys.exit(1)
     except Exception as e:
         logger.error(f"Error in scheduler: {e}", exc_info=True)
-        print(f"\n❌ Error: {e}")
+        print(f"\n[ERROR] Error: {e}")
         import traceback
 
         traceback.print_exc()
