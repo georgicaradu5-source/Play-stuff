@@ -1,442 +1,266 @@
-# Quick Start Guide# X Agent Unified - Quick Start
+# Quick Start Guide
 
+Complete step-by-step setup guide for X Agent Unified. Get your unified X agent running in 5 minutes!
 
+> **Overview**: See [README.md](../../README.md) for architecture, features, and configuration reference.
 
-Complete step-by-step setup guide for X Agent Unified.Get your unified X agent running in 5 minutes!
+## Prerequisites
 
-
-
-> **📖 Overview**: See [README.md](../../README.md) for architecture, features, and configuration reference.## Prerequisites
-
-
-
-## Prerequisites- Python 3.9+
-
-- X (Twitter) Developer Account
-
-- **Python 3.8+** (3.12 recommended)- API credentials (OAuth 1.0a or OAuth 2.0)
-
+- **Python 3.8+** (3.12 recommended)
 - **X Developer Account** with approved app
-
-- **Git** (for cloning)## Quick Setup
-
+- **Git** (for cloning)
 - **VS Code** (recommended) or any editor
-
-### Windows
 
 ## Step 1: Clone & Install
 
+### Windows PowerShell
+
 ```powershell
-
-```powershell# Run setup script
-
-# Windows PowerShell.\setup.bat
-
+# Clone repository
 git clone https://github.com/georgicaradu5-source/Play-stuff.git
+cd Play-stuff
 
-cd Play-stuff# Edit credentials
-
-.\setup.batnotepad .env
-
+# Run setup script
+.\setup.bat
 ```
 
-# Test with dry run
+### Linux/macOS
 
-```bashpython src\main.py --mode both --dry-run true
+```bash
+# Clone repository
+git clone https://github.com/georgicaradu5-source/Play-stuff.git
+cd Play-stuff
 
-# Linux/macOS
-
-git clone https://github.com/georgicaradu5-source/Play-stuff.git# Run for real
-
-cd Play-stuffpython src\main.py --mode both
-
-chmod +x setup.sh && ./setup.sh```
-
+# Run setup script
+chmod +x setup.sh
+./setup.sh
 ```
-
-### Mac/Linux
 
 **What this does:**
+- Creates virtual environment (`.venv/`)
+- Installs dependencies from `requirements.txt`
+- Creates `data/` directory for SQLite database
+- Copies `config.example.yaml` -> `config.yaml`
 
-- ✅ Creates virtual environment (`.venv/`)```bash
+## Step 2: Choose Authentication Method
 
-- ✅ Installs dependencies from `requirements.txt`# Run setup script
+### Option A: Tweepy (OAuth 1.0a) - Recommended for Beginners
 
-- ✅ Creates `data/` directory for SQLite databasechmod +x setup.sh
+**Pros**: Simple setup, 4 credentials, supports media upload  
+**Cons**: Manual token refresh
 
-- ✅ Copies `config.example.yaml` → `config.yaml`./setup.sh
-
-
-
-## Step 2: Choose Authentication Method# Edit credentials
-
-nano .env
-
-### Option A: Tweepy (OAuth 1.0a) — Recommended for Beginners
-
-# Test with dry run
-
-**Pros**: Simple setup, 4 credentials, supports media upload  python src/main.py --mode both --dry-run true
-
-**Cons**: Manual token management
-
-# Run for real
-
-1. **Get credentials** from [X Developer Portal](https://developer.twitter.com/):python src/main.py --mode both
-
-   - API Key```
-
+1. Get credentials from [X Developer Portal](https://developer.x.com/):
+   - API Key
    - API Secret
-
-   - Access Token## Choose Your Auth Mode
-
+   - Access Token
    - Access Token Secret
 
-### Option A: Tweepy (OAuth 1.0a) - Simpler
+2. Edit `.env` file:
 
-2. **Create `.env` file** in project root:
+```bash
+X_AUTH_MODE=tweepy
+X_API_KEY=your_api_key_here
+X_API_SECRET=your_api_secret_here
+X_ACCESS_TOKEN=your_access_token_here
+X_ACCESS_SECRET=your_access_token_secret_here
+```
 
-   ```env1. Edit `.env`:
+### Option B: OAuth 2.0 PKCE - Modern & Recommended for Production
 
-   X_AUTH_MODE=tweepy   ```
+**Pros**: Auto token refresh, granular scopes, modern flow  
+**Cons**: Slightly more complex initial setup
 
-   X_API_KEY=your_api_key_here   X_AUTH_MODE=tweepy
+1. Get credentials from [X Developer Portal](https://developer.x.com/):
+   - Client ID
+   - Client Secret
 
-   X_API_SECRET=your_api_secret_here   X_API_KEY=your_api_key
+2. Edit `.env` file:
 
-   X_ACCESS_TOKEN=your_access_token_here   X_API_SECRET=your_api_secret
+```bash
+X_AUTH_MODE=oauth2
+X_CLIENT_ID=your_client_id_here
+X_CLIENT_SECRET=your_client_secret_here
+```
 
-   X_ACCESS_SECRET=your_access_token_secret_here   X_ACCESS_TOKEN=your_access_token
+3. Run authorization flow (one-time):
 
-   ```   X_ACCESS_SECRET=your_access_secret
+```bash
+python src/main.py --authorize
+```
 
-   ```
+This will:
+- Open browser for X authorization
+- Save refresh token to `.token.json`
+- Auto-refresh tokens in future runs
 
-3. **Skip to Step 3**
+## Step 3: Configure Settings
 
-2. Run:
-
-### Option B: OAuth 2.0 PKCE — Recommended for Production   ```bash
-
-   python src/main.py --mode both --dry-run true
-
-**Pros**: Modern, automatic token refresh, granular scopes     ```
-
-**Cons**: Requires authorization flow, limited media support
-
-### Option B: OAuth 2.0 PKCE - Modern
-
-1. **Get credentials** from [X Developer Portal](https://developer.twitter.com/):
-
-   - Client ID1. Edit `.env`:
-
-   - Client Secret   ```
-
-   - Set redirect URI: `http://localhost:8080/callback`   X_AUTH_MODE=oauth2
-
-   X_CLIENT_ID=your_client_id
-
-2. **Create `.env` file** in project root:   X_CLIENT_SECRET=your_client_secret
-
-   ```env   ```
-
-   X_AUTH_MODE=oauth2
-
-   X_CLIENT_ID=your_client_id_here2. Authorize:
-
-   X_CLIENT_SECRET=your_client_secret_here   ```bash
-
-   X_REDIRECT_URI=http://localhost:8080/callback   python src/main.py --authorize
-
-   ```   ```
-
-
-
-3. **Run authorization flow**:3. Run:
-
-   ```bash   ```bash
-
-   python src/main.py --authorize   python src/main.py --mode both --dry-run true
-
-   ```   ```
-
-   
-
-   - Opens browser for X login## Common Commands
-
-   - Grants permissions to your app
-
-   - Saves tokens to `.token.json` (gitignored)```bash
-
-# Post mode only
-
-## Step 3: Configure Settingspython src/main.py --mode post
-
-
-
-Edit `config.yaml` to customize behavior:# Interact mode only (like, reply, follow)
-
-python src/main.py --mode interact
+Edit `config.yaml` to customize behavior:
 
 ```yaml
+# Choose plan tier (free/basic/pro)
+plan: free
 
-# Authentication mode (must match .env)# Both modes
+# Set auth mode (matches .env setting)
+auth_mode: tweepy  # or oauth2
 
-auth_mode: tweepy  # or oauth2python src/main.py --mode both
-
-
-
-# Plan tier (enforces monthly limits)# Dry run (no actual API calls)
-
-plan: free  # or basic, propython src/main.py --mode both --dry-run true
-
-
-
-# Topics for content generation# Check budget status
-
-topics:python src/main.py --safety print-budget
-
+# Define content topics
+topics:
   - power-platform
+  - data-viz
+  - automation
 
-  - data-viz# Check learning stats
-
-  - automationpython src/main.py --safety print-learning
-
-  - ai
-
-# Settle metrics for learning
-
-# Search queries for interaction modepython src/main.py --settle-all
-
-queries:
-
-  - query: '(Power BI OR "Power Platform") lang:en -is:retweet'# Use specific config
-
-    actions: [like, reply]python src/main.py --config my-config.yaml
-
-```
-
-# Time windows (when to post)
-
-schedule:## Configuration
-
-  windows:
-
-    - morning    # 9am-12pmEdit `config.yaml` to customize:
-
-    - afternoon  # 1pm-5pm
-
-    - evening    # 6pm-9pm- **Topics**: Content themes
-
-- **Queries**: Search terms for interaction
-
-# Weekday posting (1=Monday, 7=Sunday)- **Schedule**: Time windows (morning/afternoon/evening)
-
-cadence:- **Limits**: Max actions per window
-
-  weekdays: [1, 2, 3, 4, 5]- **Learning**: Enable/disable Thompson Sampling
-
-- **Budget**: Plan tier and safety buffer
-
-# Action limits per time window
-
-max_per_window:## Learning Loop
-
-  post: 1
-
-  reply: 3The agent learns which (topic, time-window, media) combinations work best:
-
-  like: 10
-
-  follow: 31. Run posts: `python src/main.py --mode post`
-
-2. Wait for engagement (hours/days)
-
-# Learning loop (optimize based on engagement)3. Settle metrics: `python src/main.py --settle-all`
-
-learning:4. Check stats: `python src/main.py --safety print-learning`
-
+# Configure time windows (optional but recommended)
+windows:
   enabled: true
+  times:
+    morning: [9, 12]
+    afternoon: [13, 17]
+    evening: [18, 21]
 
-```The agent will favor high-performing combinations!
+# Enable learning loop
+learning:
+  enabled: true
+  algorithm: thompson_sampling
+```
 
+**Key settings:**
+- `plan`: Controls monthly budget caps (free/basic/pro)
+- `topics`: Content themes for posts
+- `windows`: Optimal posting times (leave enabled for free plan)
+- `learning.enabled`: Enables Thompson Sampling optimization
 
+## Step 4: Test with Dry-Run
 
-## Step 4: Test with Dry-Run## Troubleshooting
-
-
-
-**Always test first!** Dry-run mode simulates actions without calling the X API.### "Missing X API credentials"
-
-- Check `.env` file exists and has correct variables
-
-```bash- For Tweepy: need all 4 credentials (API key/secret, access token/secret)
-
-# Test both post and interact modes- For OAuth2: need client ID/secret, run `--authorize` first
-
-python src/main.py --dry-run true --mode both
-
-```### "Budget exceeded"
-
-- Check current usage: `python src/main.py --safety print-budget`
-
-**Expected output:**- Adjust plan in `config.yaml` or `.env`
-
-```- Increase buffer: set `budget.buffer_pct: 0.1` in config
-
-[DRY-RUN] Would create post: "Just discovered a cool trick with Power BI..."
-
-[DRY-RUN] Would like tweet: 1234567890123456789### "Rate limit exceeded"
-
-[DRY-RUN] Would reply to tweet: 9876543210987654321- Agent has built-in rate limiting with backoff
-
-```- For persistent issues, reduce limits in `config.yaml`
-
-
-
-**Verify in database:**## Next Steps
+**Always test first!** Dry-run mode simulates actions without making actual API calls.
 
 ```bash
+# Windows PowerShell
+python src\main.py --mode both --dry-run true
 
-# View recent actions (should be empty in dry-run)1. Read [README.md](README.md) for full documentation
+# Linux/macOS
+python src/main.py --mode both --dry-run true
+```
 
-python scripts/peek_actions.py --limit 102. Customize `config.yaml` for your use case
+**Expected output:**
+```
+[DRY-RUN] Would create post: "Exploring Power Platform automation..."
+[DRY-RUN] Would like tweet: 1234567890
+[DRY-RUN] Metrics: 0 posts, 0 likes, 0 replies
+```
 
-```3. Set up automation (cron/Task Scheduler)
+## Step 5: Run Live
 
-4. Enable learning loop for optimization
+Once dry-run succeeds, run for real:
 
-## Step 5: Run Live (First Tweet)
+```bash
+# Post AND interact mode
+python src/main.py --mode both --plan free
 
-## Support
-
-> ⚠️ **Warning**: This will create real posts/interactions on X. Start with post mode only.
-
-- Issues: https://github.com/georgicaradu5-source/Play-stuff/issues
-
-```bash- Docs: See README.md for architecture details
-
-# Post mode only (safest)
+# Post only
 python src/main.py --mode post --plan free
+
+# Interact only (like/reply)
+python src/main.py --mode interact --plan free
 ```
 
-**First run checklist:**
-- ✅ Dry-run tested successfully
-- ✅ Config reviewed (especially topics and windows)
-- ✅ Database created (`data/agent_unified.db` exists)
-- ✅ Credentials valid (no auth errors in dry-run)
+**What happens:**
+1. Checks budget and rate limits
+2. Selects optimal topic/time-window using Thompson Sampling
+3. Creates post or interacts with tweets
+4. Logs all actions to SQLite (`data/agent_unified.db`)
+5. Tracks engagement for learning loop
 
-**Monitor progress:**
-```bash
-# Check budget usage
-python src/main.py --safety print-budget
+## Step 6: Enable Learning (Optional but Recommended)
 
-# Check rate limits
-python src/main.py --safety print-limits
-
-# View recent actions
-python scripts/peek_actions.py --limit 5 --kind post
-```
-
-## Step 6: Enable Learning Loop (Optional)
-
-After 24-48 hours, settle metrics to improve performance:
+After posts have been live for 24+ hours, settle metrics to improve future choices:
 
 ```bash
-# Fetch engagement metrics and update learning
+# Settle all posts automatically
 python src/main.py --settle-all
+
+# Or settle specific post manually
+python src/main.py --settle POST_ID --arm "topic|window|media"
 ```
 
-**What this does:**
-- Fetches likes, replies, retweets for each post
-- Calculates reward score (0-1)
-- Updates Thompson Sampling bandit for topic/window/media combinations
-- Future posts favor high-performing patterns
+This updates the Thompson Sampling model with engagement data (likes, replies, retweets).
 
 ## Common Issues
 
-### Authentication Fails
+### "ModuleNotFoundError: No module named 'dotenv'"
 
-**Tweepy Mode:**
-- Verify all 4 credentials in `.env`
-- Check app has read/write permissions in X Developer Portal
-- Ensure tokens aren't expired
+**Solution**: Activate virtual environment first
 
-**OAuth2 Mode:**
-- Re-run `python src/main.py --authorize`
-- Check redirect URI matches exactly (`http://localhost:8080/callback`)
-- Verify `.token.json` exists after authorization
+```powershell
+# Windows
+.\.venv\Scripts\Activate.ps1
 
-### No Posts Created
+# Linux/macOS
+source .venv/bin/activate
+```
 
-- Check if current time matches configured windows (morning/afternoon/evening)
-- Verify weekday is in `cadence.weekdays` (e.g., `[1,2,3,4,5]` = Mon-Fri)
-- Check budget: `python src/main.py --safety print-budget`
-- Look for errors in console output
+### "X API authentication failed"
 
-### Rate Limit Errors
+**Solution**: Verify credentials in `.env` and auth mode in `config.yaml` match
 
-- Agent automatically handles rate limits with backoff
-- If persistent, reduce `max_per_window` values in config
-- Check current limits: `python src/main.py --safety print-limits`
+### "Budget exceeded for plan 'free'"
 
-## Makefile Commands (Dev Container)
+**Solution**: Check usage with `python src/main.py --safety print-budget` or wait until next month
 
-If using the Dev Container or have `make` installed:
+### "Rate limit exceeded"
+
+**Solution**: Wait until reset time shown in error, or check with `python src/main.py --safety print-limits`
+
+## Makefile Commands
+
+If you have `make` installed:
 
 ```bash
-make dev        # Install dependencies
-make test       # Run unit tests
-make dry-run    # Safe dry-run test
-make budget     # Print budget status
-make limits     # Print rate limits
-make peek       # View recent actions
+make dev        # Install dependencies in dev mode
 make lint       # Run ruff linter
 make type       # Run mypy type checker
-make clean      # Clean cache/artifacts
+make test       # Run pytest with coverage
+make dry-run    # Dry-run with both modes
+make peek       # View recent actions from DB
 ```
 
 ## VS Code Tasks
 
-Open Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`) → "Run Task":
+Open Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`) -> "Tasks: Run Task":
 
-- **Run Tests** (default test task)
-- **Dry-Run Agent**
-- **Print Budget**
-- **Print Rate Limits**
-- **Peek Recent Actions**
-- **Lint**
-- **Type Check**
+- **Run: Tests (pytest -v)** - Run unit tests
+- **Run: Dry-run (both modes)** - Safe dry-run
+- **Run: Print Budget** - Check budget usage
+- **Run: Print Rate Limits** - Check rate limit status
+- **Run: Peek Recent Actions** - View action log
 
 ## Next Steps
 
-- **First Tweet**: See [FIRST_TWEET_GUIDE.md](FIRST_TWEET_GUIDE.md) for detailed first tweet workflow
-- **Budget Management**: See [READ_BUDGET.md](READ_BUDGET.md) for understanding plan limits
-- **Learning Loop**: Let agent run for 1-2 weeks, then review bandit performance
-- **Advanced Config**: Explore `config.*.yaml` examples for different use cases
+1. **Automate scheduling**: See [FIRST_TWEET_GUIDE.md](FIRST_TWEET_GUIDE.md) for scheduling tips
+2. **Understand budget system**: See [READ_BUDGET.md](READ_BUDGET.md) for plan details
+3. **Monitor performance**: Run `scripts/peek_actions.py` to view metrics
+4. **Optimize learning**: Regularly run `--settle-all` to improve topic/time choices
 
 ## Validation Checklist
 
-Before enabling live mode, run these validation commands:
+Before going live, confirm:
 
-```bash
-# ✅ Lint code (check style)
-make lint  # or: nox -s lint
-
-# ✅ Type check (verify types)
-make type  # or: nox -s type
-
-# ✅ Run tests (18 should pass, 2 skip)
-make test  # or: pytest -v
-
-# ✅ Dry-run both modes (no errors)
-python src/main.py --dry-run true --mode both
-```
-
-**All checks passing?** You're ready for production! 🚀
+- [ ] `make lint` passes (or `python -m ruff check src/ tests/`)
+- [ ] `make type` passes (or `./scripts/mypy.ps1` / `./scripts/mypy.sh`)
+- [ ] `make test` passes (or `pytest -v`)
+- [ ] Dry-run succeeds with `--dry-run true --mode both`
+- [ ] Credentials verified in `.env`
+- [ ] Config validated in `config.yaml`
+- [ ] Budget checked with `--safety print-budget`
 
 ## Getting Help
 
-- **Issues**: [GitHub Issues](https://github.com/georgicaradu5-source/Play-stuff/issues)
-- **Docs**: [docs/](../) directory
-- **Contributing**: See [CONTRIBUTING.md](../../CONTRIBUTING.md)
+- **Issues**: Report bugs via [GitHub Issues](https://github.com/georgicaradu5-source/Play-stuff/issues)
+- **Documentation**: See [README.md](../../README.md) for full reference
+- **Guides**: Check [docs/guides/](.) for additional walkthroughs
+- **Compliance**: Review [X Developer Policy](https://developer.x.com/en/developer-terms/policy) and [Automation Rules](https://help.x.com/en/rules-and-policies/x-automation-rules)
+
+---
+
+**Welcome to X Agent Unified!** Start with dry-run, monitor your budget, and let Thompson Sampling optimize your content strategy.
+

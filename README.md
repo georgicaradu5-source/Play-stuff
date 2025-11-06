@@ -8,9 +8,9 @@
 
 A fully unified, production-ready autonomous agent for X (Twitter) that combines the best features from both implementations. Supports **both OAuth 1.0a (Tweepy) and OAuth 2.0 PKCE** authentication methods.
 
-## ✅ Production readiness
+## Production Readiness
 
-- Required branch checks enforced: unit tests and dry‑run safety gate
+- Required branch checks enforced: unit tests and dry-run safety gate
 - Automated security scanning (CodeQL) and dependency updates (Dependabot)
 - Draft release notes generated on each push to `main` (Release Drafter)
 - See the full checklist in [docs/PRODUCTION_READINESS.md](docs/PRODUCTION_READINESS.md)
@@ -23,7 +23,7 @@ Open in GitHub Codespaces or locally with the provided Dev Container (`.devconta
 - Pre-installed: `pytest`, `nox`, `ruff`, `mypy`, `gh` CLI
 - Auto-configured pytest test discovery and recommended VS Code extensions
 
-Launch: VS Code → "Reopen in Container" (or [create a new Codespace](https://codespaces.new/georgicaradu5-source/Play-stuff)). Then:
+Launch: VS Code -> "Reopen in Container" (or [create a new Codespace](https://codespaces.new/georgicaradu5-source/Play-stuff)). Then:
 ```bash
 make dev        # Install project dependencies
 make test       # Run unit tests
@@ -31,24 +31,24 @@ make dry-run    # Safe dry-run with both modes
 make peek       # View recent actions from DB
 ```
 
-VS Code tasks are also available (Terminal → Run Task): "Run Tests", "Dry-Run Agent", "Print Budget", "Print Rate Limits", "Peek Recent Actions".
+VS Code tasks are also available (Terminal -> Run Task): "Run Tests", "Dry-Run Agent", "Print Budget", "Print Rate Limits", "Peek Recent Actions".
 
-## 🎯 Unified Features
+## Unified Features
 
 ### From Both Implementations
-- ✅ **Dual Auth Support**: Choose between Tweepy (OAuth 1.0a) or OAuth 2.0 PKCE
-- ✅ **Thompson Sampling Learning**: Optimizes topic/time-window choices based on engagement
-- ✅ **Comprehensive Budget Manager**: Free/Basic/Pro plan support with monthly caps
-- ✅ **Advanced Rate Limiting**: Per-endpoint tracking, exponential backoff, jitter
-- ✅ **Time-Window Scheduling**: Morning/afternoon/evening optimal posting times
-- ✅ **Template-Based Content**: Organized by topics with variation
-- ✅ **Full Compliance**: Respects X Developer Policy and Automation Rules
-- ✅ **SQLite Storage**: Actions, metrics, usage tracking, deduplication
-- ✅ **Dry-Run Mode**: Safe testing without API calls
+- **Dual Auth Support**: Choose between Tweepy (OAuth 1.0a) or OAuth 2.0 PKCE
+- **Thompson Sampling Learning**: Optimizes topic/time-window choices based on engagement
+- **Comprehensive Budget Manager**: Free/Basic/Pro plan support with monthly caps
+- **Advanced Rate Limiting**: Per-endpoint tracking, exponential backoff, jitter
+- **Time-Window Scheduling**: Morning/afternoon/evening optimal posting times
+- **Template-Based Content**: Organized by topics with variation
+- **Full Compliance**: Respects X Developer Policy and Automation Rules
+- **SQLite Storage**: Actions, metrics, usage tracking, deduplication
+- **Dry-Run Mode**: Safe testing without API calls
 
-## 📦 Quick Start
+## Quick Start
 
-> **💡 New here?** See **[docs/guides/QUICKSTART.md](docs/guides/QUICKSTART.md)** for a complete step-by-step setup guide with screenshots and troubleshooting tips.
+> **New here?** See **[docs/guides/QUICKSTART.md](docs/guides/QUICKSTART.md)** for a complete step-by-step setup guide with screenshots and troubleshooting tips.
 
 ### Installation
 ```powershell
@@ -91,39 +91,39 @@ python src/main.py --dry-run --mode both
 python src/main.py --mode both --plan free
 ```
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 x-agent-unified/
-├── src/
-│   ├── auth.py              # Dual auth: Tweepy + OAuth 2.0 PKCE
-│   ├── x_client.py          # Unified X API client
-│   ├── budget.py            # Budget manager with plan tiers
-│   ├── rate_limiter.py      # Rate limit guard
-│   ├── storage.py           # SQLite storage
-│   ├── scheduler.py         # Time-window scheduler
-│   ├── actions.py           # Template-based actions
-│   ├── learn.py             # Thompson Sampling learning
-│   └── main.py              # CLI entry point
-├── config.yaml              # Configuration
-├── .env                     # Credentials
-└── README.md
++-- src/
+|   +-- auth.py              # Dual auth: Tweepy + OAuth 2.0 PKCE
+|   +-- x_client.py          # Unified X API client
+|   +-- budget.py            # Budget manager with plan tiers
+|   +-- rate_limiter.py      # Rate limit guard
+|   +-- storage.py           # SQLite storage
+|   +-- scheduler.py         # Time-window scheduler
+|   +-- actions.py           # Template-based actions
+|   +-- learn.py             # Thompson Sampling learning
+|   +-- main.py              # CLI entry point
++-- config.yaml              # Configuration
++-- .env                     # Credentials
++-- README.md
 ```
 
 ### Legacy Code Reference
 
 The `legacy/` directory contains archived planning documents and deprecated configurations from the project's development phases. This includes:
 
-- **`legacy/planning/`** — Sprint planning, analysis, and unification documentation that guided the merge of agent-x and x-agent into the current unified implementation
-- **`first-tweet-config.yaml`** — Early minimal configuration (superseded by examples in root)
+- **`legacy/planning/`** - Sprint planning, analysis, and unification documentation that guided the merge of agent-x and x-agent into the current unified implementation
+- **`first-tweet-config.yaml`** - Early minimal configuration (superseded by examples in root)
 
 **All work described in legacy planning docs is complete.** The current production implementation in `src/` includes all planned features (dual auth, learning loop, time-window scheduling, budget management). For migration context and historical perspective, see **[M4_TO_M5_TRANSITION.md](M4_TO_M5_TRANSITION.md)**.
 
 The original agent implementations are preserved in `_archive/` for reference:
-- `_archive/agent-x/` — Original Tweepy-based agent with learning loop
-- `_archive/x-agent/` — Original OAuth2-based agent with advanced safety
+- `_archive/agent-x/` - Original Tweepy-based agent with learning loop
+- `_archive/x-agent/` - Original OAuth2-based agent with advanced safety
 
-## 🔑 Authentication Comparison
+## Authentication Comparison
 
 | Feature | Tweepy (OAuth 1.0a) | OAuth 2.0 PKCE |
 |---------|---------------------|----------------|
@@ -132,7 +132,7 @@ The original agent implementations are preserved in `_archive/` for reference:
 | Token Refresh | Manual | Automatic |
 | Best For | Quick start, personal | Production, apps |
 
-> **📝 Note**: For live posting, use `X_AUTH_MODE=tweepy`. OAuth 2.0 mode supports read operations and may require additional X Developer App configuration for write access.
+> **Note**: For live posting, use `X_AUTH_MODE=tweepy`. OAuth 2.0 mode supports read operations and may require additional X Developer App configuration for write access.
 
 ### Authentication Mode Examples
 
@@ -146,7 +146,7 @@ $env:X_AUTH_MODE = 'oauth2'
 python src/main.py --dry-run --mode both
 ```
 
-## ⚙️ Configuration
+## Configuration
 
 ```yaml
 # Auth mode
@@ -180,9 +180,9 @@ learning:
   algorithm: thompson_sampling
 ```
 
-## 🎓 Thompson Sampling Learning
+## Thompson Sampling Learning
 
-The agent learns which topic×time-window×media combinations perform best:
+The agent learns which topic x time-window x media combinations perform best:
 
 ```bash
 # Settle metrics for a post (manual)
@@ -199,7 +199,7 @@ python src/main.py --settle-all
 4. Updates Beta distribution for each "arm"
 5. Biases future choices toward high-performing combinations
 
-## 📊 Budget & Rate Limits
+## Budget and Rate Limits
 
 ### Monthly Caps by Plan
 | Plan | Reads | Writes | Notes |
@@ -217,7 +217,7 @@ python src/main.py --safety print-budget
 python src/main.py --safety print-limits
 ```
 
-## 🚀 Usage Examples
+## Usage Examples
 
 ### Post Mode (Time-Window Aware)
 ```bash
@@ -243,7 +243,7 @@ python src/main.py --mode both --plan free
 python src/main.py --settle-all
 ```
 
-## 📝 CLI Reference
+## CLI Reference
 
 ```bash
 # Main modes
@@ -266,7 +266,7 @@ python src/main.py --settle POST_ID --arm "topic|window|media"
 python src/main.py --settle-all
 ```
 
-## 🔧 Migration from Old Agents
+## Migration from Old Agents
 
 ### From agent-x (Tweepy)
 1. Copy `.env` credentials
@@ -278,7 +278,7 @@ python src/main.py --settle-all
 2. Set `auth_mode: oauth2` in config
 3. Run normally - all features preserved + learning added
 
-## 🧪 Testing
+## Testing
 
 ```bash
 # Smoke tests (dry-run)
@@ -291,7 +291,7 @@ python tests/live_test.py --confirm
 python tests/test_learning.py
 ```
 
-## 🧑‍💻 Local dev tips
+## Local Development Tips
 
 Type checking (parity with CI):
 
@@ -313,7 +313,7 @@ nox -s test
 nox -s all  # runs all three in sequence
 ```
 
-## 📡 Telemetry (optional)
+## Telemetry (Optional)
 
 The agent can emit OpenTelemetry traces and include W3C TraceContext IDs in logs. See [docs/telemetry.md](docs/telemetry.md) for full instructions.
 
@@ -338,26 +338,26 @@ The agent can emit OpenTelemetry traces and include W3C TraceContext IDs in logs
     - `always_on`
     - `parentbased_traceidratio/<ratio>` (e.g. `parentbased_traceidratio/0.2`)
 
-When enabled, logs include `[trace_id=… span_id=…]` for any active span. If OpenTelemetry is not
+When enabled, logs include `[trace_id=... span_id=...]` for any active span. If OpenTelemetry is not
 installed, the agent falls back to a no-op tracer automatically.
 
-## 📚 Key Improvements
+## Key Improvements
 
 ### Over agent-x
-- ✅ OAuth 2.0 PKCE support (optional)
-- ✅ Better budget manager with plan tiers
-- ✅ More comprehensive rate limiting
-- ✅ Improved documentation
-- ✅ Better error handling
+- [x] OAuth 2.0 PKCE support (optional)
+- [x] Better budget manager with plan tiers
+- [x] More comprehensive rate limiting
+- [x] Improved documentation
+- [x] Better error handling
 
 ### Over x-agent
-- ✅ Tweepy support for simpler auth
-- ✅ Thompson Sampling learning loop
-- ✅ Time-window scheduling
-- ✅ Template-based content
-- ✅ Simpler onboarding option
+- [x] Tweepy support for simpler auth
+- [x] Thompson Sampling learning loop
+- [x] Time-window scheduling
+- [x] Template-based content
+- [x] Simpler onboarding option
 
-## 🔒 Reliability
+## Reliability
 
 This project includes a small reliability layer that hardens OAuth2 (raw HTTP) calls while
 keeping Tweepy-based flows unchanged. Key points:
@@ -365,7 +365,7 @@ keeping Tweepy-based flows unchanged. Key points:
 - Timeouts: all raw HTTP calls use an explicit default timeout (DEFAULT_TIMEOUT = 10s) for
   connect/read to avoid hanging network calls.
 - Retries: bounded retries are performed with exponential backoff and jitter. Retryable
-  statuses are 429 and 500–504.
+  statuses are 429 and 500-504.
 - Rate-limit handling: when a 429 response includes an `x-rate-limit-reset` header, the
   client will wait until the reset time (capped) before retrying to be polite to the API.
 - Idempotency: POST requests automatically include a deterministic `Idempotency-Key`
@@ -376,7 +376,7 @@ Rationale: these changes make OAuth2 network interactions safer and more policy-
 under transient failures and rate limits. Dry-run behavior is unchanged; Tweepy mode is
 untouched and continues to rely on its own retry logic.
 
-## 🎯 Best Practices
+## Best Practices
 
 ### For Free Plan
 ```yaml
@@ -404,24 +404,24 @@ learning:
   enabled: true
 ```
 
-## 📖 Documentation
+## Documentation
 
 - **README.md** - This file (overview)
 - **[docs/guides/QUICKSTART.md](docs/guides/QUICKSTART.md)** - 5-minute setup guide
 - **[docs/telemetry.md](docs/telemetry.md)** - Observability and tracing
 - **[docs/guides/](docs/guides/)** - Additional guides (first tweet, read budget, migration)
 
-## 🔐 Compliance
+## Compliance
 
-- ✅ Only official X API (v2 + v1.1 media)
-- ✅ Both auth methods supported
-- ✅ Respects all rate limits
-- ✅ Enforces plan caps
-- ✅ Full audit logging
-- ✅ Deduplication
-- ✅ Follows X Developer Policy
+- [x] Only official X API (v2 + v1.1 media)
+- [x] Both auth methods supported
+- [x] Respects all rate limits
+- [x] Enforces plan caps
+- [x] Full audit logging
+- [x] Deduplication
+- [x] Follows X Developer Policy
 
-## 🤝 Contributing
+## Contributing
 
 This unified agent combines:
 
@@ -430,7 +430,7 @@ This unified agent combines:
 
 Both implementations are preserved in archive/ for reference.
 
-## 📄 License
+## License
 
 MIT License - See LICENSE file
 

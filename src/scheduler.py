@@ -87,7 +87,7 @@ def run_post_action(
             can_write, msg = budget_mgr.can_write(1)
             if not can_write:
                 logger.warning(f"Budget check failed: {msg}")
-                print(f"❌ {msg}")
+                print(f"[ERROR] {msg}")
                 return
 
             resp = client.create_post(text)
@@ -107,7 +107,7 @@ def run_post_action(
             budget_mgr.add_writes(1)
 
             logger.info(f"Posted: {post_id} (topic={topic}, slot={slot})")
-            print(f"✓ Posted: {post_id} (topic={topic}, slot={slot})")
+            print(f"[OK] Posted: {post_id} (topic={topic}, slot={slot})")
 
 
 def run_interact_actions(
@@ -126,7 +126,7 @@ def run_interact_actions(
         queries = config.get("queries", [])
         if not queries:
             logger.warning("No queries configured for interaction mode")
-            print("⚠️  No queries configured for interaction mode")
+            print("[WARNING] No queries configured for interaction mode")
             return
 
         # Get limits
@@ -171,7 +171,7 @@ def run_interact_actions(
                     qspan.set_attribute("query", query)
                 except Exception:
                     pass
-                print(f"\n🔍 Searching: {query[:50]}...")
+                print(f"\n[SEARCH] Searching: {query[:50]}...")
                 remaining = act_on_search(
                     client=client,
                     storage=storage,
@@ -203,11 +203,11 @@ def run_scheduler(
         except Exception:
             pass
         if today not in weekdays and not dry_run:
-            print(f"⏸️  Outside configured weekdays ({weekdays}), exiting")
+            print(f"[PAUSED] Outside configured weekdays ({weekdays}), exiting")
             return
 
         print(f"\n{'=' * 60}")
-        print(f"🤖 X Agent Unified - {mode.upper()} mode")
+        print(f"X Agent Unified - {mode.upper()} mode")
         print(f"{'=' * 60}")
         print(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         print(f"Dry run: {dry_run}")
@@ -221,5 +221,5 @@ def run_scheduler(
             run_interact_actions(client, storage, config, dry_run)
 
         print(f"\n{'=' * 60}")
-        print("✓ Scheduler completed")
+        print("[OK] Scheduler completed")
         print(f"{'=' * 60}\n")

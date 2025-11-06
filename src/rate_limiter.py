@@ -79,7 +79,7 @@ class RateLimiter:
 
         if not can_call and wait_seconds:
             logger.warning(f"Rate limit low for {endpoint}. Waiting {wait_seconds}s...")
-            print(f"⏳ Rate limit low for {endpoint}. Waiting {wait_seconds}s...")
+            print(f"[WAIT] Rate limit low for {endpoint}. Waiting {wait_seconds}s...")
             time.sleep(wait_seconds + 1)  # Add 1s buffer
 
     def backoff_and_retry(
@@ -107,11 +107,11 @@ class RateLimiter:
                         delay = base_delay + jitter
 
                         logger.warning(f"Rate limited (attempt {attempt + 1}/{max_retries}). Waiting {delay:.1f}s...")
-                        print(f"⚠️  Rate limited (attempt {attempt + 1}/{max_retries}). Waiting {delay:.1f}s...")
+                        print(f"[WARNING] Rate limited (attempt {attempt + 1}/{max_retries}). Waiting {delay:.1f}s...")
                         time.sleep(delay)
                     else:
                         logger.error("Max retries reached for rate limit")
-                        print("❌ Max retries reached for rate limit")
+                        print("[ERROR] Max retries reached for rate limit")
                         raise
                 else:
                     # Non-rate-limit error, propagate immediately
@@ -137,7 +137,7 @@ class RateLimiter:
             reset_dt = datetime.fromtimestamp(reset).strftime("%Y-%m-%d %H:%M:%S")
             pct = (remaining / limit) * 100 if limit > 0 else 0
 
-            status = "✓" if pct > 50 else "⚠️" if pct > 10 else "❌"
+            status = "[OK]" if pct > 50 else "[WARN]" if pct > 10 else "[ERROR]"
             print(f"\n{status} {endpoint}")
             print(f"   {remaining}/{limit} remaining ({pct:.1f}%)")
             print(f"   Resets: {reset_dt}")
