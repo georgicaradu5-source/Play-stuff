@@ -1,6 +1,6 @@
 # Telemetry (optional)
 
-This agent ships with optional OpenTelemetry tracing and W3C TraceContext log correlation. It's disabled by default and safe to turn on at any time. When disabled or when dependencies are missing, the code automatically falls back to a robust no‑op provider.
+This agent ships with optional OpenTelemetry tracing and W3C TraceContext log correlation. It's disabled by default and safe to turn on at any time. When disabled or when dependencies are missing, the code automatically falls back to a robust no-op provider.
 
 ## Enable in one minute
 
@@ -39,7 +39,7 @@ export OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318/v1/traces  # optional
 export ENABLE_TELEMETRY=true
 ```
 
-That's it. If OpenTelemetry packages aren't installed or the exporter can't be created, the agent continues with a no‑op tracer.
+That's it. If OpenTelemetry packages aren't installed or the exporter can't be created, the agent continues with a no-op tracer.
 
 ## Environment Variables
 
@@ -95,12 +95,12 @@ with tracer.start_as_current_span("some.operation"):
     pass
 ```
 
-- When ENABLE_TELEMETRY is false/unset: both helpers use a no‑op backend.
+- When ENABLE_TELEMETRY is false/unset: both helpers use a no-op backend.
 - When ENABLE_TELEMETRY is true and packages are present: spans are emitted to the configured exporter.
 
-## Diagnostics and CI‑friendly checks
+## Diagnostics and CI-friendly checks
 
-You can validate spans without any network calls using the in‑memory exporter (this is how tests do it):
+You can validate spans without any network calls using the in-memory exporter (this is how tests do it):
 
 ```python
 from opentelemetry import trace
@@ -132,15 +132,15 @@ Tip: set `OTEL_TRACES_SAMPLER` for custom sampling. Supported values include:
 
 - Telemetry is disabled by default.
 - No identifiers are emitted unless you opt in.
-- When enabled, include only operational metadata (operation names, parameters sizes/counts) — avoid sensitive content.
+- When enabled, include only operational metadata (operation names, parameters sizes/counts)  -  avoid sensitive content.
 
 ## Advanced: Provider factory
 
 Internally, the agent can choose a telemetry provider dynamically:
 
-- If `ENABLE_TELEMETRY`/`TELEMETRY_ENABLED` is false: use a strict no‑op provider.
+- If `ENABLE_TELEMETRY`/`TELEMETRY_ENABLED` is false: use a strict no-op provider.
 - If true and OpenTelemetry is available: use the OpenTelemetry provider.
-- If provider configuration fails or dependencies are missing: gracefully fall back to no‑op.
+- If provider configuration fails or dependencies are missing: gracefully fall back to no-op.
 
 Code: `src/telemetry_core/factory.py` and `src/telemetry_core/providers/opentelemetry_provider.py`.
 
@@ -177,7 +177,7 @@ class XClient:
                 return resp.json()
 ```
 
-This mirrors existing methods like `get_me` and `search_recent`, keeping behavior consistent with retries, idempotency, and dry‑run.
+This mirrors existing methods like `get_me` and `search_recent`, keeping behavior consistent with retries, idempotency, and dry-run.
 
 ## Adding new endpoints in XClient
 

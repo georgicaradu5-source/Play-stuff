@@ -6,10 +6,10 @@ This document summarizes the operational, security, and quality gates required f
 
 ## Quality gates
 
-- Build/Typecheck: mypy relaxed profile — PASS locally and in CI
-- Lint/Style: ruff/flake8 critical checks — PASS
-- Tests: pytest suite covering auth, rate limiting, storage, telemetry, reliability, client behavior — PASS
-- Dry‑run Safety Gate: `python src/main.py --mode both --dry-run true` — PASS; required status check in branch protection
+- Build/Typecheck: mypy relaxed profile  -  PASS locally and in CI
+- Lint/Style: ruff/flake8 critical checks  -  PASS
+- Tests: pytest suite covering auth, rate limiting, storage, telemetry, reliability, client behavior  -  PASS
+- Dry-run Safety Gate: `python src/main.py --mode both --dry-run true`  -  PASS; required status check in branch protection
 
 ## CI/CD
 
@@ -27,7 +27,7 @@ This document summarizes the operational, security, and quality gates required f
 ## Operations
 
 - Storage: SQLite at `data/agent_unified.db` (action log, rate limits, bandit tables)
-- Scheduling: `src/scheduler.py` time windows; safe to dry‑run in CI
+- Scheduling: `src/scheduler.py` time windows; safe to dry-run in CI
 - Rate limiting: exponential backoff + idempotency on POST; respect `x-rate-limit-reset`
 
 ## Runbooks
@@ -35,7 +35,7 @@ This document summarizes the operational, security, and quality gates required f
 Local validation
 
 1) Run tests: VS Code task "Run: Tests (pytest -v)"
-2) Dry‑run end‑to‑end: VS Code task "Run: Dry-run (both modes)"
+2) Dry-run end-to-end: VS Code task "Run: Dry-run (both modes)"
 
 Incident quick checks
 

@@ -2,7 +2,7 @@
 
 Detailed walkthrough for creating your first automated tweet with X Agent Unified.
 
-> **⚡ Quick Start**: See [QUICKSTART.md](QUICKSTART.md) for initial setup. This guide assumes you've completed Steps 1-4.
+> **[LIGHTNING] Quick Start**: See [QUICKSTART.md](QUICKSTART.md) for initial setup. This guide assumes you've completed Steps 1-4.
 
 ## Overview
 
@@ -20,11 +20,11 @@ This guide walks you through creating your first automated tweet safely, includi
 
 Before your first tweet, ensure:
 
-- ✅ Python environment activated (`.venv/Scripts/activate` or `source .venv/bin/activate`)
-- ✅ `.env` file created with credentials
-- ✅ `config.yaml` configured with topics and windows
-- ✅ Database directory exists (`data/`)
-- ✅ Authentication tested (dry-run completed successfully)
+- [OK] Python environment activated (`.venv/Scripts/activate` or `source .venv/bin/activate`)
+- [OK] `.env` file created with credentials
+- [OK] `config.yaml` configured with topics and windows
+- [OK] Database directory exists (`data/`)
+- [OK] Authentication tested (dry-run completed successfully)
 
 ## Step 1: Pre-Flight Validation
 
@@ -63,7 +63,7 @@ python src/main.py --dry-run true --mode post --plan free
 [INFO] Auth mode: tweepy
 [INFO] Plan: free (50 tweets/day, 1500 tweets/month)
 [INFO] Current time window: morning (9:00-12:00)
-[DRY-RUN] Would create post: "Just discovered a cool trick with Power BI dashboards! 📊 #PowerBI #DataViz"
+[DRY-RUN] Would create post: "Just discovered a cool trick with Power BI dashboards! [CHART] #PowerBI #DataViz"
 [DRY-RUN] Would log action to database: kind=post, arm=power-platform|morning|false
 [INFO] Cycle complete. No errors.
 ```
@@ -131,7 +131,7 @@ max_per_window:
 
 ## Step 4: Create Your First Tweet (Live)
 
-> ⚠️ **WARNING**: This will create a REAL tweet on your X account. Ensure you're logged into the correct account.
+> [WARN] **WARNING**: This will create a REAL tweet on your X account. Ensure you're logged into the correct account.
 
 ```bash
 # Post mode only, free plan
@@ -145,15 +145,15 @@ python src/main.py --mode post --plan free
 [INFO] Plan: free
 [INFO] Current time window: morning
 [INFO] Creating post with template...
-[INFO] ✅ Post created: Tweet ID 1234567890123456789
+[INFO] [OK] Post created: Tweet ID 1234567890123456789
 [INFO] Logged action: post (arm: power-platform|morning|false)
 [INFO] Cycle complete.
 ```
 
 **Look for**:
-- ✅ "Post created: Tweet ID XXXXX" — Success!
-- ✅ "Logged action" — Database updated
-- ❌ Any ERROR messages — Check authentication/rate limits
+- [OK] "Post created: Tweet ID XXXXX"  -  Success!
+- [OK] "Logged action"  -  Database updated
+- [X] Any ERROR messages  -  Check authentication/rate limits
 
 ## Step 5: Verify Tweet Creation
 
@@ -364,11 +364,11 @@ Once comfortable:
 - [ ] Review engagement
 - [ ] Adjust config if needed
 
-**Congratulations!** You've successfully deployed an autonomous X agent. 🎉
+**Congratulations!** You've successfully deployed an autonomous X agent. [PARTY]
 
 ## Further Reading
 
-- [READ_BUDGET.md](READ_BUDGET.md) — Understanding budget management
-- [ENVIRONMENTS.md](../ENVIRONMENTS.md) — GitHub Environments setup
-- [../../docs/telemetry.md](../../docs/telemetry.md) — Enabling observability
-- [../../README.md](../../README.md) — Full feature documentation
+- [READ_BUDGET.md](READ_BUDGET.md)  -  Understanding budget management
+- [ENVIRONMENTS.md](../ENVIRONMENTS.md)  -  GitHub Environments setup
+- [../../docs/telemetry.md](../../docs/telemetry.md)  -  Enabling observability
+- [../../README.md](../../README.md)  -  Full feature documentation

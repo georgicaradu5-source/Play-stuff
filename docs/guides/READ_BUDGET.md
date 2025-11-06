@@ -2,19 +2,19 @@
 
 Complete guide to understanding and managing budget limits in X Agent Unified.
 
-> **🎯 Quick Reference**: Run `python src/main.py --safety print-budget` to see current usage.
+> **[TARGET] Quick Reference**: Run `python src/main.py --safety print-budget` to see current usage.
 
 ## Overview
 
 X Agent Unified enforces budget limits to:
-- ✅ Prevent exceeding X API rate limits
-- ✅ Avoid unexpected costs on paid X plans
-- ✅ Ensure sustainable, policy-compliant automation
-- ✅ Protect against runaway automation bugs
+- [OK] Prevent exceeding X API rate limits
+- [OK] Avoid unexpected costs on paid X plans
+- [OK] Ensure sustainable, policy-compliant automation
+- [OK] Protect against runaway automation bugs
 
 Budget limits apply at **two levels**:
-1. **Monthly Caps** — Total actions per month (resets monthly)
-2. **Daily Caps** — Maximum actions per day (resets daily)
+1. **Monthly Caps**  -  Total actions per month (resets monthly)
+2. **Daily Caps**  -  Maximum actions per day (resets daily)
 
 ## Budget Plan Tiers
 
@@ -151,25 +151,25 @@ python src/main.py --safety print-budget
 
 **Output**:
 ```
-═══════════════════════════════════════
+=======================================
            BUDGET STATUS
-═══════════════════════════════════════
+=======================================
 
 Plan: free
 
 Monthly Caps (November 2025):
-  Reads:  1,234 / 100,000 (1.23%) ✅
-  Writes:   42 / 1,500 (2.80%) ✅
+  Reads:  1,234 / 100,000 (1.23%) [OK]
+  Writes:   42 / 1,500 (2.80%) [OK]
 
 Daily Caps (2025-11-06):
-  Tweets:  3 / 50 (6.00%) ✅
-  Likes:   15 / 50 (30.00%) ✅
-  Replies: 2 / 50 (4.00%) ✅
-  Follows: 1 / 50 (2.00%) ✅
+  Tweets:  3 / 50 (6.00%) [OK]
+  Likes:   15 / 50 (30.00%) [OK]
+  Replies: 2 / 50 (4.00%) [OK]
+  Follows: 1 / 50 (2.00%) [OK]
 
 Safety Buffer: 5%
 
-Status: 🟢 HEALTHY
+Status: [GREEN] HEALTHY
 Next Reset: 2025-12-01 (24 days)
 ```
 
@@ -206,9 +206,9 @@ python scripts/peek_actions.py --limit 20
 - Example: 180 search requests per 15 minutes
 
 **Both work together**:
-1. Budget check (local) → passes
-2. Rate limit check (local tracking) → passes
-3. API call → X enforces server-side rate limits
+1. Budget check (local) -> passes
+2. Rate limit check (local tracking) -> passes
+3. API call -> X enforces server-side rate limits
 
 Check rate limits:
 ```bash
@@ -332,28 +332,28 @@ Get-Process | Where-Object {$_.ProcessName -like "*python*"}  # (Windows)
 
 ### For Free Plan Users
 
-✅ **Do**:
+[OK] **Do**:
 - Use time windows to space out actions
 - Enable learning loop to optimize performance
 - Monitor weekly and adjust limits proactively
 - Use dry-run mode extensively for testing
 
-❌ **Don't**:
+[X] **Don't**:
 - Run agent more than 3x per day (once per window)
 - Enable all action types (pick 2-3)
 - Ignore budget warnings
 
 ### For Basic/Pro Plan Users
 
-✅ **Do**:
+[OK] **Do**:
 - Increase limits gradually (test with 2x, then 5x)
 - Use multiple time windows for natural patterns
 - Enable all interaction modes if desired
 - Set up monitoring/alerting for budget thresholds
 
-❌ **Don't**:
+[X] **Don't**:
 - Max out limits immediately (ramp up over weeks)
-- Ignore rate limits (budget ≠ rate limits)
+- Ignore rate limits (budget != rate limits)
 - Forget to run `--settle-all` for learning optimization
 
 ### General Best Practices
@@ -412,7 +412,7 @@ Get-Date  # (Windows PowerShell)
 
 Budget resets are automatic based on date. If not resetting:
 
-1. **Check code**: `src/storage.py` → `get_monthly_usage()` should use current month
+1. **Check code**: `src/storage.py` -> `get_monthly_usage()` should use current month
 2. **Manual reset**: Delete old month from database
    ```bash
    sqlite3 data/agent_unified.db "DELETE FROM monthly_usage WHERE month='2025-10';"
@@ -424,7 +424,7 @@ Budget resets are automatic based on date. If not resetting:
 - Budget limits protect against overages and ensure policy compliance
 - Three tiers: free (1.5K/month), basic (50K/month), pro (300K/month)
 - Check status anytime: `python src/main.py --safety print-budget`
-- Adjust limits in `config.yaml` → `max_per_window`
+- Adjust limits in `config.yaml` -> `max_per_window`
 - Monitor weekly, adjust proactively
 
 **Quick Commands**:

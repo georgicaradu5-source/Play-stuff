@@ -1,8 +1,8 @@
-# GitHub Environments & Single-Click Deployment 🚀
+# GitHub Environments & Single-Click Deployment [ROCKET]
 
 Complete guide for setting up GitHub environments with maximum automation and minimal human oversight.
 
-## 🎯 Environment Architecture
+## [TARGET] Environment Architecture
 
 ### Staging Environment
 - **Purpose**: Test changes before production
@@ -10,12 +10,12 @@ Complete guide for setting up GitHub environments with maximum automation and mi
 - **Protection**: None (auto-deploys from PRs)
 - **Usage**: Automatic testing, CI/CD validation
 
-# GitHub Environments — staging and production
+# GitHub Environments  -  staging and production
 ### Production Environment  
 - **Purpose**: Live X agent automation
 - **Secrets**: Production X API credentials
 
-## ⚡ Quick Setup (Automated)
+## [LIGHTNING] Quick Setup (Automated)
 ```powershell
 # Run interactive setup script
 .\scripts\gh_env_setup.ps1
@@ -33,7 +33,7 @@ Complete guide for setting up GitHub environments with maximum automation and mi
 ./scripts/gh_env_setup.sh --dry-run
 ```
 
-## 🛠️ Manual Setup (GitHub CLI)
+## [TOOLS] Manual Setup (GitHub CLI)
 
 If you prefer manual control or the scripts don't work:
 
@@ -77,7 +77,7 @@ gh secret set -e production X_ACCESS_SECRET -b"$Env:X_ACCESS_SECRET"
 
 Since production requires manual approval, you need to configure protection rules:
 
-1. **Go to GitHub Repository** → Settings → Environments
+1. **Go to GitHub Repository** -> Settings -> Environments
 2. **Click on "production"** environment
 3. **Check "Required reviewers"** 
 4. **Add yourself** as the required reviewer
@@ -114,7 +114,7 @@ gh secret set X_ACCESS_SECRET --env staging
 gh secret set X_ACCESS_SECRET --env production
 ```
 
-## 🎮 Single-Click Approval Workflow
+## [GAME] Single-Click Approval Workflow
 
 ### How It Works
 
@@ -153,7 +153,7 @@ gh secret set X_ACCESS_SECRET --env production
 # - Starts live automation
 ```
 
-## 🔐 Environment Secrets Reference
+## [LOCK] Environment Secrets Reference
 
 ### Required for OAuth2 Mode (Recommended)
 | Secret | Description | Example |
@@ -171,7 +171,7 @@ gh secret set X_ACCESS_SECRET --env production
 | `X_ACCESS_TOKEN` | Twitter Access Token | `your_access_token_here` |
 | `X_ACCESS_SECRET` | Twitter Access Secret | `your_access_secret_here` |
 
-## 📋 Deployment Commands
+## [CLIPBOARD] Deployment Commands
 
 ### Manual Production Deployment
 ```bash
@@ -199,7 +199,7 @@ gh workflow enable deploy-production.yml
 gh workflow enable deploy-staging.yml
 ```
 
-## 🔍 Monitoring & Validation
+## [SEARCH] Monitoring & Validation
 
 ### Pre-Deployment Checks
 The production deployment includes automatic safety checks:
@@ -211,7 +211,7 @@ python src/main.py --safety print-budget
 python src/main.py --safety print-limits
 
 # Configuration validation
-python -c "import src.config_schema; print('✅ Config valid')"
+python -c "import src.config_schema; print('[OK] Config valid')"
 ```
 
 ### Post-Deployment Monitoring
@@ -226,7 +226,7 @@ python scripts/peek_actions.py
 python src/main.py --safety print-learning
 ```
 
-## 🚨 Troubleshooting
+## [ALERT] Troubleshooting
 
 ### Common Issues
 
@@ -274,7 +274,7 @@ gh workflow enable deploy-production.yml
 gh workflow enable auto-merge.yml
 ```
 
-## ✅ Success Criteria
+## [OK] Success Criteria
 
 After setup, you should have:
 
@@ -287,7 +287,7 @@ After setup, you should have:
 - [ ] Single-click approval triggers live automation
 - [ ] Emergency stop procedures tested and working
 
-## 🎯 Maximum Automation Achieved
+## [TARGET] Maximum Automation Achieved
 
 With this setup:
 - **GitHub Copilot** handles all code changes
@@ -296,7 +296,7 @@ With this setup:
 - **Production** requires just one click from you
 - **Emergency controls** let you stop everything instantly
 
-**Result**: Maximum delegation with minimal human oversight, exactly as requested! 🚀
+**Result**: Maximum delegation with minimal human oversight, exactly as requested! [ROCKET]
 
 ---
 

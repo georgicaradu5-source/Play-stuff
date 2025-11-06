@@ -92,7 +92,7 @@ To add additional MCP servers for enhanced functionality:
 
 ## Security Guidelines
 
-### ⚠️ Important Security Notes
+### [WARN] Important Security Notes
 - **Never commit API keys or secrets** in MCP configuration files
 - Use environment variables for sensitive configuration
 - Test MCP servers in development before production use

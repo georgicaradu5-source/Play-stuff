@@ -1,8 +1,8 @@
-# First Tweet Steps — Quick Checklist
+# First Tweet Steps  -  Quick Checklist
 
 Minimal checklist for creating your first tweet. See [FIRST_TWEET_GUIDE.md](FIRST_TWEET_GUIDE.md) for detailed explanations.
 
-## ✅ Pre-Flight (5 min)
+## [OK] Pre-Flight (5 min)
 
 ```bash
 # 1. Activate environment
@@ -20,7 +20,7 @@ cat .env  # (or type .env on Windows)
 
 **Expected**: All tests pass (18 passed, 2 skipped)
 
-## ✅ Dry-Run Test (2 min)
+## [OK] Dry-Run Test (2 min)
 
 ```bash
 # Test without creating real tweets
@@ -28,9 +28,9 @@ python src/main.py --dry-run true --mode post --plan free
 ```
 
 **Expected**: `[DRY-RUN] Would create post: ...`  
-**No errors**: ✅ Continue | **Errors**: Fix before proceeding
+**No errors**: [OK] Continue | **Errors**: Fix before proceeding
 
-## ✅ Configure Limits (1 min)
+## [OK] Configure Limits (1 min)
 
 Edit `config.yaml`:
 
@@ -44,7 +44,7 @@ max_per_window:
 
 **Save file**
 
-## ✅ Check Time Window (1 min)
+## [OK] Check Time Window (1 min)
 
 ```bash
 # Verify current time is in a window
@@ -54,17 +54,17 @@ python src/main.py --dry-run true --mode post | grep "window"
 **Expected**: `Current time window: morning` (or afternoon/evening)  
 **If "No window active"**: Wait or adjust `schedule.windows` in config
 
-## ✅ Create First Tweet (1 min)
+## [OK] Create First Tweet (1 min)
 
-> ⚠️ **LIVE MODE** — This creates a REAL tweet
+> [WARN] **LIVE MODE**  -  This creates a REAL tweet
 
 ```bash
 python src/main.py --mode post --plan free
 ```
 
-**Look for**: `✅ Post created: Tweet ID XXXXX`
+**Look for**: `[OK] Post created: Tweet ID XXXXX`
 
-## ✅ Verify Tweet (2 min)
+## [OK] Verify Tweet (2 min)
 
 ```bash
 # 1. Check database
@@ -76,7 +76,7 @@ python src/main.py --safety print-budget
 # 3. Visit X.com and verify tweet appears on your profile
 ```
 
-## ✅ Settle Metrics (After 24-48 Hours)
+## [OK] Settle Metrics (After 24-48 Hours)
 
 ```bash
 # Wait 24-48 hours for engagement, then:
@@ -85,7 +85,7 @@ python src/main.py --settle-all
 
 **This optimizes future tweets based on performance.**
 
-## 🚨 Troubleshooting Quick Fixes
+## [ALERT] Troubleshooting Quick Fixes
 
 | Issue | Quick Fix |
 |-------|-----------|
@@ -95,7 +95,7 @@ python src/main.py --settle-all
 | Tweet not visible on X | Check spam filter, verify correct account, refresh page |
 | "Duplicate content" | Normal! Agent prevents spam. Wait 7 days or change topics in config |
 
-## 🎯 Success Criteria
+## [TARGET] Success Criteria
 
 - [x] Dry-run passes without errors
 - [x] Live run creates tweet (Tweet ID returned)
@@ -104,7 +104,7 @@ python src/main.py --settle-all
 - [x] Budget shows 1 tweet used
 - [x] No error messages in console
 
-**All checked?** Success! 🎉 You're ready to enable more features.
+**All checked?** Success! [PARTY] You're ready to enable more features.
 
 ## Next: Enable Full Automation
 
