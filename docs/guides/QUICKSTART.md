@@ -46,7 +46,7 @@ chmod +x setup.sh
 
 ### Option A: Tweepy (OAuth 1.0a) - Recommended for Beginners
 
-**Pros**: Simple setup, 4 credentials, supports media upload  
+**Pros**: Simple setup, 4 credentials, supports media upload
 **Cons**: Manual token refresh
 
 1. Get credentials from [X Developer Portal](https://developer.x.com/):
@@ -67,7 +67,7 @@ X_ACCESS_SECRET=your_access_token_secret_here
 
 ### Option B: OAuth 2.0 PKCE - Modern & Recommended for Production
 
-**Pros**: Auto token refresh, granular scopes, modern flow  
+**Pros**: Auto token refresh, granular scopes, modern flow
 **Cons**: Slightly more complex initial setup
 
 1. Get credentials from [X Developer Portal](https://developer.x.com/):
@@ -303,4 +303,3 @@ Before going live, confirm:
 ---
 
 **Welcome to X Agent Unified!** Start with dry-run, monitor your budget, and let Thompson Sampling optimize your content strategy.
-

@@ -82,13 +82,7 @@ class RateLimiter:
             print(f"[WAIT] Rate limit low for {endpoint}. Waiting {wait_seconds}s...")
             time.sleep(wait_seconds + 1)  # Add 1s buffer
 
-    def backoff_and_retry(
-        self,
-        func: Callable[..., T],
-        *args: Any,
-        max_retries: int | None = None,
-        **kwargs: Any
-    ) -> T:
+    def backoff_and_retry(self, func: Callable[..., T], *args: Any, max_retries: int | None = None, **kwargs: Any) -> T:
         """Execute function with exponential backoff on rate limit errors."""
         max_retries = max_retries or self.max_retries
 
@@ -102,7 +96,7 @@ class RateLimiter:
                 if "429" in error_str or "rate limit" in error_str:
                     if attempt < max_retries - 1:
                         # Exponential backoff with jitter
-                        base_delay = self.backoff_base ** attempt
+                        base_delay = self.backoff_base**attempt
                         jitter = random.uniform(0, 1)
                         delay = base_delay + jitter
 

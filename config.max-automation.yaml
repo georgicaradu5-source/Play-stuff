@@ -42,25 +42,25 @@ queries:
     actions: [like, reply, follow, repost]
   - query: '("data visualization" OR DAX OR "business intelligence") lang:en -is:retweet'
     actions: [like, reply, follow, repost]
-  
+
   # AI/ML broad coverage
   - query: '(AI OR "machine learning" OR "artificial intelligence" OR ML) lang:en -is:retweet'
     actions: [like, reply, follow, repost]
   - query: '("data science" OR analytics OR "big data") lang:en -is:retweet'
     actions: [like, reply, follow, repost]
-  
+
   # Cloud and Development
   - query: '(Azure OR AWS OR "cloud computing" OR DevOps) lang:en -is:retweet'
     actions: [like, reply, follow, repost]
   - query: '(Python OR JavaScript OR "software development" OR coding) lang:en -is:retweet'
     actions: [like, reply, follow, repost]
-  
+
   # Business and Innovation
   - query: '("digital transformation" OR innovation OR startup OR entrepreneur) lang:en -is:retweet'
     actions: [like, reply, follow, repost]
   - query: '(productivity OR automation OR "remote work" OR leadership) lang:en -is:retweet'
     actions: [like, reply, follow, repost]
-  
+
   # Tech trends and news
   - query: '("tech news" OR "technology trends" OR "emerging tech") lang:en -is:retweet'
     actions: [like, reply, follow, repost]
@@ -105,7 +105,7 @@ learning:
 budget:
   # Minimal safety buffer for maximum utilization
   buffer_pct: 0.01  # 1% buffer instead of 5%
-  
+
   # Custom caps set to maximum reasonable values
   custom_read_cap: 10000   # 10x typical limits
   custom_write_cap: 5000   # 10x typical limits
@@ -119,7 +119,7 @@ logging:
 # === FEATURE FLAGS - ALL ENABLED ===
 feature_flags:
   allow_likes: on      # Always enabled
-  allow_follows: on    # Always enabled  
+  allow_follows: on    # Always enabled
   allow_media: on      # Enable media uploads
   allow_quotes: on     # Enable quote tweets
   allow_threads: on    # Enable thread creation
@@ -147,7 +147,7 @@ rate_limits:
   max_backoff_seconds: 300         # Down from 900
   backoff_multiplier: 1.5          # Down from 2.0
   jitter_factor: 0.1               # Minimal jitter
-  
+
   # Aggressive retry strategy
   max_retries: 10                  # Up from 5
   retry_on_rate_limit: true
@@ -157,22 +157,22 @@ rate_limits:
 autonomous:
   # Enable full autonomous operation
   enabled: true
-  
+
   # Auto-scaling based on engagement
   dynamic_limits: true
   scale_factor_min: 0.5
   scale_factor_max: 3.0
-  
+
   # Automatic content optimization
   auto_optimize_templates: true
   auto_optimize_timing: true
   auto_optimize_topics: true
-  
+
   # Autonomous following strategy
   auto_follow_influencers: true
   auto_unfollow_inactive: true
   follow_ratio_target: 1.2
-  
+
   # Trending topic integration
   follow_trends: true
   trend_check_interval_minutes: 15
@@ -184,7 +184,7 @@ watchlist_user_ids:
   - "14520320"    # Microsoft
   - "395239899"   # Satya Nadella
   - "1321353599"  # Power Platform
-  
+
 # === PERSONAS ===
 # Multiple personas for varied engagement
 personas:
@@ -192,15 +192,15 @@ personas:
     name: "Tech Enthusiast"
     style: "Professional and insightful"
     signature: ""
-  
+
   casual:
     name: "Friendly Techie"
     style: "Casual and approachable"
     signature: "💻"
-    
+
   expert:
     name: "Industry Expert"
-    style: "Authoritative and detailed" 
+    style: "Authoritative and detailed"
     signature: "🚀"
 
 # === CONTENT STRATEGY ===
@@ -211,7 +211,7 @@ content_strategy:
     - questions     # 20%
     - tips          # 25%
     - news_reaction # 15%
-  
+
   # Engagement optimization
   optimal_length_range: [50, 250]
   include_hashtags: true
@@ -224,7 +224,7 @@ monitoring:
   track_engagement_rate: true
   track_follower_growth: true
   track_reach_metrics: true
-  
+
   # Automatic alerts
   alert_on_rate_limit: false  # Don't alert, handle automatically
   alert_on_low_engagement: true
@@ -236,7 +236,7 @@ safety:
   respect_rate_limits: true     # Keep this for API compliance
   avoid_spam_detection: true    # Keep this for account safety
   content_moderation: basic     # Minimal content filtering
-  
+
   # Emergency stops (human can still intervene)
   emergency_stop_triggers:
     - negative_sentiment_spike

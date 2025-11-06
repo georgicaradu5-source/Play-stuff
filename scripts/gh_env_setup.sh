@@ -53,14 +53,14 @@ SECRETS SET:
     - X_CLIENT_SECRET
     - X_REDIRECT_URI
     - OPENAI_API_KEY
-    
+
     Optional (for OAuth1/Tweepy mode):
     - X_API_KEY
     - X_API_SECRET
     - X_ACCESS_TOKEN
     - X_ACCESS_SECRET
     - X_CLIENT_ID
-    - X_CLIENT_SECRET  
+    - X_CLIENT_SECRET
     - X_REDIRECT_URI
     - OPENAI_API_KEY
     - X_API_KEY (optional, for Tweepy mode)
@@ -100,32 +100,32 @@ get_secret() {
     local description="$2"
     local required="${3:-true}"
     local secret_value=""
-    
+
     while [ -z "$secret_value" ] && [ "$required" = "true" ]; do
         if [ "$required" = "true" ]; then
             prompt="$description (required): "
         else
             prompt="$description (optional, press Enter to skip): "
         fi
-        
+
         read -s -p "$prompt" secret_value
         echo
-        
+
         if [ -z "$secret_value" ] && [ "$required" = "true" ]; then
             print_warning "This secret is required. Please provide a value."
         fi
     done
-    
+
     echo "$secret_value"
 }
 
 create_environment() {
     local env_name="$1"
     local require_approval="${2:-false}"
-    
+
     echo
     echo "🔧 Creating environment: $env_name"
-    
+
     if [ "$DRY_RUN" = true ]; then
         echo "[DRY RUN] Would create environment: $env_name"
         if [ "$require_approval" = "true" ]; then
@@ -133,14 +133,14 @@ create_environment() {
         fi
         return 0
     fi
-    
+
     # Create environment
     if gh api "repos/:owner/:repo/environments/$env_name" -X PUT >/dev/null 2>&1; then
         print_status "Environment '$env_name' created"
     else
         print_warning "Environment '$env_name' may already exist or creation failed"
     fi
-    
+
     # Set protection rules for production
     if [ "$require_approval" = "true" ] && [ "$env_name" = "production" ]; then
         local user_id=$(gh api user --jq .id)
@@ -159,14 +159,14 @@ create_environment() {
 }
 EOF
 )
-        
+
         if echo "$protection_rules" | gh api "repos/:owner/:repo/environments/$env_name" -X PUT --input - >/dev/null 2>&1; then
             print_status "Production environment configured with approval requirement"
         else
             print_warning "Could not set protection rules for production"
         fi
     fi
-    
+
     return 0
 }
 
@@ -174,17 +174,17 @@ set_environment_secret() {
     local env_name="$1"
     local secret_name="$2"
     local secret_value="$3"
-    
+
     if [ -z "$secret_value" ]; then
         echo "  Skipping empty secret: $secret_name"
         return
     fi
-    
+
     if [ "$DRY_RUN" = true ]; then
         echo "[DRY RUN] Would set secret $secret_name in environment $env_name"
         return
     fi
-    
+
     if echo "$secret_value" | gh secret set "$secret_name" --env "$env_name"; then
         print_status "Set secret: $secret_name"
     else
@@ -255,7 +255,7 @@ if ! create_environment "staging" false; then
 fi
 
 if ! create_environment "production" true; then
-    print_error "Failed to create production environment"  
+    print_error "Failed to create production environment"
     exit 1
 fi
 
@@ -263,7 +263,7 @@ fi
 for env_name in staging production; do
     echo
     echo "🔑 Setting secrets in $env_name environment..."
-    
+
     for secret_name in "${!secrets[@]}"; do
         set_environment_secret "$env_name" "$secret_name" "${secrets[$secret_name]}"
     done

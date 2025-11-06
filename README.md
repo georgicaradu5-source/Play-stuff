@@ -141,7 +141,7 @@ The original agent implementations are preserved in `_archive/` for reference:
 $env:X_AUTH_MODE = 'tweepy'
 python src/main.py --mode post --plan free
 
-# Dry-run testing (OAuth2 recommended)  
+# Dry-run testing (OAuth2 recommended)
 $env:X_AUTH_MODE = 'oauth2'
 python src/main.py --dry-run --mode both
 ```
@@ -558,4 +558,3 @@ MIT License - See LICENSE file
 ---
 
 **Choose your auth, keep your budget, learn what works. Simple.**
-

@@ -2,7 +2,7 @@
 # Conservative settings for initial deployment and testing
 
 # === AUTHENTICATION ===
-# Mode: "tweepy" or "oauth2" 
+# Mode: "tweepy" or "oauth2"
 auth_mode: oauth2
 
 # === PLAN TIER ===
@@ -63,12 +63,12 @@ logging:
 
 # === FEATURE FLAGS - CONSERVATIVE ===
 feature_flags:
-  allow_likes: auto      
+  allow_likes: auto
   allow_follows: off     # Start without follows
-  allow_media: off       
-  allow_quotes: off      
-  allow_threads: off     
-  aggressive_mode: off   
+  allow_media: off
+  allow_quotes: off
+  allow_threads: off
+  aggressive_mode: off
 
 # === INTERACTION MODE ===
 interact_mode: search

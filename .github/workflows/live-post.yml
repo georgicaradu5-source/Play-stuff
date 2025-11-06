@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: 'Agent mode'  
+        description: 'Agent mode'
         required: true
         default: 'post'
         type: choice
@@ -26,22 +26,22 @@ jobs:
     name: Production Live Post
     runs-on: ubuntu-latest
     environment: production
-    
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        
+
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: 'pip'
-          
+
       - name: Install dependencies
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
-          
+
       - name: Configure production environment
         run: |
           # Create .env from production secrets
@@ -56,33 +56,33 @@ jobs:
           ENABLE_TELEMETRY=true
           OTEL_SERVICE_NAME=x-agent-production
           EOF
-          
+
           # Copy production token (OAuth2 mode)
           if [[ -n "${{ secrets.X_TOKEN_JSON }}" ]]; then
             echo '${{ secrets.X_TOKEN_JSON }}' > .token.json
           fi
-          
+
       - name: Production safety preflight
         run: |
           echo "🔍 Production preflight checks..."
-          
+
           # Safety checks as required
           python src/main.py --safety print-budget || echo "Budget check completed"
           python src/main.py --safety print-limits || echo "Limits check completed"
-          
+
       - name: Run agent (production)
         id: run-production
         run: |
           echo "🚀 Starting X agent in PRODUCTION environment..."
           echo "⚠️  This will make LIVE posts on X/Twitter!"
-          
+
           # Single mode post with free plan as specified
           python src/main.py \
             --mode ${{ github.event.inputs.mode }} \
             --plan ${{ github.event.inputs.plan }}
-            
+
         timeout-minutes: 30
-        
+
       - name: Production deployment summary
         if: always()
         run: |
@@ -93,7 +93,7 @@ jobs:
           echo "**Plan:** ${{ github.event.inputs.plan }}" >> $GITHUB_STEP_SUMMARY
           echo "**Timestamp:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          
+
           if [[ "${{ steps.run-production.outcome }}" == "success" ]]; then
             echo "✅ **Production deployment completed successfully**" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
@@ -103,7 +103,7 @@ jobs:
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "Check logs and artifacts for error details." >> $GITHUB_STEP_SUMMARY
           fi
-        
+
       - name: Upload production logs
         uses: actions/upload-artifact@v3
         if: always()

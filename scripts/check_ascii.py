@@ -133,9 +133,7 @@ class AsciiChecker:
         """
         dir_path = Path(directory)
         if not dir_path.exists():
-            print(
-                f"[WARNING] Directory not found: {directory}, skipping", file=sys.stderr
-            )
+            print(f"[WARNING] Directory not found: {directory}, skipping", file=sys.stderr)
             return 0
 
         files_with_issues = 0
@@ -186,16 +184,11 @@ class AsciiChecker:
 
             for match in self.matches:
                 # Produce ASCII-safe line preview using backslash escapes
-                safe_line = (
-                    match.line_content.encode("ascii", "backslashreplace").decode("ascii")
-                )
+                safe_line = match.line_content.encode("ascii", "backslashreplace").decode("ascii")
                 if len(safe_line) > 80:
                     safe_line = safe_line[:80] + "..."
 
-                print(
-                    f"  {match.file}:{match.line_num}:{match.char_position} "
-                    f"(U+{match.char_value:04X})"
-                )
+                print(f"  {match.file}:{match.line_num}:{match.char_position} " f"(U+{match.char_value:04X})")
                 print(f"    {safe_line}")
                 print()
 

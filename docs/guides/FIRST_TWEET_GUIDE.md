@@ -78,13 +78,13 @@ python scripts/peek_actions.py --limit 10
 
 ### Common Dry-Run Issues
 
-**Issue**: "No window active"  
+**Issue**: "No window active"
 **Fix**: Check current time matches configured windows in `config.yaml`. Test with `windows: [morning, afternoon, evening]` to cover all day.
 
-**Issue**: "Budget exceeded"  
+**Issue**: "Budget exceeded"
 **Fix**: Database has old data. Delete `data/agent_unified.db` and rerun setup.
 
-**Issue**: "Authentication failed"  
+**Issue**: "Authentication failed"
 **Fix**: Verify `.env` credentials. For Tweepy, ensure all 4 tokens are correct. For OAuth2, rerun `--authorize`.
 
 ## Step 3: Prepare for Live Execution

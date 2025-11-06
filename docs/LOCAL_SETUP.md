@@ -88,7 +88,7 @@ python src/main.py --dry-run --mode both
 # Check budget limits
 python src/main.py --safety print-budget
 
-# Check rate limits  
+# Check rate limits
 python src/main.py --safety print-limits
 
 # Both should show reasonable values
@@ -111,7 +111,7 @@ python src/main.py --mode both
 ### Interact only:
 ```powershell
 # Interactions without posting
-python src/main.py --mode interact  
+python src/main.py --mode interact
 ```
 
 ## [TOOLS] Troubleshooting
@@ -169,7 +169,7 @@ python src/main.py --safety print-learning
 
 - [ ] OAuth2 authorization completes successfully
 - [ ] Dry-run shows realistic actions without errors
-- [ ] Safety checks show expected budget/limit values  
+- [ ] Safety checks show expected budget/limit values
 - [ ] Single post test works without rate limit errors
 - [ ] Full automation runs for 5+ minutes without crashes
 

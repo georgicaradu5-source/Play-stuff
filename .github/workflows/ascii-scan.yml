@@ -26,16 +26,16 @@ jobs:
   ascii-scan:
     name: Check for non-ASCII characters
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      
+
       - name: Run ASCII compliance check
         run: |
           if [ "${{ github.event.inputs.scope }}" = "full" ]; then
@@ -45,7 +45,7 @@ jobs:
           fi
         shell: bash
         # To scan docs in PR/push, change the line above to include docs or trigger manual run with scope=full
-      
+
       - name: Report results
         if: failure()
         run: |

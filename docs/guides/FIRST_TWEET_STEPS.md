@@ -27,7 +27,7 @@ cat .env  # (or type .env on Windows)
 python src/main.py --dry-run true --mode post --plan free
 ```
 
-**Expected**: `[DRY-RUN] Would create post: ...`  
+**Expected**: `[DRY-RUN] Would create post: ...`
 **No errors**: [OK] Continue | **Errors**: Fix before proceeding
 
 ## [OK] Configure Limits (1 min)
@@ -51,7 +51,7 @@ max_per_window:
 python src/main.py --dry-run true --mode post | grep "window"
 ```
 
-**Expected**: `Current time window: morning` (or afternoon/evening)  
+**Expected**: `Current time window: morning` (or afternoon/evening)
 **If "No window active"**: Wait or adjust `schedule.windows` in config
 
 ## [OK] Create First Tweet (1 min)

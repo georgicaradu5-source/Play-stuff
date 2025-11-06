@@ -5,7 +5,7 @@
   color: "0e8a16"
   description: "Automatically merge this PR when checks pass"
 
-- name: "auto-deploy" 
+- name: "auto-deploy"
   color: "0e8a16"
   description: "Automatically deploy when merged to main"
 
@@ -27,7 +27,7 @@
   description: "Dependency updates"
 
 - name: "security"
-  color: "d73a49" 
+  color: "d73a49"
   description: "Security-related changes"
 
 # Automation Status
@@ -43,20 +43,20 @@
   color: "d73a49"
   description: "CI/CD pipeline failure"
 
-# Priority Levels  
+# Priority Levels
 - name: "priority-critical"
   color: "b60205"
   description: "Critical priority - immediate attention needed"
 
 - name: "priority-high"
-  color: "d93f0b" 
+  color: "d93f0b"
   description: "High priority"
 
 - name: "priority-medium"
   color: "fbca04"
   description: "Medium priority"
 
-- name: "priority-low" 
+- name: "priority-low"
   color: "0e8a16"
   description: "Low priority"
 
@@ -74,7 +74,7 @@
   description: "Improvements or additions to documentation"
 
 - name: "maintenance"
-  color: "fbca04" 
+  color: "fbca04"
   description: "Routine maintenance tasks"
 
 - name: "refactoring"

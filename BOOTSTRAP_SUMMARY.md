@@ -12,7 +12,7 @@ Created comprehensive bootstrap infrastructure for maximum GitHub Copilot delega
   - OpenAI API key placeholder
   - Automation settings with maximum delegation flags
 
-### 2. Configuration Files  
+### 2. Configuration Files
 - **`config.safe.yaml`** (New) - Complete file, 89 lines
   - Conservative configuration for free plan usage
   - Limited post/interaction rates (1 post per window, 5 likes per window)
@@ -39,7 +39,7 @@ Created comprehensive bootstrap infrastructure for maximum GitHub Copilot delega
   - Creates staging/production environments with protection rules
   - Comprehensive error handling and validation
 
-- **`scripts/gh_env_setup.sh`** (New) - Complete file, 221 lines  
+- **`scripts/gh_env_setup.sh`** (New) - Complete file, 221 lines
   - Bash equivalent for Linux/macOS environments
   - Same functionality as PowerShell version
   - Unix-style argument parsing and error handling
@@ -73,7 +73,7 @@ Created comprehensive bootstrap infrastructure for maximum GitHub Copilot delega
 ### 1. Multi-Layer Safety
 - **Code Level**: Type checking, unit tests, dry-run validation
 - **Configuration Level**: Schema validation, safety limits
-- **Environment Level**: Staging testing before production  
+- **Environment Level**: Staging testing before production
 - **Deployment Level**: Manual approval gates for production
 
 ### 2. Single-Click Workflows
@@ -104,7 +104,7 @@ Created comprehensive bootstrap infrastructure for maximum GitHub Copilot delega
 
 ### Local Setup (5 minutes)
 1. Copy `.env.example` to `.env` and fill in credentials
-2. Run `python src/main.py --authorize` for OAuth2 setup  
+2. Run `python src/main.py --authorize` for OAuth2 setup
 3. Test with `python src/main.py --config config.safe.yaml --dry-run --mode both`
 4. Follow `docs/LOCAL_SETUP.md` checklist
 

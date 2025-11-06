@@ -35,7 +35,7 @@
 - README.md - Complete ASCII normalization
 - docs/guides/QUICKSTART.md - Removed duplicates, normalized to ASCII
 - src/scheduler.py - ASCII console output
-- src/rate_limiter.py - ASCII console output  
+- src/rate_limiter.py - ASCII console output
 - src/main.py - ASCII console output for auth flow and metrics
 
 ### Validation Results

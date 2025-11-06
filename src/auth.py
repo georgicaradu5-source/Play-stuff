@@ -21,6 +21,7 @@ except ImportError:
 
 try:
     from dotenv import load_dotenv
+
     load_dotenv()
 except ImportError:
     pass
@@ -31,6 +32,7 @@ AuthMode = Literal["tweepy", "oauth2"]
 
 class OAuthCallbackHandler(BaseHTTPRequestHandler):
     """HTTP server to capture OAuth 2.0 callback."""
+
     auth_code: str | None = None
 
     def do_GET(self) -> None:
@@ -98,7 +100,7 @@ class UnifiedAuth:
         that explicitly pass the desired auth mode. If not provided, the
         mode is read from the X_AUTH_MODE environment variable (default: tweepy).
         """
-        resolved_mode: str = (mode or os.getenv("X_AUTH_MODE", "tweepy"))  # type: ignore
+        resolved_mode: str = mode or os.getenv("X_AUTH_MODE", "tweepy")  # type: ignore
 
         if resolved_mode not in ["tweepy", "oauth2"]:
             raise ValueError(f"Invalid X_AUTH_MODE: {resolved_mode}. Use 'tweepy' or 'oauth2'")
@@ -191,9 +193,9 @@ class UnifiedAuth:
     def _generate_pkce_pair(self) -> tuple[str, str]:
         """Generate PKCE code verifier and challenge."""
         verifier = base64.urlsafe_b64encode(secrets.token_bytes(32)).decode("utf-8").rstrip("=")
-        challenge = base64.urlsafe_b64encode(
-            hashlib.sha256(verifier.encode("utf-8")).digest()
-        ).decode("utf-8").rstrip("=")
+        challenge = (
+            base64.urlsafe_b64encode(hashlib.sha256(verifier.encode("utf-8")).digest()).decode("utf-8").rstrip("=")
+        )
         return verifier, challenge
 
     def authorize_oauth2(self, scopes: list[str]) -> str:

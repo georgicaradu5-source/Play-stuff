@@ -3,7 +3,7 @@
 
 # Tech leaders and influencers
 microsoft
-satyanadella  
+satyanadella
 github
 openai
 elonmusk

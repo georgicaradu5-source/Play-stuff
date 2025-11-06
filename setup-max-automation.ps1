@@ -20,7 +20,7 @@ X_CLIENT_SECRET=your_oauth2_client_secret
 
 # Optional: Tweepy fallback (for v1.1 media uploads)
 X_API_KEY=your_api_key
-X_API_SECRET=your_api_secret  
+X_API_SECRET=your_api_secret
 X_ACCESS_TOKEN=your_access_token
 X_ACCESS_SECRET=your_access_secret
 
@@ -63,14 +63,14 @@ Write-Host "✅ Git hooks configured" -ForegroundColor Green
 # 5. Configure GitHub CLI if available
 if (Get-Command gh -ErrorAction SilentlyContinue) {
     Write-Host "⚙️ Configuring GitHub repository settings..." -ForegroundColor Cyan
-    
+
     # Enable auto-merge
     gh api repos/georgicaradu5-source/Play-stuff --method PATCH --field allow_auto_merge=true | Out-Null
     gh api repos/georgicaradu5-source/Play-stuff --method PATCH --field delete_branch_on_merge=true | Out-Null
-    
+
     # Enable all repository features
     gh repo edit --enable-issues --enable-wiki --enable-projects | Out-Null
-    
+
     Write-Host "✅ GitHub repository configured for automation" -ForegroundColor Green
 } else {
     Write-Host "⚠️ GitHub CLI not found - configure manually" -ForegroundColor Yellow
@@ -93,7 +93,7 @@ $curatedAccounts = @"
 
 # Tech leaders and influencers
 microsoft
-satyanadella  
+satyanadella
 github
 openai
 elonmusk
@@ -113,7 +113,7 @@ Write-Host "3. Test: python src/main.py --dry-run --mode both" -ForegroundColor 
 Write-Host "4. Go live: python src/main.py --mode both" -ForegroundColor White
 Write-Host "`nAutomation features enabled:" -ForegroundColor Cyan
 Write-Host "• Maximum per-window limits (500 likes, 100 follows, 50 replies)" -ForegroundColor Green
-Write-Host "• 24/7 posting schedule (6 time windows)" -ForegroundColor Green  
+Write-Host "• 24/7 posting schedule (6 time windows)" -ForegroundColor Green
 Write-Host "• Hybrid mode (search + curated)" -ForegroundColor Green
 Write-Host "• All feature flags enabled" -ForegroundColor Green
 Write-Host "• Aggressive Thompson Sampling" -ForegroundColor Green

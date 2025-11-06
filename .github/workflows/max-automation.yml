@@ -21,47 +21,47 @@ jobs:
     strategy:
       matrix:
         python-version: ['3.12']  # Focus on latest for speed
-    
+
     steps:
       - name: Checkout with full history
         uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Full history for better analysis
-      
+
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
-      
+
       - name: Install dependencies aggressively
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install pytest coverage mypy ruff black bandit safety
-      
+
       - name: Auto-format code
         run: |
           black src/ tests/
           ruff --fix src/ tests/ || true
         continue-on-error: true
-      
+
       - name: Security scanning
         run: |
           bandit -r src/ -f json -o security-report.json || true
           safety check --json --output safety-report.json || true
         continue-on-error: true
-      
+
       - name: Type checking
         run: mypy src/ || true
         continue-on-error: true
-      
+
       - name: Run comprehensive tests
         run: |
           coverage run -m pytest -v --tb=short
           coverage xml
           coverage report
-      
+
       - name: Auto-commit formatting fixes
         if: github.event_name == 'push'
         run: |
@@ -71,7 +71,7 @@ jobs:
           git diff --staged --quiet || git commit -m "🤖 Auto-format code [skip ci]"
           git push || true
         continue-on-error: true
-      
+
       - name: Auto-create PR for improvements
         if: failure() && github.ref != 'refs/heads/main'
         run: |
@@ -82,7 +82,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
-      
+
       - name: Auto-merge if tests pass
         if: success() && github.event_name == 'pull_request'
         run: |
@@ -97,17 +97,17 @@ jobs:
     if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.12'
-      
+
       - name: Update dependencies
         run: |
           pip install pip-tools
           pip-compile --upgrade requirements.in > requirements.txt || true
-          
+
       - name: Create dependency update PR
         run: |
           git config --local user.email "action@github.com"
@@ -128,7 +128,7 @@ jobs:
     if: github.event_name == 'schedule'
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Auto-close stale issues
         run: |
           gh issue list --state open --json number,updatedAt \
@@ -137,7 +137,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
-      
+
       - name: Create maintenance issues
         run: |
           gh issue create --title "🤖 Monthly Maintenance $(date +%B)" \
@@ -152,13 +152,13 @@ jobs:
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Security audit
         run: |
           pip install safety bandit
           safety check || true
           bandit -r src/ || true
-      
+
       - name: Update security-related packages
         run: |
           pip install --upgrade pip setuptools wheel

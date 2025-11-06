@@ -21,7 +21,7 @@ The main MCP configuration file at the repository root contains safe default ser
 
 This includes only the basic filesystem server for safe file operations.
 
-### VS Code: `.vscode/mcp.json`  
+### VS Code: `.vscode/mcp.json`
 The VS Code specific MCP configuration mirrors the root configuration:
 
 ```json
@@ -44,7 +44,7 @@ To add additional MCP servers for enhanced functionality:
 {
   "mcpServers": {
     "fs": {
-      "command": "fs", 
+      "command": "fs",
       "args": []
     },
     "sqlite": {
@@ -135,7 +135,7 @@ If using VS Code with MCP support:
 Common MCP servers you might want to add:
 - `fs` - Filesystem operations (included by default)
 - `sqlite` - SQLite database access
-- `git` - Git repository operations  
+- `git` - Git repository operations
 - `web-search` - Web search capabilities
 - `calendar` - Calendar integration
 - `email` - Email operations

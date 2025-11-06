@@ -32,7 +32,7 @@ SECRETS SET:
     - X_CLIENT_SECRET
     - X_REDIRECT_URI
     - OPENAI_API_KEY
-    
+
     Optional (for OAuth1/Tweepy mode):
     - X_API_KEY
     - X_API_SECRET
@@ -64,7 +64,7 @@ function Write-Info {
 
 function Test-GitHubAuth {
     Write-Info "Checking GitHub CLI authentication..."
-    
+
     try {
         gh auth status --hostname github.com 2>$null
         if ($LASTEXITCODE -eq 0) {
@@ -82,9 +82,9 @@ function Test-GitHubAuth {
 
 function New-GitHubEnvironment {
     param($EnvName, $RequireApproval = $false)
-    
+
     Write-Host "`n🔧 Configuring environment: $EnvName"
-    
+
     if ($DryRun) {
         Write-Host "[DRY RUN] gh api repos/:owner/:repo/environments/$EnvName -X PUT"
         if ($RequireApproval) {
@@ -92,7 +92,7 @@ function New-GitHubEnvironment {
         }
         return $true
     }
-    
+
     # Create environment using gh api
     try {
         Write-Info "Creating environment: $EnvName"
@@ -105,22 +105,22 @@ function New-GitHubEnvironment {
     } catch {
         Write-Warning "Environment '$EnvName' creation issue: $($_.Exception.Message)"
     }
-    
+
     # Set protection rules for production
     if ($RequireApproval -and $EnvName -eq "production") {
         try {
             Write-Info "Setting protection rules for production environment"
-            
+
             # Get current user ID
             $userId = gh api user --jq .id
-            
+
             # Create protection rules using temporary file (PowerShell-compatible approach)
             $tempFile = [System.IO.Path]::GetTempFileName()
             $protectionJson = @"
 {
   "reviewers": [
     {
-      "type": "User", 
+      "type": "User",
       "id": $userId
     }
   ],
@@ -132,11 +132,11 @@ function New-GitHubEnvironment {
 }
 "@
             $protectionJson | Set-Content $tempFile
-            
+
             # Apply protection rules
             gh api "repos/:owner/:repo/environments/$EnvName" -X PUT --input $tempFile | Out-Null
             Remove-Item $tempFile -ErrorAction SilentlyContinue
-            
+
             if ($LASTEXITCODE -eq 0) {
                 Write-Status "Production environment configured with single-reviewer approval"
             } else {
@@ -146,23 +146,23 @@ function New-GitHubEnvironment {
             Write-Warning "Could not set protection rules for production: $($_.Exception.Message)"
         }
     }
-    
+
     return $true
 }
 
 function Set-EnvironmentSecret {
     param($EnvName, $SecretName, $SecretValue)
-    
+
     if ([string]::IsNullOrWhiteSpace($SecretValue)) {
         Write-Host "  Skipping empty secret: $SecretName" -ForegroundColor Gray
         return
     }
-    
+
     if ($DryRun) {
         Write-Host "[DRY RUN] gh secret set $SecretName --env $EnvName --body `"<VALUE>`""
         return
     }
-    
+
     try {
         Write-Host "  Setting secret: $SecretName" -ForegroundColor Cyan
         $SecretValue | gh secret set $SecretName --env $EnvName
@@ -231,7 +231,7 @@ if (!(New-GitHubEnvironment "staging" $false)) {
 }
 
 if (!(New-GitHubEnvironment "production" $true)) {
-    Write-Error "Failed to create production environment"  
+    Write-Error "Failed to create production environment"
     exit 1
 }
 
@@ -240,7 +240,7 @@ $environments = @("staging", "production")
 
 foreach ($env in $environments) {
     Write-Host "`n🔑 Setting secrets for environment: $env"
-    
+
     foreach ($secretName in $secrets.Keys) {
         Set-EnvironmentSecret $env $secretName $secrets[$secretName]
     }
@@ -258,7 +258,7 @@ if (!$DryRun) {
 ✅ Environment setup complete!
 
 Next steps:
-1. Go to GitHub → Settings → Environments  
+1. Go to GitHub → Settings → Environments
 2. Verify 'production' has 'Required reviewers' set to your user
 3. Test deployment with: gh workflow run live-post.yml
 

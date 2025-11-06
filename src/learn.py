@@ -62,7 +62,9 @@ def settle(client: XClient, storage: Storage, post_id: str, arm: str) -> None:
     # Update bandit arm
     storage.bandit_update(arm, reward)
 
-    print(f"[OK] Settled {post_id}: reward={reward:.3f} (likes={like_count}, replies={reply_count}, RT={retweet_count})")
+    print(
+        f"[OK] Settled {post_id}: reward={reward:.3f} (likes={like_count}, replies={reply_count}, RT={retweet_count})"
+    )
 
 
 def settle_all(
@@ -114,7 +116,9 @@ def print_bandit_stats(storage: Storage) -> None:
         return
 
     print("\n=== Learning Stats (Thompson Sampling) ===")
-    for arm_data in sorted(arms, key=lambda x: x.get("alpha", 0) / (x.get("alpha", 1) + x.get("beta", 1)), reverse=True):
+    for arm_data in sorted(
+        arms, key=lambda x: x.get("alpha", 0) / (x.get("alpha", 1) + x.get("beta", 1)), reverse=True
+    ):
         arm = arm_data["arm"]
         alpha = arm_data.get("alpha", 1.0)
         beta = arm_data.get("beta", 1.0)

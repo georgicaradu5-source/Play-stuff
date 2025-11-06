@@ -405,7 +405,7 @@ class Storage:
             alpha, beta = (float(row[0]), float(row[1])) if row else (1.0, 1.0)
 
             alpha += reward
-            beta += (1.0 - reward)
+            beta += 1.0 - reward
 
             self.conn.execute(
                 """

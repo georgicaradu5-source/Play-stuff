@@ -41,9 +41,7 @@ def minimal_valid_config():
 @pytest.fixture
 def temp_config_file(minimal_valid_config):
     """Create a temporary config file."""
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".yaml", delete=False, encoding="utf-8"
-    ) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False, encoding="utf-8") as f:
         yaml.dump(minimal_valid_config, f)
         return Path(f.name)
 
@@ -83,9 +81,7 @@ def test_missing_required_field(minimal_valid_config):
     # Remove required field
     del minimal_valid_config["plan"]
 
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".yaml", delete=False, encoding="utf-8"
-    ) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False, encoding="utf-8") as f:
         yaml.dump(minimal_valid_config, f)
         temp_path = Path(f.name)
 
@@ -104,9 +100,7 @@ def test_invalid_auth_mode(minimal_valid_config):
     """Test that invalid auth_mode values are rejected."""
     minimal_valid_config["auth_mode"] = "invalid_mode"
 
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".yaml", delete=False, encoding="utf-8"
-    ) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False, encoding="utf-8") as f:
         yaml.dump(minimal_valid_config, f)
         temp_path = Path(f.name)
 
@@ -125,9 +119,7 @@ def test_invalid_plan(minimal_valid_config):
     """Test that invalid plan values are rejected."""
     minimal_valid_config["plan"] = "enterprise"
 
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".yaml", delete=False, encoding="utf-8"
-    ) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False, encoding="utf-8") as f:
         yaml.dump(minimal_valid_config, f)
         temp_path = Path(f.name)
 
@@ -146,9 +138,7 @@ def test_extra_field_allowed(minimal_valid_config):
     """Test that extra fields are allowed (Pydantic default behavior)."""
     minimal_valid_config["extra_field"] = "should_be_ignored"
 
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".yaml", delete=False, encoding="utf-8"
-    ) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False, encoding="utf-8") as f:
         yaml.dump(minimal_valid_config, f)
         temp_path = Path(f.name)
 
@@ -167,9 +157,7 @@ def test_invalid_jitter_range(minimal_valid_config):
     """Test that jitter_seconds with min >= max is rejected."""
     minimal_valid_config["jitter_seconds"] = [20, 8]  # min > max
 
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".yaml", delete=False, encoding="utf-8"
-    ) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False, encoding="utf-8") as f:
         yaml.dump(minimal_valid_config, f)
         temp_path = Path(f.name)
 
@@ -188,9 +176,7 @@ def test_invalid_weekday(minimal_valid_config):
     """Test that weekdays out of range are rejected."""
     minimal_valid_config["cadence"]["weekdays"] = [0, 8]  # Invalid: must be 1-7
 
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".yaml", delete=False, encoding="utf-8"
-    ) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False, encoding="utf-8") as f:
         yaml.dump(minimal_valid_config, f)
         temp_path = Path(f.name)
 
@@ -209,9 +195,7 @@ def test_invalid_action(minimal_valid_config):
     """Test that invalid query actions are rejected."""
     minimal_valid_config["queries"][0]["actions"] = ["like", "invalid_action"]
 
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".yaml", delete=False, encoding="utf-8"
-    ) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False, encoding="utf-8") as f:
         yaml.dump(minimal_valid_config, f)
         temp_path = Path(f.name)
 
@@ -230,9 +214,7 @@ def test_empty_topics(minimal_valid_config):
     """Test that empty topics list is rejected."""
     minimal_valid_config["topics"] = []
 
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".yaml", delete=False, encoding="utf-8"
-    ) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False, encoding="utf-8") as f:
         yaml.dump(minimal_valid_config, f)
         temp_path = Path(f.name)
 
@@ -251,9 +233,7 @@ def test_negative_rate_limit(minimal_valid_config):
     """Test that negative rate limits are rejected."""
     minimal_valid_config["max_per_window"]["post"] = -1
 
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".yaml", delete=False, encoding="utf-8"
-    ) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False, encoding="utf-8") as f:
         yaml.dump(minimal_valid_config, f)
         temp_path = Path(f.name)
 
@@ -271,9 +251,7 @@ def test_buffer_pct_out_of_range(minimal_valid_config):
     """Test that buffer_pct outside [0, 1] is rejected."""
     minimal_valid_config["budget"]["buffer_pct"] = 1.5
 
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".yaml", delete=False, encoding="utf-8"
-    ) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False, encoding="utf-8") as f:
         yaml.dump(minimal_valid_config, f)
         temp_path = Path(f.name)
 
@@ -307,9 +285,7 @@ def test_extended_time_windows(minimal_valid_config):
         "late-night",
     ]
 
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".yaml", delete=False, encoding="utf-8"
-    ) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False, encoding="utf-8") as f:
         yaml.dump(minimal_valid_config, f)
         temp_path = Path(f.name)
 
@@ -339,9 +315,7 @@ def test_file_not_found():
 
 def test_invalid_yaml():
     """Test validation of malformed YAML file."""
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".yaml", delete=False, encoding="utf-8"
-    ) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False, encoding="utf-8") as f:
         f.write("invalid: yaml: content: [unclosed")
         temp_path = Path(f.name)
 
@@ -367,9 +341,7 @@ def test_rate_limits_optional_section(minimal_valid_config):
         },
     }
 
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".yaml", delete=False, encoding="utf-8"
-    ) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False, encoding="utf-8") as f:
         yaml.dump(minimal_valid_config, f)
         temp_path = Path(f.name)
 
@@ -394,9 +366,7 @@ def test_personas_optional_section(minimal_valid_config):
         "professional": {"tone": "formal", "expertise": ["Enterprise Software"]},
     }
 
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".yaml", delete=False, encoding="utf-8"
-    ) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False, encoding="utf-8") as f:
         yaml.dump(minimal_valid_config, f)
         temp_path = Path(f.name)
 
@@ -423,9 +393,7 @@ def test_monitoring_optional_section(minimal_valid_config):
         "metrics_export": {"endpoint": "http://localhost:4317", "interval_seconds": 60},
     }
 
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".yaml", delete=False, encoding="utf-8"
-    ) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False, encoding="utf-8") as f:
         yaml.dump(minimal_valid_config, f)
         temp_path = Path(f.name)
 
@@ -450,9 +418,7 @@ def test_safety_optional_section(minimal_valid_config):
         "rate_check": {"enabled": True, "warn_threshold_pct": 0.85},
     }
 
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".yaml", delete=False, encoding="utf-8"
-    ) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False, encoding="utf-8") as f:
         yaml.dump(minimal_valid_config, f)
         temp_path = Path(f.name)
 
@@ -478,9 +444,7 @@ def test_autonomous_optional_section(minimal_valid_config):
         "max_daily_decisions": 150,
     }
 
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".yaml", delete=False, encoding="utf-8"
-    ) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False, encoding="utf-8") as f:
         yaml.dump(minimal_valid_config, f)
         temp_path = Path(f.name)
 
@@ -506,9 +470,7 @@ def test_autonomous_invalid_action(minimal_valid_config):
         "max_daily_decisions": 100,
     }
 
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".yaml", delete=False, encoding="utf-8"
-    ) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False, encoding="utf-8") as f:
         yaml.dump(minimal_valid_config, f)
         temp_path = Path(f.name)
 
@@ -523,29 +485,29 @@ def test_autonomous_invalid_action(minimal_valid_config):
 
 def test_all_optional_sections_together(minimal_valid_config):
     """Test that all optional sections can be used together."""
-    minimal_valid_config.update({
-        "rate_limits": {
-            "read_per_15min": 10000,
-            "write_per_24hr": 40,
-            "custom_endpoints": {},
-        },
-        "personas": {"default": {"tone": "friendly", "expertise": ["AI"]}},
-        "monitoring": {"enable_telemetry": False, "log_retention_days": 30},
-        "safety": {
-            "content_filter": {"enabled": True, "blocked_patterns": []},
-            "rate_check": {"enabled": True, "warn_threshold_pct": 0.8},
-        },
-        "autonomous": {
-            "decision_mode": "conservative",
-            "require_approval": ["follow"],
-            "auto_approve": ["like"],
-            "max_daily_decisions": 100,
-        },
-    })
+    minimal_valid_config.update(
+        {
+            "rate_limits": {
+                "read_per_15min": 10000,
+                "write_per_24hr": 40,
+                "custom_endpoints": {},
+            },
+            "personas": {"default": {"tone": "friendly", "expertise": ["AI"]}},
+            "monitoring": {"enable_telemetry": False, "log_retention_days": 30},
+            "safety": {
+                "content_filter": {"enabled": True, "blocked_patterns": []},
+                "rate_check": {"enabled": True, "warn_threshold_pct": 0.8},
+            },
+            "autonomous": {
+                "decision_mode": "conservative",
+                "require_approval": ["follow"],
+                "auto_approve": ["like"],
+                "max_daily_decisions": 100,
+            },
+        }
+    )
 
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".yaml", delete=False, encoding="utf-8"
-    ) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False, encoding="utf-8") as f:
         yaml.dump(minimal_valid_config, f)
         temp_path = Path(f.name)
 
@@ -569,9 +531,7 @@ def test_pydantic_unavailable_fallback(minimal_valid_config, monkeypatch):
     # Simulate Pydantic being unavailable
     monkeypatch.setattr(config_schema, "PYDANTIC_AVAILABLE", False)
 
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".yaml", delete=False, encoding="utf-8"
-    ) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False, encoding="utf-8") as f:
         yaml.dump(minimal_valid_config, f)
         temp_path = Path(f.name)
 

@@ -17,7 +17,7 @@ jobs:
       github.actor == 'dependabot[bot]' ||
       github.actor == 'github-actions[bot]' ||
       contains(github.event.pull_request.labels.*.name, 'auto-merge')
-    
+
     steps:
       - name: Wait for status checks
         uses: fountainhead/action-wait-for-check@v1.1.0

@@ -11,7 +11,7 @@ Complete guide for setting up GitHub environments with maximum automation and mi
 - **Usage**: Automatic testing, CI/CD validation
 
 # GitHub Environments  -  staging and production
-### Production Environment  
+### Production Environment
 - **Purpose**: Live X agent automation
 - **Secrets**: Production X API credentials
 
@@ -40,7 +40,7 @@ If you prefer manual control or the scripts don't work:
 ### 1. Create Environments
 
 ```bash
-# Create production environment 
+# Create production environment
 gh api -X PUT repos/<owner>/<repo>/environments/production -H "Accept: application/vnd.github+json"
 ```
 ### 2. Set Secrets for Each Environment
@@ -50,7 +50,7 @@ Replace `<owner>` and `<repo>` with your actual values, and set your actual secr
 ```bash
 # Set secrets for staging environment
 gh secret set -e staging X_CLIENT_ID -b"$Env:X_CLIENT_ID"
-gh secret set -e staging X_CLIENT_SECRET -b"$Env:X_CLIENT_SECRET" 
+gh secret set -e staging X_CLIENT_SECRET -b"$Env:X_CLIENT_SECRET"
 gh secret set -e staging X_REDIRECT_URI -b"$Env:X_REDIRECT_URI"
 gh secret set -e staging OPENAI_API_KEY -b"$Env:OPENAI_API_KEY"
 
@@ -63,7 +63,7 @@ gh secret set -e staging X_ACCESS_SECRET -b"$Env:X_ACCESS_SECRET"
 # Set secrets for production environment (same secrets)
 gh secret set -e production X_CLIENT_ID -b"$Env:X_CLIENT_ID"
 gh secret set -e production X_CLIENT_SECRET -b"$Env:X_CLIENT_SECRET"
-gh secret set -e production X_REDIRECT_URI -b"$Env:X_REDIRECT_URI" 
+gh secret set -e production X_REDIRECT_URI -b"$Env:X_REDIRECT_URI"
 gh secret set -e production OPENAI_API_KEY -b"$Env:OPENAI_API_KEY"
 
 # Optional OAuth1 secrets for production
@@ -79,7 +79,7 @@ Since production requires manual approval, you need to configure protection rule
 
 1. **Go to GitHub Repository** -> Settings -> Environments
 2. **Click on "production"** environment
-3. **Check "Required reviewers"** 
+3. **Check "Required reviewers"**
 4. **Add yourself** as the required reviewer
 5. **Save protection rules**
 
@@ -96,7 +96,7 @@ gh api -X PUT repos/<owner>/<repo>/environments/production -H "Accept: applicati
 {
   "reviewers": [
     {
-      "type": "User", 
+      "type": "User",
       "id": $USER_ID
     }
   ],
@@ -121,11 +121,11 @@ gh secret set X_ACCESS_SECRET --env production
 1. **GitHub Copilot** creates PR with changes
 2. **CI Pipeline** runs automatically:
    - Type checking (`nox -s type`)
-   - Unit tests (`nox -s test`) 
+   - Unit tests (`nox -s test`)
    - Dry-run validation (`python src/main.py --dry-run --mode both`)
 3. **Auto-merge** happens if tests pass
 4. **Production deployment** waits for your approval
-5. **You click "Approve"** (single click) 
+5. **You click "Approve"** (single click)
 6. **Live automation** starts with new changes
 
 ### GitHub Actions Workflows
@@ -145,7 +145,7 @@ gh secret set X_ACCESS_SECRET --env production
 # - No approval required
 ```
 
-**`.github/workflows/deploy-production.yml`** - Production Deployment  
+**`.github/workflows/deploy-production.yml`** - Production Deployment
 ```yaml
 # Manual trigger with single-click approval
 # - Uses production environment (requires approval)
@@ -178,7 +178,7 @@ gh secret set X_ACCESS_SECRET --env production
 # Trigger production deployment workflow
 gh workflow run deploy-production.yml
 
-# Check deployment status  
+# Check deployment status
 gh run list --workflow=deploy-production.yml
 
 # View deployment logs
@@ -207,7 +207,7 @@ The production deployment includes automatic safety checks:
 # Budget validation
 python src/main.py --safety print-budget
 
-# Rate limit check  
+# Rate limit check
 python src/main.py --safety print-limits
 
 # Configuration validation
@@ -268,9 +268,9 @@ gh run list --status in_progress --json databaseId --jq '.[].databaseId' | xargs
 # Test locally first
 python src/main.py --dry-run --mode both
 
-# Re-enable workflows gradually  
+# Re-enable workflows gradually
 gh workflow enable deploy-staging.yml
-gh workflow enable deploy-production.yml  
+gh workflow enable deploy-production.yml
 gh workflow enable auto-merge.yml
 ```
 
@@ -279,7 +279,7 @@ gh workflow enable auto-merge.yml
 After setup, you should have:
 
 - [ ] Staging environment created and accessible
-- [ ] Production environment created with approval requirement  
+- [ ] Production environment created with approval requirement
 - [ ] All required secrets set in both environments
 - [ ] CI workflow runs successfully on PR
 - [ ] Staging deployment works automatically

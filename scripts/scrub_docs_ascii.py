@@ -43,26 +43,26 @@ REPLACEMENTS = {
 
 def scrub_file(file_path: Path) -> tuple[bool, int]:
     """Scrub non-ASCII from a file.
-    
+
     Returns:
         (changed, replacement_count)
     """
     try:
-        with open(file_path, "r", encoding="utf-8") as f:
+        with open(file_path, encoding="utf-8") as f:
             content = f.read()
     except Exception as e:
         print(f"[ERROR] Could not read {file_path}: {e}", file=sys.stderr)
         return False, 0
-    
+
     original = content
     replacements = 0
-    
+
     for old, new in REPLACEMENTS.items():
         if old in content:
             count = content.count(old)
             content = content.replace(old, new)
             replacements += count
-    
+
     if content != original:
         try:
             with open(file_path, "w", encoding="utf-8") as f:
@@ -72,7 +72,7 @@ def scrub_file(file_path: Path) -> tuple[bool, int]:
         except Exception as e:
             print(f"[ERROR] Could not write {file_path}: {e}", file=sys.stderr)
             return False, 0
-    
+
     return False, 0
 
 
@@ -82,26 +82,26 @@ def main():
     if not docs_dir.exists():
         print("[ERROR] docs/ directory not found", file=sys.stderr)
         return 1
-    
+
     total_files = 0
     total_changed = 0
     total_replacements = 0
-    
+
     for file_path in docs_dir.rglob("*.md"):
         # Skip archived/legacy
         if "_archive" in file_path.parts or "legacy" in file_path.parts:
             continue
-        
+
         total_files += 1
         changed, count = scrub_file(file_path)
         if changed:
             total_changed += 1
             total_replacements += count
-    
+
     print(f"\n[SUMMARY] Processed {total_files} files")
     print(f"[SUMMARY] Changed {total_changed} files")
     print(f"[SUMMARY] Made {total_replacements} total replacements")
-    
+
     return 0
 
 

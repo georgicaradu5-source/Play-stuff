@@ -15,26 +15,26 @@ jobs:
   free-mode-dryrun:
     runs-on: ubuntu-latest
     environment: staging
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Set up Python 3.11
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-          
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          
+
       - name: Create artifacts directory
         run: |
           mkdir -p artifacts/dryrun-$(date +%Y-%m-%d-%H%M)
           echo "ARTIFACT_DIR=artifacts/dryrun-$(date +%Y-%m-%d-%H%M)" >> $GITHUB_ENV
-          
+
       - name: Run dry-run operations (OAuth2 mode)
         env:
           X_AUTH_MODE: oauth2
@@ -45,13 +45,13 @@ jobs:
         run: |
           echo "=== Dry-Run Both Modes ===" | tee ${{ env.ARTIFACT_DIR }}/dryrun-summary.txt
           python src/main.py --dry-run --mode both 2>&1 | tee -a ${{ env.ARTIFACT_DIR }}/dryrun-summary.txt
-          
+
           echo -e "\n=== Budget Status ===" | tee -a ${{ env.ARTIFACT_DIR }}/dryrun-summary.txt
           python src/main.py --safety print-budget 2>&1 | tee -a ${{ env.ARTIFACT_DIR }}/dryrun-summary.txt
-          
+
           echo -e "\n=== Rate Limits ===" | tee -a ${{ env.ARTIFACT_DIR }}/dryrun-summary.txt
           python src/main.py --safety print-limits 2>&1 | tee -a ${{ env.ARTIFACT_DIR }}/dryrun-summary.txt
-          
+
       - name: Extract database tail
         run: |
           python -c "
@@ -64,7 +64,7 @@ jobs:
               json.dump([dict(row) for row in rows], f, indent=2)
           conn.close()
           "
-          
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:

@@ -33,7 +33,7 @@ python src/main.py --dry-run --mode both
 # Check budget status
 python src/main.py --safety print-budget
 
-# Check rate limits  
+# Check rate limits
 python src/main.py --safety print-limits
 
 # View recent actions

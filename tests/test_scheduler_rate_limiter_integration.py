@@ -29,9 +29,7 @@ def test_current_slot_all_extended_windows():
 
     for test_time, expected_window, windows_list in test_cases:
         result = current_slot(windows_list, now=test_time)
-        assert result == expected_window, (
-            f"At {test_time}, expected {expected_window} but got {result}"
-        )
+        assert result == expected_window, f"At {test_time}, expected {expected_window} but got {result}"
 
 
 def test_current_slot_priority_order():
@@ -100,6 +98,7 @@ def test_scheduler_respects_max_per_window(tmp_path):
 
     # Verify storage recorded attempts
     from datetime import datetime
+
     current_month = datetime.now().strftime("%Y-%m")
     metrics = storage.get_monthly_usage(current_month)
     # In dry-run, posts may not increment the same way, so check structure
@@ -192,23 +191,21 @@ def test_extended_windows_cross_midnight_integration():
 
     # Test times that should match
     midnight_times = [
-        dtime(23, 0),   # Start of window
+        dtime(23, 0),  # Start of window
         dtime(23, 30),  # Late evening
-        dtime(0, 0),    # Midnight
-        dtime(1, 0),    # Early morning
-        dtime(1, 59),   # Just before end
+        dtime(0, 0),  # Midnight
+        dtime(1, 0),  # Early morning
+        dtime(1, 59),  # Just before end
     ]
 
     for test_time in midnight_times:
         result = current_slot(["late-night"], now=test_time)
-        assert result == "late-night", (
-            f"Time {test_time} should be in late-night window"
-        )
+        assert result == "late-night", f"Time {test_time} should be in late-night window"
 
     # Test times that should NOT match
     outside_times = [
-        dtime(2, 1),    # Just after window ends
-        dtime(5, 0),    # Early morning
+        dtime(2, 1),  # Just after window ends
+        dtime(5, 0),  # Early morning
         dtime(22, 59),  # Just before window starts
     ]
 
@@ -270,10 +267,7 @@ def test_time_window_coverage():
     windows = WINDOWS.copy()
 
     # Verify all expected windows exist
-    expected_windows = [
-        "morning", "afternoon", "evening",
-        "early-morning", "night", "late-night"
-    ]
+    expected_windows = ["morning", "afternoon", "evening", "early-morning", "night", "late-night"]
 
     for window_name in expected_windows:
         assert window_name in windows, f"Missing window: {window_name}"
@@ -289,9 +283,7 @@ def test_time_window_coverage():
             # For non-midnight-crossing windows, start < end
             if start > end:
                 # Only late-night should have start > end
-                assert name == "late-night", (
-                    f"Window {name} crosses midnight but shouldn't"
-                )
+                assert name == "late-night", f"Window {name} crosses midnight but shouldn't"
 
 
 def test_scheduler_with_all_window_combinations(tmp_path):

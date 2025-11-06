@@ -1,7 +1,7 @@
 # Owners for all files
 * @georgicaradu5-source
 # GitHub CODEOWNERS - Maximum Automation Configuration
-# 
+#
 # This file is configured for maximum GitHub Copilot delegation.
 # Only critical infrastructure files require manual review.
 # Everything else can be auto-merged when CI passes.
@@ -10,11 +10,11 @@
 # CRITICAL INFRASTRUCTURE (Always requires manual review)
 # =============================================================================
 
-# Repository configuration - Changes affect permissions and settings  
+# Repository configuration - Changes affect permissions and settings
 .github/CODEOWNERS @georgicaradu5-source
 COPILOT_MAX_DELEGATION.md @georgicaradu5-source
 
-# Security and secrets configuration  
+# Security and secrets configuration
 .github/environments/ @georgicaradu5-source
 scripts/gh_env_setup.* @georgicaradu5-source
 
@@ -25,7 +25,7 @@ scripts/gh_env_setup.* @georgicaradu5-source
 # The following paths are NOT listed here intentionally to allow auto-merge:
 #
 # /src/                    - All Python source code
-# /tests/                  - All test files  
+# /tests/                  - All test files
 # /config*.yaml            - Configuration files (validated by CI)
 # /docs/                   - Documentation updates
 # /requirements.txt        - Dependencies (security scanned by CI)

@@ -44,7 +44,7 @@ def make_fake_requests(sequence, raise_timeout_first=False):
 
     fake_requests = SimpleNamespace(
         request=request,
-    Timeout=FakeTimeoutError,
+        Timeout=FakeTimeoutError,
         HTTPError=FakeHTTPError,
     )
     return fake_requests, state
@@ -57,6 +57,7 @@ def test_retries_on_500_then_success(monkeypatch):
     monkeypatch.setattr(rel, "requests", fake_requests, raising=False)
 
     waits = []
+
     def sleep_fn(s):
         waits.append(s)
 
@@ -80,6 +81,7 @@ def test_respects_rate_limit_reset_header(monkeypatch):
     monkeypatch.setattr(rel, "requests", fake_requests, raising=False)
 
     waits = []
+
     def sleep_fn(s):
         waits.append(s)
 
@@ -102,6 +104,7 @@ def test_timeout_then_retry_success(monkeypatch):
     monkeypatch.setattr(rel, "requests", fake_requests, raising=False)
 
     waits = []
+
     def sleep_fn(s):
         waits.append(s)
 

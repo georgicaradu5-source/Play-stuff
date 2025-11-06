@@ -47,8 +47,10 @@ def main() -> int:
     cmd = [
         sys.executable,
         "src/main.py",
-        "--dry-run", "true",
-        "--mode", "both",
+        "--dry-run",
+        "true",
+        "--mode",
+        "both",
     ]
 
     print(f"Running: {' '.join(cmd)}")
@@ -77,8 +79,8 @@ def main() -> int:
     print()
 
     # Look for telemetry patterns
-    trace_id_pattern = re.compile(r'trace_id[=:]?\s*([0-9a-f]{32})', re.IGNORECASE)
-    span_id_pattern = re.compile(r'span_id[=:]?\s*([0-9a-f]{16})', re.IGNORECASE)
+    trace_id_pattern = re.compile(r"trace_id[=:]?\s*([0-9a-f]{32})", re.IGNORECASE)
+    span_id_pattern = re.compile(r"span_id[=:]?\s*([0-9a-f]{16})", re.IGNORECASE)
 
     trace_ids = trace_id_pattern.findall(output)
     span_ids = span_id_pattern.findall(output)
@@ -102,7 +104,7 @@ def main() -> int:
     print()
 
     # Check for W3C TraceContext format in logs
-    traceparent_pattern = re.compile(r'traceparent:\s*00-([0-9a-f]{32})-([0-9a-f]{16})-[0-9a-f]{2}')
+    traceparent_pattern = re.compile(r"traceparent:\s*00-([0-9a-f]{32})-([0-9a-f]{16})-[0-9a-f]{2}")
     traceparents = traceparent_pattern.findall(output)
 
     if traceparents:

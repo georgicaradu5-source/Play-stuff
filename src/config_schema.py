@@ -31,14 +31,18 @@ except ImportError:
 
     def field_validator(*args: Any, **kwargs: Any) -> Any:  # type: ignore[misc]
         """Fallback field_validator when Pydantic not available."""
+
         def decorator(f: Any) -> Any:
             return f
+
         return decorator
 
     def model_validator(*args: Any, **kwargs: Any) -> Any:  # type: ignore[misc]
         """Fallback model_validator when Pydantic not available."""
+
         def decorator(f: Any) -> Any:
             return f
+
         return decorator
 
     PydanticValidationError = Exception  # type: ignore[misc,assignment]
@@ -117,9 +121,7 @@ class PersonaConfig(BaseModel):
     """Persona configuration for content style."""
 
     tone: str = Field(..., description="Tone of voice (e.g., friendly, formal, casual)")
-    expertise: list[str] = Field(
-        default_factory=list, description="Areas of expertise"
-    )
+    expertise: list[str] = Field(default_factory=list, description="Areas of expertise")
     style: str | None = Field(None, description="Writing style description")
 
 
@@ -133,33 +135,23 @@ class MetricsExportConfig(BaseModel):
 class MonitoringConfig(BaseModel):
     """Monitoring and observability configuration."""
 
-    enable_telemetry: bool = Field(
-        default=False, description="Enable OpenTelemetry tracing"
-    )
-    log_retention_days: int = Field(
-        default=30, ge=1, description="Log retention period in days"
-    )
-    metrics_export: MetricsExportConfig | None = Field(
-        None, description="Optional metrics export configuration"
-    )
+    enable_telemetry: bool = Field(default=False, description="Enable OpenTelemetry tracing")
+    log_retention_days: int = Field(default=30, ge=1, description="Log retention period in days")
+    metrics_export: MetricsExportConfig | None = Field(None, description="Optional metrics export configuration")
 
 
 class ContentFilterConfig(BaseModel):
     """Content filtering configuration."""
 
     enabled: bool = Field(default=True, description="Enable content filtering")
-    blocked_patterns: list[str] = Field(
-        default_factory=list, description="Patterns to block"
-    )
+    blocked_patterns: list[str] = Field(default_factory=list, description="Patterns to block")
 
 
 class RateCheckConfig(BaseModel):
     """Rate limit safety check configuration."""
 
     enabled: bool = Field(default=True, description="Enable rate limit checks")
-    warn_threshold_pct: float = Field(
-        default=0.8, ge=0.0, le=1.0, description="Warning threshold percentage"
-    )
+    warn_threshold_pct: float = Field(default=0.8, ge=0.0, le=1.0, description="Warning threshold percentage")
 
 
 class SafetyConfig(BaseModel):
@@ -168,26 +160,16 @@ class SafetyConfig(BaseModel):
     content_filter: ContentFilterConfig = Field(
         default_factory=ContentFilterConfig, description="Content filtering settings"
     )
-    rate_check: RateCheckConfig = Field(
-        default_factory=RateCheckConfig, description="Rate limit check settings"
-    )
+    rate_check: RateCheckConfig = Field(default_factory=RateCheckConfig, description="Rate limit check settings")
 
 
 class AutonomousConfig(BaseModel):
     """Autonomous decision-making configuration."""
 
-    decision_mode: DecisionMode = Field(
-        default=DecisionMode.CONSERVATIVE, description="Decision-making mode"
-    )
-    require_approval: list[str] = Field(
-        default_factory=list, description="Actions requiring approval"
-    )
-    auto_approve: list[str] = Field(
-        default_factory=list, description="Actions automatically approved"
-    )
-    max_daily_decisions: int = Field(
-        default=100, ge=0, description="Maximum decisions per day"
-    )
+    decision_mode: DecisionMode = Field(default=DecisionMode.CONSERVATIVE, description="Decision-making mode")
+    require_approval: list[str] = Field(default_factory=list, description="Actions requiring approval")
+    auto_approve: list[str] = Field(default_factory=list, description="Actions automatically approved")
+    max_daily_decisions: int = Field(default=100, ge=0, description="Maximum decisions per day")
 
     @field_validator("require_approval", "auto_approve")
     @classmethod
@@ -196,9 +178,7 @@ class AutonomousConfig(BaseModel):
         valid_actions = {"like", "reply", "follow", "repost", "post"}
         for action in v:
             if action not in valid_actions:
-                raise ValueError(
-                    f"Invalid action '{action}'. Must be one of: {valid_actions}"
-                )
+                raise ValueError(f"Invalid action '{action}'. Must be one of: {valid_actions}")
         return v
 
 
@@ -206,9 +186,7 @@ class QueryConfig(BaseModel):
     """Search query configuration."""
 
     query: str = Field(..., min_length=1, description="X search query string")
-    actions: list[str] = Field(
-        ..., min_length=1, description="Actions to perform: like, reply, follow, repost"
-    )
+    actions: list[str] = Field(..., min_length=1, description="Actions to perform: like, reply, follow, repost")
 
     @field_validator("actions")
     @classmethod
@@ -217,26 +195,20 @@ class QueryConfig(BaseModel):
         valid_actions = {"like", "reply", "follow", "repost"}
         for action in v:
             if action not in valid_actions:
-                raise ValueError(
-                    f"Invalid action '{action}'. Must be one of: {valid_actions}"
-                )
+                raise ValueError(f"Invalid action '{action}'. Must be one of: {valid_actions}")
         return v
 
 
 class ScheduleConfig(BaseModel):
     """Scheduling configuration."""
 
-    windows: list[TimeWindow] = Field(
-        ..., min_length=1, description="Time windows for posting"
-    )
+    windows: list[TimeWindow] = Field(..., min_length=1, description="Time windows for posting")
 
 
 class CadenceConfig(BaseModel):
     """Posting cadence configuration."""
 
-    weekdays: list[int] = Field(
-        ..., min_length=1, max_length=7, description="Days of week (1=Monday, 7=Sunday)"
-    )
+    weekdays: list[int] = Field(..., min_length=1, max_length=7, description="Days of week (1=Monday, 7=Sunday)")
 
     @field_validator("weekdays")
     @classmethod
@@ -267,15 +239,9 @@ class LearningConfig(BaseModel):
 class BudgetConfig(BaseModel):
     """Budget and rate limit configuration."""
 
-    buffer_pct: float = Field(
-        ..., ge=0.0, le=1.0, description="Safety buffer percentage (0.05 = 5%)"
-    )
-    custom_read_cap: int | None = Field(
-        None, ge=0, description="Optional custom read cap"
-    )
-    custom_write_cap: int | None = Field(
-        None, ge=0, description="Optional custom write cap"
-    )
+    buffer_pct: float = Field(..., ge=0.0, le=1.0, description="Safety buffer percentage (0.05 = 5%)")
+    custom_read_cap: int | None = Field(None, ge=0, description="Optional custom read cap")
+    custom_write_cap: int | None = Field(None, ge=0, description="Optional custom write cap")
 
 
 class LoggingConfig(BaseModel):
@@ -289,15 +255,9 @@ class LoggingConfig(BaseModel):
 class FeatureFlagsConfig(BaseModel):
     """Feature flags configuration."""
 
-    allow_likes: FeatureToggle = Field(
-        default=FeatureToggle.AUTO, description="Enable likes"
-    )
-    allow_follows: FeatureToggle = Field(
-        default=FeatureToggle.AUTO, description="Enable follows"
-    )
-    allow_media: FeatureToggle = Field(
-        default=FeatureToggle.OFF, description="Enable media uploads"
-    )
+    allow_likes: FeatureToggle = Field(default=FeatureToggle.AUTO, description="Enable likes")
+    allow_follows: FeatureToggle = Field(default=FeatureToggle.AUTO, description="Enable follows")
+    allow_media: FeatureToggle = Field(default=FeatureToggle.OFF, description="Enable media uploads")
 
     @field_validator("allow_likes", "allow_follows", "allow_media", mode="before")
     @classmethod
@@ -313,42 +273,22 @@ class ConfigSettings(BaseModel):
 
     auth_mode: AuthMode = Field(..., description="Authentication mode")
     plan: PlanTier = Field(..., description="X API plan tier")
-    topics: list[str] = Field(
-        ..., min_length=1, description="Topics for content generation"
-    )
-    queries: list[QueryConfig] = Field(
-        ..., min_length=1, description="Search queries for interaction"
-    )
+    topics: list[str] = Field(..., min_length=1, description="Topics for content generation")
+    queries: list[QueryConfig] = Field(..., min_length=1, description="Search queries for interaction")
     schedule: ScheduleConfig = Field(..., description="Posting schedule")
     cadence: CadenceConfig = Field(..., description="Posting cadence")
     max_per_window: MaxPerWindowConfig = Field(..., description="Rate limits per window")
-    jitter_seconds: tuple[int, int] = Field(
-        ..., description="Jitter bounds [min, max] in seconds"
-    )
+    jitter_seconds: tuple[int, int] = Field(..., description="Jitter bounds [min, max] in seconds")
     learning: LearningConfig = Field(..., description="Learning configuration")
     budget: BudgetConfig = Field(..., description="Budget configuration")
-    logging: LoggingConfig = Field(
-        default_factory=LoggingConfig, description="Logging configuration"
-    )
-    feature_flags: FeatureFlagsConfig = Field(
-        default_factory=FeatureFlagsConfig, description="Feature flags"
-    )
+    logging: LoggingConfig = Field(default_factory=LoggingConfig, description="Logging configuration")
+    feature_flags: FeatureFlagsConfig = Field(default_factory=FeatureFlagsConfig, description="Feature flags")
     # Optional extended configuration sections
-    rate_limits: RateLimitsConfig | None = Field(
-        None, description="Optional rate limit configuration"
-    )
-    personas: dict[str, PersonaConfig] | None = Field(
-        None, description="Optional persona configurations"
-    )
-    monitoring: MonitoringConfig | None = Field(
-        None, description="Optional monitoring configuration"
-    )
-    safety: SafetyConfig | None = Field(
-        None, description="Optional safety configuration"
-    )
-    autonomous: AutonomousConfig | None = Field(
-        None, description="Optional autonomous configuration"
-    )
+    rate_limits: RateLimitsConfig | None = Field(None, description="Optional rate limit configuration")
+    personas: dict[str, PersonaConfig] | None = Field(None, description="Optional persona configurations")
+    monitoring: MonitoringConfig | None = Field(None, description="Optional monitoring configuration")
+    safety: SafetyConfig | None = Field(None, description="Optional safety configuration")
+    autonomous: AutonomousConfig | None = Field(None, description="Optional autonomous configuration")
 
     @field_validator("jitter_seconds")
     @classmethod
@@ -358,9 +298,7 @@ class ConfigSettings(BaseModel):
             raise ValueError("jitter_seconds must be [min, max]")
         min_jitter, max_jitter = v
         if min_jitter >= max_jitter:
-            raise ValueError(
-                f"jitter_seconds min ({min_jitter}) must be < max ({max_jitter})"
-            )
+            raise ValueError(f"jitter_seconds min ({min_jitter}) must be < max ({max_jitter})")
         if min_jitter < 0:
             raise ValueError(f"jitter_seconds min ({min_jitter}) must be >= 0")
         return v
