@@ -460,6 +460,71 @@ learning:
 - **[docs/telemetry.md](docs/telemetry.md)** - Observability and tracing
 - **[docs/guides/](docs/guides/)** - Additional guides (first tweet, read budget, migration)
 
+## Developer Setup
+
+### Pre-commit Hooks (Recommended)
+
+Install pre-commit hooks to ensure code quality before committing:
+
+```bash
+# Install pre-commit
+pip install pre-commit
+
+# Install hooks
+pre-commit install
+
+# Run manually on all files
+pre-commit run --all-files
+```
+
+The hooks will automatically:
+- ✅ Run `ruff` linter and formatter
+- ✅ Validate config schema tests
+- ✅ Scan for non-ASCII characters
+- ✅ Check YAML/TOML/JSON syntax
+- ✅ Fix trailing whitespace and line endings
+
+**Performance Note**: Only fast config tests run on commit (not the full test suite).
+
+### Running Tests
+
+```bash
+# Quick test run
+pytest -q
+
+# Verbose output
+pytest -v
+
+# With coverage
+pytest --cov=src --cov-report=term
+
+# Specific test file
+pytest tests/test_config_schema.py -v
+```
+
+### Type Checking
+
+```bash
+# Windows
+.\scripts\mypy.ps1
+
+# Linux/macOS
+./scripts/mypy.sh
+
+# Or use nox
+nox -s type
+```
+
+### Validation Scripts
+
+```bash
+# Verify telemetry in dry-run mode
+python scripts/verify_telemetry_dry_run.py
+
+# Check ASCII compliance
+python scripts/check_ascii.py --scan-dirs src docs
+```
+
 ## Compliance
 
 - [x] Only official X API (v2 + v1.1 media)
@@ -478,6 +543,13 @@ This unified agent combines:
 - **x-agent**: OAuth 2.0 with comprehensive safety
 
 Both implementations are preserved in archive/ for reference.
+
+**Development Workflow**:
+1. Fork and clone the repository
+2. Run `./setup.bat` (Windows) or `./setup.sh` (Linux/macOS)
+3. Install pre-commit hooks: `pip install pre-commit && pre-commit install`
+4. Make your changes and ensure tests pass: `pytest -q`
+5. Submit a pull request
 
 ## License
 

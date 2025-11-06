@@ -67,7 +67,15 @@ jobs:
 
       - name: Run tests with coverage (fail if <80%)
         run: |
-          pytest -q --maxfail=1 --disable-warnings --cov=src --cov-fail-under=80
+          pytest -q --maxfail=1 --disable-warnings --cov=src --cov-report=xml --cov-report=term --cov-fail-under=80
+
+      - name: Upload coverage artifact
+        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.12'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage.xml
+          retention-days: 30
 
   test-telemetry-no-extras:
     name: Tests (TELEMETRY_ENABLED=true, no extras)
@@ -103,7 +111,7 @@ jobs:
 
       - name: Run tests with coverage (fallback path)
         run: |
-          pytest -q --maxfail=1 --disable-warnings --cov=src --cov-fail-under=80
+          pytest -q --maxfail=1 --disable-warnings --cov=src --cov-report=xml --cov-report=term --cov-fail-under=80
 
   test-telemetry-with-extras:
     name: Tests (with telemetry extras)
@@ -137,7 +145,14 @@ jobs:
 
       - name: Run tests with coverage (extras installed)
         run: |
-          pytest -q --maxfail=1 --disable-warnings --cov=src --cov-fail-under=80
+          pytest -q --maxfail=1 --disable-warnings --cov=src --cov-report=xml --cov-report=term --cov-fail-under=80
+
+      - name: Upload coverage artifact (telemetry extras)
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report-telemetry-extras
+          path: coverage.xml
+          retention-days: 30
 
   security-audit:
     name: Security (pip-audit) — non-blocking

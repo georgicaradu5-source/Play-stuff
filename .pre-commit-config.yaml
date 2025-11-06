@@ -1,0 +1,68 @@
+# Pre-commit hooks for code quality and validation
+# Install: pip install pre-commit && pre-commit install
+# Run manually: pre-commit run --all-files
+
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.4
+    hooks:
+      # Linter
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+        exclude: ^(_archive/|legacy/)
+      # Formatter
+      - id: ruff-format
+        exclude: ^(_archive/|legacy/)
+
+  - repo: local
+    hooks:
+      # Run fast config validation tests only (not full test suite)
+      - id: pytest-config
+        name: pytest (config validation only)
+        entry: pytest
+        language: system
+        pass_filenames: false
+        args:
+          - tests/test_config_schema.py
+          - tests/test_load_config_merge.py
+          - -q
+          - --tb=short
+        files: ^(src/(config_schema|main)\.py|tests/test_config.*\.py|config\..*\.yaml)$
+
+      # ASCII scan for non-ASCII characters in source files
+      - id: ascii-scan
+        name: ASCII character validation
+        entry: python
+        language: system
+        pass_filenames: false
+        args:
+          - scripts/check_ascii.py
+          - --scan-dirs
+          - src
+          - docs
+        files: \.(py|md|yaml|yml|txt)$
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      # Basic file checks
+      - id: check-yaml
+        exclude: ^(_archive/|legacy/)
+      - id: check-toml
+        exclude: ^(_archive/|legacy/)
+      - id: check-json
+        exclude: ^(_archive/|legacy/)
+      - id: end-of-file-fixer
+        exclude: ^(_archive/|legacy/)
+      - id: trailing-whitespace
+        exclude: ^(_archive/|legacy/)
+      - id: mixed-line-ending
+        args: [--fix=lf]
+        exclude: ^(_archive/|legacy/|.*\.bat$)
+
+# Performance tuning
+default_language_version:
+  python: python3.12
+
+# Speed up by limiting files checked
+exclude: ^(_archive/|legacy/|.*\.egg-info/|__pycache__/)
