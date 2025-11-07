@@ -66,9 +66,9 @@ jobs:
       - name: Mypy
         run: mypy src || (echo "Mypy failures" && exit 1)
 
-      - name: Run tests with coverage (fail if <55%)
+      - name: Run tests with coverage (fail if <60%)
         run: |
-          pytest -q --maxfail=1 --disable-warnings --cov=src --cov-report=xml --cov-report=term --cov-fail-under=55
+          pytest -q --maxfail=1 --disable-warnings --cov=src --cov-report=xml --cov-report=term --cov-fail-under=60
 
       - name: Upload coverage artifact
         if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.12'
@@ -119,9 +119,9 @@ jobs:
       - name: Mypy
         run: mypy src || (echo "Mypy failures" && exit 1)
 
-      - name: Run tests with coverage (fallback path, fail if <55%)
+      - name: Run tests with coverage (fallback path, fail if <60%)
         run: |
-          pytest -q --maxfail=1 --disable-warnings --cov=src --cov-report=xml --cov-report=term --cov-fail-under=55
+          pytest -q --maxfail=1 --disable-warnings --cov=src --cov-report=xml --cov-report=term --cov-fail-under=60
 
   test-telemetry-with-extras:
     name: Tests (with telemetry extras)
@@ -153,9 +153,9 @@ jobs:
       - name: Mypy
         run: mypy src || (echo "Mypy failures" && exit 1)
 
-      - name: Run tests with coverage (extras installed, fail if <55%)
+      - name: Run tests with coverage (extras installed, fail if <60%)
         run: |
-          pytest -q --maxfail=1 --disable-warnings --cov=src --cov-report=xml --cov-report=term --cov-fail-under=55
+          pytest -q --maxfail=1 --disable-warnings --cov=src --cov-report=xml --cov-report=term --cov-fail-under=60
 
       - name: Upload coverage artifact (telemetry extras)
         uses: actions/upload-artifact@v4

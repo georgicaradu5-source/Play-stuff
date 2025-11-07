@@ -35,7 +35,7 @@ Coverage reports are uploaded to Codecov and as CI artifacts:
 
 To run the full CI validation locally:
 ```bash
-pytest -q --cov=src --cov-report=xml --cov-report=term --cov-fail-under=55
+pytest -q --cov=src --cov-report=xml --cov-report=term --cov-fail-under=60
 python scripts/check_ascii.py --scan-dirs src docs
 ruff check .
 mypy src
