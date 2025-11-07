@@ -8,7 +8,7 @@
 [![Dev Container Ready](https://img.shields.io/badge/devcontainer-ready-success?logo=visualstudiocode)](.devcontainer/devcontainer.json)
 [![Open in GitHub Codespaces](https://img.shields.io/badge/Codespaces-open-blue?logo=github)](https://codespaces.new/georgicaradu5-source/Play-stuff)
 
-> **Coverage monitoring:** Test coverage is tracked with [Codecov](https://codecov.io/gh/georgicaradu5-source/Play-stuff). CI uploads coverage reports on every push, and the current threshold is 42%. Coverage details and trends are available on the Codecov dashboard.
+> **Coverage monitoring:** Test coverage is tracked with [Codecov](https://codecov.io/gh/georgicaradu5-source/Play-stuff). See the badge above for current status. Coverage will be improved as more tests are added.
 
 A fully unified, production-ready autonomous agent for X (Twitter) that combines the best features from both implementations. Supports **both OAuth 1.0a (Tweepy) and OAuth 2.0 PKCE** authentication methods.
 
