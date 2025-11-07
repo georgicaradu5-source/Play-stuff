@@ -1,5 +1,5 @@
-import pytest
-from src.budget import BudgetManager
+from src.budget import BudgetManager  # ruff: noqa: I001
+
 
 class DummyStorage:
     def __init__(self, read_count=0, create_count=0):

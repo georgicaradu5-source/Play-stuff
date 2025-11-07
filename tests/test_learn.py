@@ -1,5 +1,5 @@
-import pytest
-from src import learn
+from src import learn  # ruff: noqa: I001
+
 
 class DummyStorage:
     def __init__(self):

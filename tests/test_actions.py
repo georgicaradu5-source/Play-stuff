@@ -1,5 +1,7 @@
 import random
+
 from src import actions
+
 
 class DummyStorage:
     def __init__(self):
