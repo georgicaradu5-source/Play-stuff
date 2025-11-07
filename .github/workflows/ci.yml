@@ -68,7 +68,7 @@ jobs:
 
       - name: Run tests with coverage (fail if <42%)
         run: |
-          pytest -q --maxfail=1 --disable-warnings --cov=src --cov-report=xml --cov-report=term --cov-fail-under=42
+          pytest -q --maxfail=1 --disable-warnings --cov=src --cov-report=xml --cov-report=term --cov-fail-under=50
 
       - name: Upload coverage artifact
         if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.12'
@@ -121,7 +121,7 @@ jobs:
 
       - name: Run tests with coverage (fallback path)
         run: |
-          pytest -q --maxfail=1 --disable-warnings --cov=src --cov-report=xml --cov-report=term --cov-fail-under=42
+          pytest -q --maxfail=1 --disable-warnings --cov=src --cov-report=xml --cov-report=term --cov-fail-under=50
 
   test-telemetry-with-extras:
     name: Tests (with telemetry extras)
@@ -155,7 +155,7 @@ jobs:
 
       - name: Run tests with coverage (extras installed)
         run: |
-          pytest -q --maxfail=1 --disable-warnings --cov=src --cov-report=xml --cov-report=term --cov-fail-under=42
+          pytest -q --maxfail=1 --disable-warnings --cov=src --cov-report=xml --cov-report=term --cov-fail-under=50
 
       - name: Upload coverage artifact (telemetry extras)
         uses: actions/upload-artifact@v4

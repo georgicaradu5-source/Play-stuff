@@ -32,8 +32,8 @@ Thanks for your interest in contributing! This repo powers a production-ready X 
 All PRs must pass CI checks:
 - **Lint**: `ruff check .` (critical errors only in flake8 job)
 - **Type check**: `mypy src`
-- **Tests**: `pytest -q --cov=src --cov-fail-under=42`
-- **Coverage**: Must meet or exceed 42% threshold (currently at 51.45%)
+- **Tests**: `pytest -q --cov=src --cov-fail-under=50`
+- **Coverage**: Must meet or exceed 50% threshold (currently at 55.99%)
 
 Coverage reports are uploaded to Codecov and as CI artifacts:
 - View coverage trends at [Codecov](https://codecov.io/gh/georgicaradu5-source/Play-stuff)
@@ -41,7 +41,7 @@ Coverage reports are uploaded to Codecov and as CI artifacts:
 
 To run the full CI validation locally:
 ```bash
-pytest -q --cov=src --cov-report=xml --cov-report=term --cov-fail-under=42
+pytest -q --cov=src --cov-report=xml --cov-report=term --cov-fail-under=50
 python scripts/check_ascii.py --scan-dirs src docs
 ruff check .
 mypy src
