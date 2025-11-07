@@ -563,6 +563,39 @@ Both implementations are preserved in archive/ for reference.
 4. Make your changes and ensure tests pass: `pytest -q`
 5. Submit a pull request
 
+See **[CONTRIBUTING.md](CONTRIBUTING.md)** for detailed guidelines, CI expectations, and troubleshooting tips.
+
+## Troubleshooting
+
+### Common Pre-commit Hook Errors
+
+**Error: `/bin/sh: not found`** (Windows)
+- **Cause**: Pre-commit expects a Unix shell
+- **Fix**: Use Git Bash as your terminal, or bypass with `git commit --no-verify` (not recommended)
+
+**Error: `mypy` fails on Windows paths**
+- **Cause**: Path separator differences
+- **Fix**: Run `./scripts/mypy.ps1` which normalizes paths for Windows
+
+**Error: `ruff` import sorting conflicts**
+- **Cause**: Manual import ordering doesn't match ruff's rules
+- **Fix**: Run `ruff check . --fix` to auto-fix import order
+
+### Windows Workflow Tips
+
+- **Use Git Bash** for full compatibility with pre-commit hooks
+- **Or use WSL** for a native Linux environment
+- **PowerShell users**: Bypass hooks with `--no-verify` or install Git Bash
+- **Line endings**: Repo is configured for CRLF on Windows (handled by `.gitattributes`)
+
+### CI Coverage Artifacts
+
+Coverage reports are uploaded to:
+- **Codecov**: [View coverage trends](https://codecov.io/gh/georgicaradu5-source/Play-stuff)
+- **CI artifacts**: Download `coverage-report` or `coverage-report-telemetry-extras` from any CI run (30-day retention)
+
+Current coverage: **51.45%** (threshold: 42%)
+
 ## License
 
 MIT License - See LICENSE file

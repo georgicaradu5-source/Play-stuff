@@ -27,6 +27,39 @@ Thanks for your interest in contributing! This repo powers a production-ready X 
 - Keep imports clean; run `ruff` (CI enforces style).
 - Respect architecture boundaries (see README and docs).
 
+## CI and Coverage
+
+All PRs must pass CI checks:
+- **Lint**: `ruff check .` (critical errors only in flake8 job)
+- **Type check**: `mypy src`
+- **Tests**: `pytest -q --cov=src --cov-fail-under=42`
+- **Coverage**: Must meet or exceed 42% threshold (currently at 51.45%)
+
+Coverage reports are uploaded to Codecov and as CI artifacts:
+- View coverage trends at [Codecov](https://codecov.io/gh/georgicaradu5-source/Play-stuff)
+- Download coverage XML artifacts from CI runs (retention: 30 days)
+
+To run the full CI validation locally:
+```bash
+pytest -q --cov=src --cov-report=xml --cov-report=term --cov-fail-under=42
+python scripts/check_ascii.py --scan-dirs src docs
+ruff check .
+mypy src
+```
+
+## Pre-commit Hooks
+
+This repo uses pre-commit hooks to enforce code quality. After setup, hooks run automatically on commit:
+- **ruff**: Format and lint
+- **mypy**: Type checking
+- **pytest**: Run fast unit tests
+
+Install pre-commit (included in dev dependencies):
+```bash
+pip install pre-commit
+pre-commit install
+```
+
 ## Reporting Security Issues
 Please do not file public issues. Email the maintainers or follow the process in `SECURITY.md`.
 
