@@ -30,11 +30,13 @@ def make_fake_requests(sequence, raise_timeout_first=False):
     state = {
         "calls": 0,
         "last_headers": None,
+        "last_data": None,
     }
 
-    def request(method, url, headers=None, params=None, json=None, timeout=None):
+    def request(method, url, headers=None, params=None, json=None, data=None, timeout=None):
         state["calls"] += 1
         state["last_headers"] = headers or {}
+        state["last_data"] = data
         if raise_timeout_first and state["calls"] == 1:
             raise FakeTimeoutError("timeout")
         item = sequence[min(state["calls"] - 1, len(sequence) - 1)]
@@ -146,3 +148,25 @@ def test_idempotency_key_added_for_post(monkeypatch):
     )
     key2 = state["last_headers"].get("Idempotency-Key")
     assert key2 == key1
+
+
+def test_request_with_retries_supports_data_parameter(monkeypatch):
+    """Test that request_with_retries accepts and forwards the 'data' parameter for form data."""
+    seq = [FakeResponse(200, {"ok": True})]
+    fake_requests, state = make_fake_requests(seq)
+    monkeypatch.setattr(rel, "requests", fake_requests, raising=False)
+
+    form_data = {"field1": "value1", "field2": "value2"}
+    resp = rel.request_with_retries(
+        "POST",
+        "https://example.test/form",
+        data=form_data,
+        retries=0,
+    )
+    assert resp.status_code == 200
+    # Verify data was passed to requests.request
+    assert state["last_data"] == form_data
+    # Idempotency key should be computed from data
+    key = state["last_headers"].get("Idempotency-Key")
+    assert key and isinstance(key, str)
+

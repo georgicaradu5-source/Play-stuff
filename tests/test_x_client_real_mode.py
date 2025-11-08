@@ -29,20 +29,21 @@ class FakeResponse:
 
 
 def make_fake_requests(sequence):
-    state = {"calls": 0, "last_headers": None, "last_json": None, "last_method": None, "last_url": None}
+    state = {"calls": 0, "last_headers": None, "last_json": None, "last_method": None, "last_url": None, "last_data": None}
 
-    def request(method, url, headers=None, params=None, json=None, timeout=None):
+    def request(method, url, headers=None, params=None, json=None, data=None, timeout=None):
         state["calls"] += 1
         state["last_headers"] = dict(headers or {})
         state["last_json"] = json
         state["last_method"] = method
         state["last_url"] = url
+        state["last_data"] = data
         item = sequence[min(state["calls"] - 1, len(sequence) - 1)]
         if isinstance(item, Exception):
             raise item
         return item
 
-    return types.SimpleNamespace(request=request), state
+    return types.SimpleNamespace(request=request, Timeout=TimeoutError, HTTPError=Exception), state
 
 
 def test_create_post_variants_and_retry_and_4xx(monkeypatch):

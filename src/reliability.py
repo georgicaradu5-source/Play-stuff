@@ -47,6 +47,7 @@ def request_with_retries(
     headers: Mapping[str, str] | None = None,
     params: Mapping[str, Any] | None = None,
     json_body: Any | None = None,
+    data: Any | None = None,
     timeout: float = DEFAULT_TIMEOUT,
     retries: int = DEFAULT_RETRIES,
     backoff_base: float = 0.5,
@@ -56,7 +57,22 @@ def request_with_retries(
 ) -> Any:
     """Perform an HTTP request with retries and backoff.
 
-    Returns requests.Response on success, raises on permanent failure.
+    Args:
+        method: HTTP method (GET, POST, etc.)
+        url: Target URL
+        headers: HTTP headers
+        params: URL query parameters
+        json_body: JSON payload (for Content-Type: application/json)
+        data: Form data (for Content-Type: application/x-www-form-urlencoded)
+        timeout: Request timeout in seconds
+        retries: Maximum retry attempts
+        backoff_base: Base delay for exponential backoff
+        backoff_cap: Maximum backoff delay
+        status_forcelist: HTTP status codes that trigger retries
+        sleep_fn: Sleep function (injectable for testing)
+
+    Returns:
+        requests.Response on success, raises on permanent failure.
     """
     if requests is None:  # pragma: no cover
         raise RuntimeError("requests library not installed")
@@ -67,7 +83,7 @@ def request_with_retries(
 
     # Add idempotency key for POST to allow safe retries
     if method.upper() == "POST" and "Idempotency-Key" not in hdrs:
-        hdrs["Idempotency-Key"] = _compute_idempotency_key(json_body)
+        hdrs["Idempotency-Key"] = _compute_idempotency_key(json_body or data)
 
     while True:
         try:
@@ -77,6 +93,7 @@ def request_with_retries(
                 headers=hdrs,
                 params=params,
                 json=json_body,
+                data=data,
                 timeout=timeout,
             )
         except requests.Timeout:
