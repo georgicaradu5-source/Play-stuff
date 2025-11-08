@@ -1,26 +1,28 @@
-name: Notebook output check
+name: Notebook Output Check
 
 on:
   pull_request:
-    branches: [ main ]
+    paths:
+      - 'notebooks/**/*.ipynb'
   push:
-    branches: [ main ]
-
-permissions:
-  contents: read
+    branches:
+      - main
+    paths:
+      - 'notebooks/**/*.ipynb'
 
 jobs:
-  nb-clean:
+  check-notebooks:
+    name: Ensure notebooks have no outputs
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
-      - name: Run notebook output check (stdlib)
+      - name: Run notebook output check
         run: |
-          python scripts/check_notebooks_no_outputs.py
+          python scripts/check_notebook_outputs.py
