@@ -1,9 +1,9 @@
 # Modularization Progress Report
 
-## Current Status: Phase 2 Complete ✅
+## Current Status: Phase 3 In Progress 🚧
 
 **Branch:** `feature/modularization`
-**Latest Commit:** `e71ac27` - "feat(modularization): Extract business logic layer (Phase 2)"
+**Latest Commit:** `41e2058` (branch `feature/modularization-phase3`) - "Begin Phase 3 — introduce orchestration engine"
 
 ---
 
@@ -71,6 +71,26 @@ All existing 509 tests still pass. New tests add 26 cases. Business layer has 10
 - ✅ `actions.py` now delegates to business layer
 - ✅ Backward compatibility maintained via re-exports
 - ✅ No breaking changes to existing code
+
+### Phase 3: Extract Orchestration Layer (Breaking) — Started
+
+**Branch:** `feature/modularization-phase3`
+
+#### Created Files:
+- **`src/orchestration/engine.py`** — action orchestration (`act_on_search`) moved from `src/actions.py`
+- **`src/orchestration/__init__.py`** — re-exports `act_on_search`
+
+#### Modified Files:
+- **`src/actions.py`** — now a compatibility shim that delegates `act_on_search` to `orchestration.engine.act_on_search`. Re-exports retained to keep public API stable during migration.
+
+#### Validation:
+- Tests: 535 passed, 2 skipped
+- Coverage: 97.82%
+
+Next steps in Phase 3:
+- Update `src/main.py` and `src/scheduler.py` to import from `orchestration` directly (keep shims for one release cycle)
+- Add unit tests for `orchestration.engine`
+- Document deprecation of `src/actions.py` in Phase 4
 
 ---
 
