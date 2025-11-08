@@ -1,0 +1,53 @@
+name: Milestone Progress Tracker
+
+on:
+  schedule:
+    # Run daily at 00:00 UTC
+    - cron: '0 0 * * *'
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/roadmap/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: read
+
+jobs:
+  update-progress:
+    name: Update milestone progress status
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          pip install requests
+
+      - name: Update milestone status
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python scripts/update_milestone_status.py --milestone 2 --status-file docs/roadmap/STATUS.md
+
+      - name: Commit status update if changed
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/roadmap/STATUS.md
+          if git diff --cached --quiet; then
+            echo "No changes to milestone status"
+          else
+            git commit -m "chore(milestone): update progress status [skip ci]"
+            git push
+          fi
