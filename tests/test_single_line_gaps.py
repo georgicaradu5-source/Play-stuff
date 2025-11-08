@@ -1,6 +1,5 @@
 """Coverage tests for single-line gaps in storage, telemetry, rate_limiter, reliability, budget."""
 
-import pytest
 from unittest.mock import MagicMock, patch
 
 from rate_limiter import RateLimiter
@@ -37,10 +36,10 @@ class TestTelemetryNoOpTracer:
     def test_noop_tracer_start_span(self):
         """Test _NoOpTracer.start_span returns _NoOpSpan (covers line 132)."""
         tracer = _NoOpTracer()
-        
+
         # Call start_span - this covers line 132 (class definition)
         span = tracer.start_span("test_span")
-        
+
         # Verify it returns a _NoOpSpan
         assert span is not None
         assert hasattr(span, "__enter__")

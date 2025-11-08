@@ -80,7 +80,7 @@ processors:
   batch:
     timeout: 10s
     send_batch_size: 1024
-  
+
   # Add resource attributes
   resource:
     attributes:
@@ -94,7 +94,7 @@ exporters:
     endpoint: jaeger:4317
     tls:
       insecure: true
-  
+
   # Debug logging (optional, disable in production)
   logging:
     loglevel: info
@@ -203,13 +203,13 @@ processors:
   batch:
     timeout: 10s
     send_batch_size: 1024
-  
+
   resource:
     attributes:
       - key: deployment.environment
         value: production
         action: insert
-  
+
   # Tail sampling (reduce costs)
   tail_sampling:
     policies:
@@ -217,7 +217,7 @@ processors:
       - name: errors-policy
         type: status_code
         status_code: {status_codes: [ERROR]}
-      
+
       # Sample 10% of successful traces
       - name: probabilistic-policy
         type: probabilistic
@@ -228,7 +228,7 @@ exporters:
     endpoint: jaeger:4317
     tls:
       insecure: true
-  
+
   # Send to external backend (e.g., Grafana Cloud, Honeycomb)
   otlphttp/cloud:
     endpoint: https://your-backend.com/v1/traces
@@ -321,7 +321,7 @@ groups:
         annotations:
           summary: "X Agent approaching daily post quota"
           description: "{{ $value }}% of daily post quota used"
-      
+
       # Alert when monthly quota > 90%
       - alert: MonthlyQuotaCritical
         expr: xagent_posts_monthly / 1500 > 0.9
@@ -331,7 +331,7 @@ groups:
         annotations:
           summary: "X Agent approaching monthly post limit (Free tier: 1,500)"
           description: "{{ $value }}% of monthly quota used"
-      
+
       # Alert on rate limit violations
       - alert: RateLimitHit
         expr: rate(xagent_rate_limit_errors_total[5m]) > 0
@@ -564,5 +564,5 @@ extensions:
 
 ---
 
-**Status**: Production-ready observability stack for X Agent Unified  
+**Status**: Production-ready observability stack for X Agent Unified
 **Updated**: 2025-11-08

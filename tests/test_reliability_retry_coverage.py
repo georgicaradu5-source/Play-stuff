@@ -26,6 +26,7 @@ def test_idempotency_key_different_payloads():
 
 def test_idempotency_key_fallback_non_json():
     """Test idempotency key fallback for non-JSON-serializable payload."""
+
     # Object with circular reference
     class Circular:
         def __init__(self):
@@ -116,9 +117,7 @@ def test_request_retryable_500_exhausts_retries(monkeypatch):
         sleep_calls.append(delay)
 
     with pytest.raises(Exception, match="HTTP 500"):
-        request_with_retries(
-            "GET", "https://api.example.com/test", retries=2, sleep_fn=mock_sleep
-        )
+        request_with_retries("GET", "https://api.example.com/test", retries=2, sleep_fn=mock_sleep)
     assert len(sleep_calls) == 2  # Exhausted 2 retries
 
 

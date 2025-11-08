@@ -209,7 +209,7 @@ class TestXClientOAuth2Paths:
         # Second call should include next_token parameter
         second_call_kwargs = mock_request_with_retries.call_args_list[1][1]
         assert second_call_kwargs["params"]["next_token"] == "token456"
-        
+
         # Verify results
         assert len(result) == 2
         assert result[0]["id"] == "1"

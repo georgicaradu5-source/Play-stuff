@@ -176,7 +176,7 @@ with tracer.start_as_current_span("check_quota") as span:
     span.set_attribute("quota.remaining", remaining)
     span.set_attribute("quota.monthly_used", monthly_posts)
     span.set_attribute("quota.monthly_limit", 1500)
-    
+
     if remaining < 150:  # < 10% remaining
         span.add_event("quota_warning", {"threshold": "90%"})
 ```
@@ -403,6 +403,6 @@ export X_FORCE_DRY_RUN=true
 
 ---
 
-**Status**: Alerting checklist complete  
-**Priority**: Set up monthly quota alerts (critical) and rate limit monitoring (high)  
+**Status**: Alerting checklist complete
+**Priority**: Set up monthly quota alerts (critical) and rate limit monitoring (high)
 **Updated**: 2025-11-08

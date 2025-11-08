@@ -63,7 +63,7 @@ budget:
 # - Posts work on Free tier (both auth modes)
 # - Search requires Basic tier ($100/month) - currently disabled
 # - Media upload works in Tweepy mode only
-# 
+#
 # To enable engagement (reply/like/follow):
 # 1. Upgrade to Basic tier in X Developer Portal
 # 2. Switch to config.safe-first-run.yaml

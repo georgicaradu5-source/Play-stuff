@@ -19,7 +19,6 @@ import pytest
 
 from src.budget import BudgetManager, add_create, add_reads, configure_caps
 
-
 # ==================== Plan Validation Tests ====================
 
 
@@ -404,7 +403,6 @@ def test_add_create_default_cap(capsys):
     # The compat function doesn't actually use the global for display,
     # it uses the cap parameter which defaults to _CREATE_CAP
     # But since we can call configure_caps to change it, let's test that path
-    from src.budget import _CREATE_CAP
 
     add_create(3)  # Should use _CREATE_CAP which is 500
     captured = capsys.readouterr()
@@ -414,7 +412,6 @@ def test_add_create_default_cap(capsys):
 
 def test_add_reads_default_cap(capsys):
     """Test add_reads uses global _READ_CAP."""
-    from src.budget import _READ_CAP
 
     add_reads(10)  # Should use _READ_CAP which is 100
     captured = capsys.readouterr()

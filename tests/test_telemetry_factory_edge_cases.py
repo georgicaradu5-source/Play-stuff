@@ -45,7 +45,9 @@ def test_create_telemetry_opentelemetry_import_error():
     os.environ["TELEMETRY_PROVIDER"] = "opentelemetry"
 
     # Mock the import to fail at the provider level
-    with patch("telemetry_core.providers.opentelemetry_provider.create_opentelemetry", side_effect=ImportError("no module")):
+    with patch(
+        "telemetry_core.providers.opentelemetry_provider.create_opentelemetry", side_effect=ImportError("no module")
+    ):
         # Should fall back to NoOp instead of raising
         impl = create_telemetry(provider="opentelemetry")
         assert isinstance(impl, NoOpTelemetry)
@@ -58,7 +60,9 @@ def test_create_telemetry_opentelemetry_runtime_error():
 
     os.environ["ENABLE_TELEMETRY"] = "true"
 
-    with patch("telemetry_core.providers.opentelemetry_provider.create_opentelemetry", side_effect=RuntimeError("init failed")):
+    with patch(
+        "telemetry_core.providers.opentelemetry_provider.create_opentelemetry", side_effect=RuntimeError("init failed")
+    ):
         # Should fall back to NoOp
         impl = create_telemetry(provider="opentelemetry")
         assert isinstance(impl, NoOpTelemetry)

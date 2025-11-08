@@ -9,7 +9,7 @@ class DummyClient:
         self._posts = posts
 
     def search_recent(self, query: str, max_results: int = 10):  # noqa: D401 - simple dummy
-        return self._posts[: max_results]
+        return self._posts[:max_results]
 
     # The following methods emulate x_client behavior but are no-ops for dry-run.
     def create_post(self, text: str, reply_to: str | None = None):

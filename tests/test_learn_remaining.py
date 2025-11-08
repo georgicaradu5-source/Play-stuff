@@ -12,6 +12,7 @@ from src import learn
 
 class MockStorage:
     """Mock storage for testing."""
+
     def __init__(self, bandit_arms=None, actions=None):
         self.bandit_arms = bandit_arms or []
         self.actions = actions or []
@@ -33,6 +34,7 @@ class MockStorage:
 
 class MockClient:
     """Mock client for testing."""
+
     def __init__(self, tweet_data=None, raise_error=False):
         self.tweet_data = tweet_data
         self.raise_error = raise_error
@@ -51,23 +53,27 @@ def test_settle_all_default_arm_none_skips_invalid_entries():
 
     Covers line 95: if default_arm is None: continue
     """
-    storage = MockStorage(actions=[
-        {"post_id": None, "topic": "tech", "slot": "morning", "media": 1},  # Skip: no post_id (line 90)
-        {"post_id": "1", "topic": None, "slot": None, "media": 0},  # Skip: no topic/slot + no default (line 95-96)
-        {"post_id": "2", "topic": "tech", "slot": "morning", "media": 1},  # Process
-    ])
+    storage = MockStorage(
+        actions=[
+            {"post_id": None, "topic": "tech", "slot": "morning", "media": 1},  # Skip: no post_id (line 90)
+            {"post_id": "1", "topic": None, "slot": None, "media": 0},  # Skip: no topic/slot + no default (line 95-96)
+            {"post_id": "2", "topic": "tech", "slot": "morning", "media": 1},  # Process
+        ]
+    )
 
-    client = MockClient(tweet_data={
-        "data": {
-            "public_metrics": {
-                "like_count": 1,
-                "reply_count": 0,
-                "retweet_count": 0,
-                "quote_count": 0,
-                "impression_count": 10
+    client = MockClient(
+        tweet_data={
+            "data": {
+                "public_metrics": {
+                    "like_count": 1,
+                    "reply_count": 0,
+                    "retweet_count": 0,
+                    "quote_count": 0,
+                    "impression_count": 10,
+                }
             }
         }
-    })
+    )
 
     # Call with default_arm=None
     count = learn.settle_all(client, storage, default_arm=None)
@@ -84,11 +90,13 @@ def test_settle_all_handles_settle_exceptions():
 
     Covers lines 103-105: except Exception as e: print(...); continue
     """
-    storage = MockStorage(actions=[
-        {"post_id": "1", "topic": "tech", "slot": "morning", "media": 1},  # Will fail
-        {"post_id": "2", "topic": "tech", "slot": "afternoon", "media": 0},  # Will fail
-        {"post_id": "3", "topic": "tech", "slot": "evening", "media": 1},  # Will fail
-    ])
+    storage = MockStorage(
+        actions=[
+            {"post_id": "1", "topic": "tech", "slot": "morning", "media": 1},  # Will fail
+            {"post_id": "2", "topic": "tech", "slot": "afternoon", "media": 0},  # Will fail
+            {"post_id": "3", "topic": "tech", "slot": "evening", "media": 1},  # Will fail
+        ]
+    )
 
     # Client that raises errors
     client = MockClient(raise_error=True)
@@ -125,13 +133,13 @@ def test_settle_no_data_returns_early(capsys):
 def test_print_bandit_stats_no_data(capsys):
     """
     Test print_bandit_stats when there are no bandit arms.
-    
+
     Covers lines 115-116: if not arms: print(...); return
     """
     storage = MockStorage(bandit_arms=[])  # Empty arms list
-    
+
     learn.print_bandit_stats(storage)
-    
+
     captured = capsys.readouterr()
     assert "No bandit data yet." in captured.out
     # Should not print the header or arm details
@@ -141,15 +149,17 @@ def test_print_bandit_stats_no_data(capsys):
 def test_print_bandit_stats_with_data_shows_header(capsys):
     """
     Verify print_bandit_stats shows proper output when data exists.
-    
+
     This confirms the no-data path is distinct from the normal path.
     """
-    storage = MockStorage(bandit_arms=[
-        {"arm": "tech|morning|1", "alpha": 5.0, "beta": 2.0},
-    ])
-    
+    storage = MockStorage(
+        bandit_arms=[
+            {"arm": "tech|morning|1", "alpha": 5.0, "beta": 2.0},
+        ]
+    )
+
     learn.print_bandit_stats(storage)
-    
+
     captured = capsys.readouterr()
     assert "Learning Stats" in captured.out
     assert "No bandit data yet." not in captured.out

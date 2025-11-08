@@ -1,7 +1,8 @@
 from typing import Any
 
-from telemetry_core.providers.opentelemetry_provider import create_opentelemetry
 from opentelemetry import trace
+
+from telemetry_core.providers.opentelemetry_provider import create_opentelemetry
 
 
 def _patch_provider_shutdown_to_raise(telemetry: Any) -> None:
@@ -16,8 +17,10 @@ def _patch_provider_shutdown_to_raise(telemetry: Any) -> None:
     for cell in closure:
         obj = getattr(cell, "cell_contents", None)
         if obj and hasattr(obj, "shutdown"):
+
             def _boom():  # type: ignore
                 raise RuntimeError("simulated failure")
+
             obj.shutdown = _boom  # type: ignore[attr-defined]
             break
 

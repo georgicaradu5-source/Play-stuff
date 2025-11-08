@@ -18,7 +18,6 @@ import pytest
 
 from src.auth import UnifiedAuth
 
-
 # ==================== Mode Validation Tests ====================
 
 
@@ -42,7 +41,7 @@ def test_from_env_defaults_to_tweepy():
         # Remove X_AUTH_MODE if present
         if "X_AUTH_MODE" in os.environ:
             del os.environ["X_AUTH_MODE"]
-        
+
         with patch("src.auth.tweepy") as mock_tweepy:
             mock_tweepy.Client = MagicMock()
             auth = UnifiedAuth.from_env()
@@ -202,9 +201,10 @@ def test_oauth2_exchange_code_with_client_secret():
 
     token_data = {"access_token": "test_token", "refresh_token": "test_refresh"}
 
-    with patch("src.auth.requests.post", return_value=FakeResponse(token_data)) as mock_post, patch.object(
-        UnifiedAuth, "_save_tokens"
-    ) as mock_save:
+    with (
+        patch("src.auth.requests.post", return_value=FakeResponse(token_data)) as mock_post,
+        patch.object(UnifiedAuth, "_save_tokens") as mock_save,
+    ):
         auth = UnifiedAuth(
             mode="oauth2",
             client_id="test_id",
@@ -239,8 +239,9 @@ def test_oauth2_exchange_code_without_client_secret():
 
     token_data = {"access_token": "test_token"}
 
-    with patch("src.auth.requests.post", return_value=FakeResponse(token_data)) as mock_post, patch.object(
-        UnifiedAuth, "_save_tokens"
+    with (
+        patch("src.auth.requests.post", return_value=FakeResponse(token_data)) as mock_post,
+        patch.object(UnifiedAuth, "_save_tokens"),
     ):
         auth = UnifiedAuth(mode="oauth2", client_id="test_id", redirect_uri="http://localhost:8080/callback")
         result = auth._exchange_code("test_code", "test_verifier")
@@ -265,8 +266,9 @@ def test_oauth2_refresh_with_client_secret():
 
     token_data = {"access_token": "new_token", "refresh_token": "new_refresh"}
 
-    with patch("src.auth.requests.post", return_value=FakeResponse(token_data)) as mock_post, patch.object(
-        UnifiedAuth, "_save_tokens"
+    with (
+        patch("src.auth.requests.post", return_value=FakeResponse(token_data)) as mock_post,
+        patch.object(UnifiedAuth, "_save_tokens"),
     ):
         auth = UnifiedAuth(mode="oauth2", client_id="test_id", client_secret="test_secret")
         auth.oauth2_refresh_token = "old_refresh"
@@ -294,8 +296,9 @@ def test_oauth2_refresh_without_client_secret():
 
     token_data = {"access_token": "new_token"}
 
-    with patch("src.auth.requests.post", return_value=FakeResponse(token_data)) as mock_post, patch.object(
-        UnifiedAuth, "_save_tokens"
+    with (
+        patch("src.auth.requests.post", return_value=FakeResponse(token_data)) as mock_post,
+        patch.object(UnifiedAuth, "_save_tokens"),
     ):
         auth = UnifiedAuth(mode="oauth2", client_id="test_id")
         auth.oauth2_refresh_token = "old_refresh"
@@ -348,7 +351,10 @@ def test_load_tokens_file_exists():
     """Test _load_tokens loads from existing file."""
     token_data = {"access_token": "loaded_token", "refresh_token": "loaded_refresh"}
 
-    with patch("os.path.exists", return_value=True), patch("builtins.open", mock_open(read_data=json.dumps(token_data))):
+    with (
+        patch("os.path.exists", return_value=True),
+        patch("builtins.open", mock_open(read_data=json.dumps(token_data))),
+    ):
         auth = UnifiedAuth(mode="oauth2", token_file="test.json")
         auth._load_tokens()
 
@@ -371,7 +377,10 @@ def test_get_oauth2_access_token_loads_from_file():
     """Test get_oauth2_access_token loads from file when token not in memory."""
     token_data = {"access_token": "file_token", "refresh_token": "file_refresh"}
 
-    with patch("os.path.exists", return_value=True), patch("builtins.open", mock_open(read_data=json.dumps(token_data))):
+    with (
+        patch("os.path.exists", return_value=True),
+        patch("builtins.open", mock_open(read_data=json.dumps(token_data))),
+    ):
         auth = UnifiedAuth(mode="oauth2", token_file="test.json")
 
         result = auth.get_oauth2_access_token()

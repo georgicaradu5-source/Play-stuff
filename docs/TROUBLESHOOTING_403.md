@@ -4,7 +4,7 @@
 Attempted live post verification resulted in `403 Forbidden` error when calling `POST /2/tweets`.
 
 ## Diagnosis
-✅ OAuth2 token has correct scopes: `tweet.write`, `tweet.read`, `like.write`, `follows.write`, `offline.access`  
+✅ OAuth2 token has correct scopes: `tweet.write`, `tweet.read`, `like.write`, `follows.write`, `offline.access`
 ❌ X Developer App permissions likely set to **"Read Only"** in the portal
 
 ## Resolution Steps

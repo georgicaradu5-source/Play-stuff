@@ -196,9 +196,7 @@ class TestActOnSearchNonDryRun:
     def test_search_api_returns_response(self, mock_sleep):
         """Test search_recent API call returns response (covers line 87)."""
         mock_client = MagicMock()
-        mock_client.search_recent.return_value = [
-            {"id": "tweet_1", "text": "Test", "author_id": "user_1"}
-        ]
+        mock_client.search_recent.return_value = [{"id": "tweet_1", "text": "Test", "author_id": "user_1"}]
 
         mock_storage = MagicMock()
         mock_storage.already_acted.return_value = True
@@ -221,9 +219,7 @@ class TestActOnSearchNonDryRun:
     def test_skips_self_tweets(self, mock_sleep):
         """Test that own tweets are skipped."""
         mock_client = MagicMock()
-        mock_client.search_recent.return_value = [
-            {"id": "tweet_self", "text": "My own tweet", "author_id": "me_999"}
-        ]
+        mock_client.search_recent.return_value = [{"id": "tweet_self", "text": "My own tweet", "author_id": "me_999"}]
 
         mock_storage = MagicMock()
         mock_storage.already_acted.return_value = False
@@ -246,9 +242,7 @@ class TestActOnSearchNonDryRun:
     def test_respects_already_acted(self, mock_sleep):
         """Test that already-acted tweets are skipped."""
         mock_client = MagicMock()
-        mock_client.search_recent.return_value = [
-            {"id": "tweet_123", "text": "Already seen", "author_id": "user_456"}
-        ]
+        mock_client.search_recent.return_value = [{"id": "tweet_123", "text": "Already seen", "author_id": "user_456"}]
 
         mock_storage = MagicMock()
         mock_storage.already_acted.return_value = True
@@ -270,9 +264,7 @@ class TestActOnSearchNonDryRun:
     def test_dry_run_reply_action(self, capsys):
         """Test dry run mode for reply action specifically (covers line 119)."""
         mock_client = MagicMock()
-        mock_client.search_recent.return_value = [
-            {"id": "tweet_1", "text": "Test tweet", "author_id": "user_1"}
-        ]
+        mock_client.search_recent.return_value = [{"id": "tweet_1", "text": "Test tweet", "author_id": "user_1"}]
 
         mock_storage = MagicMock()
         mock_storage.already_acted.return_value = False
@@ -298,9 +290,7 @@ class TestActOnSearchNonDryRun:
     def test_zero_quota_skips_action(self):
         """Test that actions with zero quota are skipped (covers line 113)."""
         mock_client = MagicMock()
-        mock_client.search_recent.return_value = [
-            {"id": "tweet_1", "text": "Test tweet", "author_id": "user_1"}
-        ]
+        mock_client.search_recent.return_value = [{"id": "tweet_1", "text": "Test tweet", "author_id": "user_1"}]
 
         mock_storage = MagicMock()
         mock_storage.already_acted.return_value = False
@@ -357,4 +347,9 @@ class TestActOnSearchNonDryRun:
         # Verify dry run prints happened
         captured = capsys.readouterr()
         assert "[DRY RUN]" in captured.out
-        assert "reply" in captured.out.lower() or "like" in captured.out or "follow" in captured.out or "repost" in captured.out
+        assert (
+            "reply" in captured.out.lower()
+            or "like" in captured.out
+            or "follow" in captured.out
+            or "repost" in captured.out
+        )

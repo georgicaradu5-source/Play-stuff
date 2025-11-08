@@ -274,7 +274,9 @@ class ConfigSettings(BaseModel):
     auth_mode: AuthMode = Field(..., description="Authentication mode")
     plan: PlanTier = Field(..., description="X API plan tier")
     topics: list[str] = Field(..., min_length=1, description="Topics for content generation")
-    queries: list[QueryConfig] = Field(default_factory=list, description="Search queries for interaction (empty list = post-only mode)")
+    queries: list[QueryConfig] = Field(
+        default_factory=list, description="Search queries for interaction (empty list = post-only mode)"
+    )
     schedule: ScheduleConfig = Field(..., description="Posting schedule")
     cadence: CadenceConfig = Field(..., description="Posting cadence")
     max_per_window: MaxPerWindowConfig = Field(..., description="Rate limits per window")

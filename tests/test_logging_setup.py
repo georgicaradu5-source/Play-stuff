@@ -33,9 +33,9 @@ def test_attach_tracecontext_importerror():
         )
 
         # Should have None for trace fields when ImportError occurs
-        assert hasattr(record, 'trace_id')
+        assert hasattr(record, "trace_id")
         assert record.trace_id is None
-        assert hasattr(record, 'span_id')
+        assert hasattr(record, "span_id")
         assert record.span_id is None
 
 

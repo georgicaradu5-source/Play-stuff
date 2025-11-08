@@ -105,6 +105,7 @@ class TestPydanticFallbacks:
         # The fallback is used when ImportError occurs during import
         # We can at least verify the module loads
         import config_schema
+
         assert config_schema.PYDANTIC_AVAILABLE is True
 
     def test_field_validator_fallback(self):
@@ -112,13 +113,12 @@ class TestPydanticFallbacks:
         # Similar to above - the fallback decorator is only used when Pydantic unavailable
         # We verify the module structure is correct
         from config_schema import field_validator
+
         assert field_validator is not None
 
     def test_model_validator_fallback(self):
         """Test model_validator fallback (covers lines 40-46)."""
         # Verify the fallback exists in the module structure
         from config_schema import model_validator
+
         assert model_validator is not None
-
-
-

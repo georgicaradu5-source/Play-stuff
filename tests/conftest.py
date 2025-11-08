@@ -8,6 +8,7 @@ sys.path.insert(0, str(src_path))
 # Global autouse tweak: silence noisy ConsoleSpanExporter when OpenTelemetry is present
 # Avoids intermittent "I/O operation on closed file" warnings from ConsoleSpanExporter.
 
+
 def pytest_configure(config):
     try:
         # Patch the exporter at the source module where create_opentelemetry imports from

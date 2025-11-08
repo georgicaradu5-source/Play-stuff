@@ -37,9 +37,7 @@ class TestStorageInit:
         storage = Storage(db_path=str(db_path))
 
         # Check all tables exist
-        cursor = storage.conn.execute(
-            "SELECT name FROM sqlite_master WHERE type='table'"
-        )
+        cursor = storage.conn.execute("SELECT name FROM sqlite_master WHERE type='table'")
         tables = {row[0] for row in cursor.fetchall()}
 
         expected = {
@@ -60,9 +58,7 @@ class TestStorageInit:
         db_path = tmp_path / "test.db"
         storage = Storage(db_path=str(db_path))
 
-        cursor = storage.conn.execute(
-            "SELECT name FROM sqlite_master WHERE type='index'"
-        )
+        cursor = storage.conn.execute("SELECT name FROM sqlite_master WHERE type='index'")
         indexes = {row[0] for row in cursor.fetchall()}
 
         expected_indexes = {
@@ -95,9 +91,7 @@ class TestActionsLog:
     def test_log_action_stores_text_hash(self, tmp_path: Path):
         """Action logging also stores text hash."""
         storage = Storage(db_path=str(tmp_path / "test.db"))
-        storage.log_action(
-            kind="post", post_id="123", text="test post content"
-        )
+        storage.log_action(kind="post", post_id="123", text="test post content")
 
         # Check text_hashes table
         cursor = storage.conn.execute("SELECT COUNT(*) FROM text_hashes")
@@ -234,9 +228,7 @@ class TestMonthlyUsage:
     def test_update_monthly_usage_new_period(self, tmp_path: Path):
         """update_monthly_usage creates new period."""
         storage = Storage(db_path=str(tmp_path / "test.db"))
-        storage.update_monthly_usage(
-            period="2025-01", create_count=5, read_count=10
-        )
+        storage.update_monthly_usage(period="2025-01", create_count=5, read_count=10)
 
         usage = storage.get_monthly_usage(period="2025-01")
         assert usage["create_count"] == 5
@@ -246,12 +238,8 @@ class TestMonthlyUsage:
     def test_update_monthly_usage_incremental(self, tmp_path: Path):
         """update_monthly_usage increments existing counts."""
         storage = Storage(db_path=str(tmp_path / "test.db"))
-        storage.update_monthly_usage(
-            period="2025-01", create_count=5, read_count=10
-        )
-        storage.update_monthly_usage(
-            period="2025-01", create_count=3, read_count=7
-        )
+        storage.update_monthly_usage(period="2025-01", create_count=5, read_count=10)
+        storage.update_monthly_usage(period="2025-01", create_count=3, read_count=7)
 
         usage = storage.get_monthly_usage(period="2025-01")
         assert usage["create_count"] == 8
@@ -329,6 +317,7 @@ class TestTextDeduplication:
     def test_is_text_duplicate_days_cutoff(self, tmp_path: Path):
         """is_text_duplicate respects days cutoff."""
         from datetime import UTC
+
         storage = Storage(db_path=str(tmp_path / "test.db"))
         old_dt = (datetime.now(UTC) - timedelta(days=10)).isoformat()
         storage.store_text_hash(text="Old content", post_id="1", dt=old_dt)
@@ -340,6 +329,7 @@ class TestTextDeduplication:
     def test_get_recent_texts(self, tmp_path: Path):
         """get_recent_texts returns normalized texts within cutoff."""
         from datetime import UTC
+
         storage = Storage(db_path=str(tmp_path / "test.db"))
         storage.store_text_hash(text="Recent post", post_id="1")
         old_dt = (datetime.now(UTC) - timedelta(days=10)).isoformat()
@@ -384,9 +374,7 @@ class TestThompsonSamplingBandit:
         storage = Storage(db_path=str(tmp_path / "test.db"))
         storage.bandit_update(arm="topic:tech", reward=0.8)
 
-        cursor = storage.conn.execute(
-            "SELECT alpha, beta FROM bandit WHERE arm='topic:tech'"
-        )
+        cursor = storage.conn.execute("SELECT alpha, beta FROM bandit WHERE arm='topic:tech'")
         row = cursor.fetchone()
         assert row is not None
         # alpha = 1.0 + 0.8 = 1.8, beta = 1.0 + (1.0 - 0.8) = 1.2
@@ -400,9 +388,7 @@ class TestThompsonSamplingBandit:
         storage.bandit_update(arm="topic:tech", reward=0.5)
         storage.bandit_update(arm="topic:tech", reward=0.7)
 
-        cursor = storage.conn.execute(
-            "SELECT alpha, beta FROM bandit WHERE arm='topic:tech'"
-        )
+        cursor = storage.conn.execute("SELECT alpha, beta FROM bandit WHERE arm='topic:tech'")
         row = cursor.fetchone()
         assert row is not None
         # After 1st: alpha=1.5, beta=1.5
@@ -416,9 +402,7 @@ class TestThompsonSamplingBandit:
         storage = Storage(db_path=str(tmp_path / "test.db"))
         storage.bandit_update(arm="topic:tech", reward=2.5)
 
-        cursor = storage.conn.execute(
-            "SELECT alpha, beta FROM bandit WHERE arm='topic:tech'"
-        )
+        cursor = storage.conn.execute("SELECT alpha, beta FROM bandit WHERE arm='topic:tech'")
         row = cursor.fetchone()
         # Reward clamped to 1.0: alpha = 2.0, beta = 1.0
         assert row[0] == pytest.approx(2.0)
@@ -463,6 +447,7 @@ class TestUtility:
         init_db()
         # Verify DB_PATH exists
         from src.storage import DB_PATH
+
         assert Path(DB_PATH).exists()
 
     def test_log_action_backward_compat(self):
@@ -471,6 +456,7 @@ class TestUtility:
         log_action(kind="post", post_id="backward123", text="backward test")
 
         from src.storage import DB_PATH
+
         storage = Storage(db_path=DB_PATH)
         actions = storage.get_recent_actions(kind="post", limit=10)
         # Find our action

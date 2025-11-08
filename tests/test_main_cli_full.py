@@ -4,8 +4,8 @@ import os
 import runpy
 import subprocess
 import sys
-from pathlib import Path
 import types
+from pathlib import Path
 
 
 def _run_main_with_args(args: list[str], env: dict[str, str] | None = None) -> subprocess.CompletedProcess:
@@ -32,7 +32,16 @@ def test_cli_dry_run_true(monkeypatch, tmp_path):
 
     monkeypatch.setattr(main_mod, "attach_tracecontext_to_logs", lambda: None)
     monkeypatch.setattr(main_mod, "init_telemetry", lambda: None)
-    monkeypatch.setattr(main_mod, "get_logger", lambda name: types.SimpleNamespace(info=lambda *a, **k: None, debug=lambda *a, **k: None, warning=lambda *a, **k: None, error=lambda *a, **k: None))
+    monkeypatch.setattr(
+        main_mod,
+        "get_logger",
+        lambda name: types.SimpleNamespace(
+            info=lambda *a, **k: None,
+            debug=lambda *a, **k: None,
+            warning=lambda *a, **k: None,
+            error=lambda *a, **k: None,
+        ),
+    )
     monkeypatch.setattr(main_mod, "configure_logging", lambda *a, **k: None)
 
     import x_client as x_client_mod

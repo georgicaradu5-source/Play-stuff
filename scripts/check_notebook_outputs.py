@@ -5,6 +5,7 @@ Lightweight notebook output checker for CI.
 Exits with code 1 if any .ipynb contains outputs; otherwise 0.
 Intended for use in GitHub Actions to enforce clean notebooks.
 """
+
 import json
 import sys
 from pathlib import Path

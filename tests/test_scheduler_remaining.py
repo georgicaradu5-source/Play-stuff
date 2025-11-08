@@ -152,6 +152,8 @@ class TestRunInteractActionsEdgeCases:
 
         # Verify execution continued
         assert mock_act.called
+
+
 class TestRunSchedulerEdgeCases:
     """Tests for edge cases in run_scheduler."""
 

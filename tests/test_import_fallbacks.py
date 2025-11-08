@@ -52,4 +52,3 @@ def test_budget_storage_fallback():
     # Storage symbol should exist (None placeholder assigned)
     assert getattr(mod, "Storage") is None
     importlib.reload(mod)
-

@@ -5,13 +5,15 @@ class DummyStorage:
     def __init__(self, read_count=0, create_count=0):
         self._usage = {"read_count": read_count, "create_count": create_count}
         self._updated = {}
+
     def get_monthly_usage(self, period):
         return self._usage.copy()
+
     def update_monthly_usage(self, period, read_count=None, create_count=None):
         if read_count is not None:
-            self._updated['read_count'] = read_count
+            self._updated["read_count"] = read_count
         if create_count is not None:
-            self._updated['create_count'] = create_count
+            self._updated["create_count"] = create_count
 
 
 def test_plan_caps_and_buffer():
@@ -56,9 +58,9 @@ def test_add_reads_and_writes():
     storage = DummyStorage()
     bm = BudgetManager(storage=storage)
     bm.add_reads(7)
-    assert storage._updated['read_count'] == 7
+    assert storage._updated["read_count"] == 7
     bm.add_writes(3)
-    assert storage._updated['create_count'] == 3
+    assert storage._updated["create_count"] == 3
 
 
 def test_from_config():

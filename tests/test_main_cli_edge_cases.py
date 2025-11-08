@@ -43,9 +43,7 @@ def test_missing_config_file_uses_defaults(monkeypatch, capsys):
     monkeypatch.setattr(xc.XClient, "from_env", staticmethod(lambda **kw: DummyClient()))
     monkeypatch.setattr(sch, "run_scheduler", lambda **kw: None)
 
-    code = run_main_with_args(
-        ["--config", "/nonexistent/config.yaml", "--mode", "post", "--dry-run", "true"]
-    )
+    code = run_main_with_args(["--config", "/nonexistent/config.yaml", "--mode", "post", "--dry-run", "true"])
     assert code == 0
 
 
@@ -72,9 +70,7 @@ def test_config_validation_failure_falls_back(monkeypatch, tmp_path, capsys):
     # Patch validation to fail
     import config_schema as cs
 
-    monkeypatch.setattr(
-        cs, "validate_config", lambda _path: (False, "Invalid auth_mode", None)
-    )
+    monkeypatch.setattr(cs, "validate_config", lambda _path: (False, "Invalid auth_mode", None))
 
     # Patch XClient and scheduler to allow completion
     import scheduler as sch
@@ -110,9 +106,7 @@ def test_plan_override_from_args(monkeypatch, tmp_path):
     monkeypatch.setattr(xc.XClient, "from_env", staticmethod(lambda **kw: DummyClient()))
     monkeypatch.setattr(sch, "run_scheduler", capture_scheduler)
 
-    code = run_main_with_args(
-        ["--config", str(cfg), "--plan", "pro", "--dry-run", "true"]
-    )
+    code = run_main_with_args(["--config", str(cfg), "--plan", "pro", "--dry-run", "true"])
     assert code == 0
     assert captured_config.get("plan") == "pro"
 
@@ -147,9 +141,7 @@ def test_client_init_failure_oauth2_hint(monkeypatch, tmp_path, capsys):
 
     monkeypatch.setattr(xc.XClient, "from_env", staticmethod(raise_error))
 
-    code = run_main_with_args(
-        ["--config", str(cfg), "--dry-run", "true"], env={"X_AUTH_MODE": "oauth2"}
-    )
+    code = run_main_with_args(["--config", str(cfg), "--dry-run", "true"], env={"X_AUTH_MODE": "oauth2"})
     assert code == 1
     captured = capsys.readouterr()
     assert "--authorize" in captured.out
@@ -171,9 +163,7 @@ def test_safety_print_budget(monkeypatch, tmp_path):
             print("BUDGET_INFO")
 
     monkeypatch.setattr(xc.XClient, "from_env", staticmethod(lambda **kw: DummyClient()))
-    monkeypatch.setattr(
-        bg.BudgetManager, "from_config", staticmethod(lambda *a, **kw: DummyBudget())
-    )
+    monkeypatch.setattr(bg.BudgetManager, "from_config", staticmethod(lambda *a, **kw: DummyBudget()))
 
     code = run_main_with_args(["--config", str(cfg), "--safety", "print-budget"])
     assert code == 0

@@ -5,7 +5,7 @@ Focus: 429 rate limits, 500/503 errors, timeouts, idempotency keys.
 """
 
 import types
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
 import pytest
 

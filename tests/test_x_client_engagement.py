@@ -50,6 +50,7 @@ def test_upload_media_tweepy_success():
 
     class DummyAuth:
         mode = "tweepy"
+
         def get_tweepy_api(self):
             return DummyAPI()
 
@@ -101,6 +102,7 @@ def test_create_post_tweepy_kwargs_mapping():
 
     class DummyAuth:
         mode = "tweepy"
+
         def get_tweepy_client(self):
             return DummyClient()
 
@@ -141,24 +143,30 @@ def test_tweepy_engagements_basic():
     class DummyClient:
         def __init__(self):
             self.calls = []
+
         def like(self, tweet_id):
             self.calls.append(("like", tweet_id))
             return types.SimpleNamespace(data={"liked": True})
+
         def unlike(self, tweet_id):
             self.calls.append(("unlike", tweet_id))
             return types.SimpleNamespace(data={"liked": False})
+
         def retweet(self, tweet_id):
             self.calls.append(("retweet", tweet_id))
             return types.SimpleNamespace(data={"retweeted": True})
+
         def unretweet(self, tweet_id):
             self.calls.append(("unretweet", tweet_id))
             return types.SimpleNamespace(data={"retweeted": False})
+
         def follow_user(self, user_id):
             self.calls.append(("follow_user", user_id))
             return types.SimpleNamespace(data={"following": True})
 
     class DummyAuth:
         mode = "tweepy"
+
         def get_tweepy_client(self):
             return DummyClient()
 
@@ -169,4 +177,3 @@ def test_tweepy_engagements_basic():
     assert client.retweet("t2") is True
     assert client.unretweet("t2") is True
     assert client.follow_user("u1") is True
-    

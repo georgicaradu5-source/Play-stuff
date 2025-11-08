@@ -4,7 +4,7 @@ from pathlib import Path
 
 # Ensure src on path
 ROOT = Path(__file__).resolve().parent.parent
-SRC = ROOT / 'src'
+SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
@@ -50,6 +50,7 @@ def test_authorize_success(monkeypatch):
 
 def test_authorize_failure(monkeypatch):
     """Test --authorize with OAuth2 returns exit code 1 when authorization fails (covers main.py lines 245-247)."""
+
     class DummyAuth:
         def authorize_oauth2(self, scopes):
             return False  # Authorization failed

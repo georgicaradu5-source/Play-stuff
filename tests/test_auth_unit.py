@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parent.parent
-SRC = ROOT / 'src'
+SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
@@ -142,7 +142,14 @@ def test_get_tweepy_client_missing_creds(monkeypatch):
 
 def test_get_tweepy_client_success(monkeypatch):
     class DummyClient:
-        def __init__(self, consumer_key=None, consumer_secret=None, access_token=None, access_token_secret=None, wait_on_rate_limit=False):  # noqa: D401,E501
+        def __init__(
+            self,
+            consumer_key=None,
+            consumer_secret=None,
+            access_token=None,
+            access_token_secret=None,
+            wait_on_rate_limit=False,
+        ):  # noqa: D401,E501
             self.consumer_key = consumer_key
             self.access_token = access_token
 
@@ -188,4 +195,3 @@ def test_get_me_user_id_tweepy_path(monkeypatch):
     ua._tweepy_client = DummyClient()  # shortcut
     uid = ua.get_me_user_id()
     assert uid == "999"
-

@@ -86,11 +86,14 @@ class TestUnifiedAuthTweepyMode:
         mock_tweepy_module.API.assert_called_once_with(mock_oauth_handler)
         assert result == mock_api
 
-    @patch.dict("os.environ", {
-        "X_API_KEY": "",
-        "X_ACCESS_TOKEN": "test_token",
-        "X_AUTH_MODE": "tweepy",
-    })
+    @patch.dict(
+        "os.environ",
+        {
+            "X_API_KEY": "",
+            "X_ACCESS_TOKEN": "test_token",
+            "X_AUTH_MODE": "tweepy",
+        },
+    )
     @patch("auth.tweepy")
     def test_get_tweepy_api_missing_credentials(self, mock_tweepy_module):
         """Test get_tweepy_api raises error with missing credentials."""
@@ -132,6 +135,7 @@ class TestImportErrorHandling:
         # This is covered when running tests without tweepy installed
         # We verify the module loads successfully regardless
         import auth
+
         assert hasattr(auth, "tweepy")
 
     @patch("sys.modules", {"dotenv": None})
@@ -141,4 +145,5 @@ class TestImportErrorHandling:
         # This is covered when running without python-dotenv
         # We verify the module loads without crashing
         import auth
+
         assert auth is not None

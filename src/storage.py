@@ -7,7 +7,7 @@ import os
 import sqlite3
 from collections.abc import Sequence
 from contextlib import contextmanager
-from datetime import datetime, timedelta, UTC
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "agent_unified.db")
