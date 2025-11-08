@@ -60,6 +60,15 @@ repos:
         args: [--fix=lf]
         exclude: ^(_archive/|legacy/|.*\.bat$)
 
+  # Keep Jupyter notebooks diffable by stripping outputs
+  - repo: https://github.com/kynan/nbstripout
+    rev: 0.7.1
+    hooks:
+      - id: nbstripout
+        name: Strip Jupyter notebook outputs
+        files: \\.(ipynb)$
+        stages: [commit]
+
 # Performance tuning
 default_language_version:
   python: python3.12
