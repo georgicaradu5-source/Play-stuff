@@ -1,17 +1,18 @@
-.PHONY: help lint type test all dev dry-run budget limits peek clean
+.PHONY: help lint type test all dev dry-run budget limits peek clean check-notebooks
 
 help:
 	@echo "Available targets:"
-	@echo "  lint    - Run Ruff checks via nox"
-	@echo "  type    - Run mypy on src via nox"
-	@echo "  test    - Run pytest with coverage via nox"
-	@echo "  all     - Run lint, type, and test via nox"
-	@echo "  dev     - Install all dev dependencies"
-	@echo "  dry-run - Run agent in dry-run mode (safe)"
-	@echo "  budget  - Print current budget status"
-	@echo "  limits  - Print current rate limits"
-	@echo "  peek    - Show recent actions from DB"
-	@echo "  clean   - Remove cache and build artifacts"
+	@echo "  lint           - Run Ruff checks via nox"
+	@echo "  type           - Run mypy on src via nox"
+	@echo "  test           - Run pytest with coverage via nox"
+	@echo "  all            - Run lint, type, and test via nox"
+	@echo "  dev            - Install all dev dependencies"
+	@echo "  dry-run        - Run agent in dry-run mode (safe)"
+	@echo "  budget         - Print current budget status"
+	@echo "  limits         - Print current rate limits"
+	@echo "  peek           - Show recent actions from DB"
+	@echo "  check-notebooks - Validate notebooks have no outputs"
+	@echo "  clean          - Remove cache and build artifacts"
 
 lint:
 	nox -s lint
@@ -41,6 +42,9 @@ limits:
 
 peek:
 	python scripts/peek_actions.py --limit 25
+
+check-notebooks:
+	python scripts/check_notebook_outputs.py
 
 clean:
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
