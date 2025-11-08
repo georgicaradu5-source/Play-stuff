@@ -27,19 +27,20 @@ class FakeResponse:
 
 
 def make_fake_requests(sequence):
-    state = {"calls": 0, "last_headers": None, "last_timeout": None, "last_json": None}
+    state = {"calls": 0, "last_headers": None, "last_timeout": None, "last_json": None, "last_data": None}
 
-    def request(method, url, headers=None, params=None, json=None, timeout=None):  # noqa: A002 - shadow builtins ok in test
+    def request(method, url, headers=None, params=None, json=None, data=None, timeout=None):  # noqa: A002 - shadow builtins ok in test
         state["calls"] += 1
         state["last_headers"] = dict(headers or {})
         state["last_timeout"] = timeout
         state["last_json"] = json
+        state["last_data"] = data
         item = sequence[min(state["calls"] - 1, len(sequence) - 1)]
         if isinstance(item, Exception):
             raise item
         return item
 
-    fake_requests = types.SimpleNamespace(request=request)
+    fake_requests = types.SimpleNamespace(request=request, Timeout=TimeoutError, HTTPError=Exception)
     return fake_requests, state
 
 

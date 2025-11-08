@@ -63,7 +63,9 @@ def run_interact_actions(client, storage, config, dry_run: bool) -> None:
     eng.start_span = start_span  # type: ignore[assignment]
     if dry_run:
         with start_span("scheduler.run_interact_actions") as span:  # patched in tests
-            me_user_id = getattr(client, "me_user_id", "unknown")
+            # Get authenticated user ID (same as engine does)
+            me_resp = client.get_me()
+            me_user_id = me_resp.get("data", {}).get("id", "unknown")
             queries = config.get("queries", [])
             # Early exit + message (mirrors engine behaviour)
             if not queries:

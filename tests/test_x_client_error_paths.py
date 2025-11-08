@@ -288,6 +288,7 @@ def test_search_recent_oauth2_pagination_stops_on_empty_tweets():
     class MockRequests:
         # Define the Timeout exception
         Timeout = TimeoutError
+        HTTPError = Exception
 
         def request(
             self,
@@ -296,7 +297,8 @@ def test_search_recent_oauth2_pagination_stops_on_empty_tweets():
             headers=None,
             params=None,
             timeout=None,
-            json=None,  # Add json parameter
+            json=None,
+            data=None,
         ):
             return FakeResponse(200, {"data": [], "meta": {}})
 
@@ -390,14 +392,14 @@ def test_like_post_oauth2_fetches_me_id_when_missing():
     """Test like_post() in OAuth2 mode calls get_me() when me_id is not set."""
     from x_client import XClient
 
-    def mock_request(method, url, headers=None, params=None, json=None, timeout=None):
+    def mock_request(method, url, headers=None, params=None, json=None, data=None, timeout=None):
         if "users/me" in url:
             return FakeResponse(200, {"data": {"id": "user123", "username": "me"}})
         elif "likes" in url:
             return FakeResponse(200, {"data": {"liked": True}})
         return FakeResponse(404, {})
 
-    with patch("reliability.requests", types.SimpleNamespace(request=mock_request)):
+    with patch("reliability.requests", types.SimpleNamespace(request=mock_request, Timeout=TimeoutError, HTTPError=Exception)):
         auth = types.SimpleNamespace(mode="oauth2", access_token="token")
         client = XClient(auth)
 
@@ -450,14 +452,14 @@ def test_unlike_post_oauth2_fetches_me_id_when_missing():
     """Test unlike_post() in OAuth2 mode calls get_me() when me_id is not set."""
     from x_client import XClient
 
-    def mock_request(method, url, headers=None, params=None, json=None, timeout=None):
+    def mock_request(method, url, headers=None, params=None, json=None, data=None, timeout=None):
         if "users/me" in url:
             return FakeResponse(200, {"data": {"id": "user123", "username": "me"}})
         elif "likes" in url:
             return FakeResponse(200, {"data": {"liked": False}})
         return FakeResponse(404, {})
 
-    with patch("reliability.requests", types.SimpleNamespace(request=mock_request)):
+    with patch("reliability.requests", types.SimpleNamespace(request=mock_request, Timeout=TimeoutError, HTTPError=Exception)):
         auth = types.SimpleNamespace(mode="oauth2", access_token="token")
         client = XClient(auth)
 
@@ -505,14 +507,14 @@ def test_retweet_oauth2_fetches_me_id_when_missing():
     """Test retweet() in OAuth2 mode calls get_me() when me_id is not set."""
     from x_client import XClient
 
-    def mock_request(method, url, headers=None, params=None, json=None, timeout=None):
+    def mock_request(method, url, headers=None, params=None, json=None, data=None, timeout=None):
         if "users/me" in url:
             return FakeResponse(200, {"data": {"id": "user123", "username": "me"}})
         elif "retweets" in url:
             return FakeResponse(200, {"data": {"retweeted": True}})
         return FakeResponse(404, {})
 
-    with patch("reliability.requests", types.SimpleNamespace(request=mock_request)):
+    with patch("reliability.requests", types.SimpleNamespace(request=mock_request, Timeout=TimeoutError, HTTPError=Exception)):
         auth = types.SimpleNamespace(mode="oauth2", access_token="token")
         client = XClient(auth)
 
@@ -549,14 +551,14 @@ def test_unretweet_oauth2_fetches_me_id_when_missing():
     """Test unretweet() in OAuth2 mode calls get_me() when me_id is not set."""
     from x_client import XClient
 
-    def mock_request(method, url, headers=None, params=None, json=None, timeout=None):
+    def mock_request(method, url, headers=None, params=None, json=None, data=None, timeout=None):
         if "users/me" in url:
             return FakeResponse(200, {"data": {"id": "user123", "username": "me"}})
         elif "retweets" in url:
             return FakeResponse(200, {})
         return FakeResponse(404, {})
 
-    with patch("reliability.requests", types.SimpleNamespace(request=mock_request)):
+    with patch("reliability.requests", types.SimpleNamespace(request=mock_request, Timeout=TimeoutError, HTTPError=Exception)):
         auth = types.SimpleNamespace(mode="oauth2", access_token="token")
         client = XClient(auth)
 
@@ -604,14 +606,14 @@ def test_follow_user_oauth2_fetches_me_id_when_missing():
     """Test follow_user() in OAuth2 mode calls get_me() when me_id is not set."""
     from x_client import XClient
 
-    def mock_request(method, url, headers=None, params=None, json=None, timeout=None):
+    def mock_request(method, url, headers=None, params=None, json=None, data=None, timeout=None):
         if "users/me" in url:
             return FakeResponse(200, {"data": {"id": "user123", "username": "me"}})
         elif "following" in url:
             return FakeResponse(200, {"data": {"following": True}})
         return FakeResponse(404, {})
 
-    with patch("reliability.requests", types.SimpleNamespace(request=mock_request)):
+    with patch("reliability.requests", types.SimpleNamespace(request=mock_request, Timeout=TimeoutError, HTTPError=Exception)):
         auth = types.SimpleNamespace(mode="oauth2", access_token="token")
         client = XClient(auth)
 

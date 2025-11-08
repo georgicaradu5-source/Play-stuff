@@ -111,6 +111,28 @@ def test_api_client_post_live(mock_retry):
 
 
 @patch("api.client.request_with_retries")
+def test_api_client_post_with_form_data(mock_retry):
+    """Test POST request with form data instead of JSON."""
+    mock_response = MagicMock()
+    mock_response.json.return_value = {"data": {"id": "789", "result": "ok"}}
+    mock_retry.return_value = mock_response
+
+    client = APIClient(dry_run=False)
+    headers = {"Authorization": "Bearer test_token", "Content-Type": "application/x-www-form-urlencoded"}
+    form_data = {"field1": "value1", "field2": "value2"}
+
+    result = client.post("https://api.example.com/form", headers, data=form_data)
+
+    assert result == {"data": {"id": "789", "result": "ok"}}
+    mock_retry.assert_called_once()
+    args, kwargs = mock_retry.call_args
+    assert args[0] == "POST"
+    assert args[1] == "https://api.example.com/form"
+    assert kwargs["data"] == form_data
+    assert kwargs.get("json_body") is None  # data and json_body are mutually exclusive
+
+
+@patch("api.client.request_with_retries")
 def test_api_client_delete_live(mock_retry):
     """Test DELETE request in live mode."""
     mock_response = MagicMock()
