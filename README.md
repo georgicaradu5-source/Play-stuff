@@ -8,7 +8,7 @@
 [![Dev Container Ready](https://img.shields.io/badge/devcontainer-ready-success?logo=visualstudiocode)](.devcontainer/devcontainer.json)
 [![Open in GitHub Codespaces](https://img.shields.io/badge/Codespaces-open-blue?logo=github)](https://codespaces.new/georgicaradu5-source/Play-stuff)
 
-> **Coverage monitoring:** Test coverage is tracked with [Codecov](https://codecov.io/gh/georgicaradu5-source/Play-stuff). See the badge above for current status. Coverage will be improved as more tests are added.
+> **Coverage monitoring:** Test coverage is tracked with [Codecov](https://codecov.io/gh/georgicaradu5-source/Play-stuff). Current coverage: **97.8%** with a 97.7% quality gate enforced via `pytest.ini`.
 
 A fully unified, production-ready autonomous agent for X (Twitter) that combines the best features from both implementations. Supports **both OAuth 1.0a (Tweepy) and OAuth 2.0 PKCE** authentication methods.
 
@@ -547,6 +547,76 @@ python scripts/check_ascii.py --scan-dirs src docs
 - [x] Deduplication
 - [x] Follows X Developer Policy
 
+## Repository Structure
+
+```
+Play-stuff/
+├── src/                        # Core agent source code
+│   ├── main.py                # CLI entry point
+│   ├── x_client.py            # Unified X API client (Tweepy + OAuth2)
+│   ├── auth.py                # Dual authentication (OAuth 1.0a + PKCE)
+│   ├── scheduler.py           # Time-window orchestration
+│   ├── actions.py             # Content generation & posting
+│   ├── budget.py              # Plan caps & safety buffers
+│   ├── rate_limiter.py        # Per-endpoint rate limiting
+│   ├── storage.py             # SQLite persistence & deduplication
+│   ├── learn.py               # Thompson Sampling bandit
+│   ├── telemetry.py           # OpenTelemetry tracing
+│   └── reliability.py         # Retry logic with backoff
+│
+├── tests/                      # Test suite (97.8% coverage)
+│   ├── test_x_client.py       # Client behavior verification
+│   ├── test_auth.py           # Authentication flows
+│   ├── test_budget.py         # Plan enforcement
+│   ├── test_rate_limiter.py   # Rate limit tracking
+│   ├── test_storage.py        # Database operations
+│   ├── test_telemetry*.py     # Tracing & observability
+│   └── conftest.py            # Shared fixtures
+│
+├── docs/                       # Production documentation
+│   ├── guides/                # User-facing guides
+│   │   ├── QUICKSTART.md      # Getting started
+│   │   ├── FIRST_TWEET_GUIDE.md
+│   │   └── READ_BUDGET.md     # Plan cap documentation
+│   ├── observability/         # Production monitoring
+│   │   ├── otel-jaeger-setup.md    # OpenTelemetry + Jaeger
+│   │   └── alerting-checklist.md   # Prometheus alerts
+│   └── TROUBLESHOOTING_403.md # Auth debugging
+│
+├── legacy/                     # Historical documentation
+│   ├── planning/              # Sprint & milestone reports
+│   │   ├── PHASE_*.md         # Development phases
+│   │   ├── COVERAGE_*.md      # Coverage campaigns
+│   │   └── SPRINT_*.md        # Agile planning docs
+│   └── *.yaml                 # Old config variants
+│
+├── _archive/                   # Pre-unification implementations
+│   ├── agent-x/               # Original Tweepy agent
+│   └── x-agent/               # Original OAuth2 agent
+│
+├── data/                       # Runtime data directory
+│   └── agent_unified.db       # SQLite database (gitignored)
+│
+├── scripts/                    # Development tools
+│   ├── mypy.ps1 / mypy.sh     # Type checking
+│   └── verify_telemetry*.py   # Validation scripts
+│
+└── config.yaml                 # Active runtime configuration
+```
+
+**Key Files**:
+- `config.yaml`: Active agent configuration (see `config.example.yaml` for template)
+- `config.safe-first-run.yaml`: Safe production starter (16 actions/day)
+- `.env`: API keys and secrets (create from `.env.example`)
+- `pyproject.toml`: Python dependencies & project metadata
+- `pytest.ini`: Test configuration with 97.7% coverage gate
+
+**Documentation Hierarchy**:
+- **docs/guides/**: User-facing quickstarts and tutorials
+- **docs/observability/**: Production monitoring setup (OTEL, Prometheus, Jaeger)
+- **legacy/planning/**: Historical sprint reports and coverage campaigns
+- **_archive/**: Pre-unification agent implementations (reference only)
+
 ## Contributing
 
 This unified agent combines:
@@ -594,7 +664,7 @@ Coverage reports are uploaded to:
 - **Codecov**: [View coverage trends](https://codecov.io/gh/georgicaradu5-source/Play-stuff)
 - **CI artifacts**: Download `coverage-report` or `coverage-report-telemetry-extras` from any CI run (30-day retention)
 
-Current coverage: **51.45%** (threshold: 42%)
+Current coverage: **97.8%** (quality gate: 97.7% enforced in `pytest.ini`)
 
 ## License
 

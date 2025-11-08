@@ -33,9 +33,9 @@ All PRs must pass CI checks:
 
 Coverage reports are uploaded to Codecov and as CI artifacts:
 
-To run the full CI validation locally:
+To run the full CI validation locally (current coverage gate 70%):
 ```bash
-pytest -q --cov=src --cov-report=xml --cov-report=term --cov-fail-under=60
+pytest -q --cov=src --cov-report=xml --cov-report=term --cov-fail-under=70
 python scripts/check_ascii.py --scan-dirs src docs
 ruff check .
 mypy src
