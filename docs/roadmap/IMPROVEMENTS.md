@@ -36,3 +36,15 @@ This document mirrors the top improvement checklists from the strategic notebook
 - Convert each checked item into an Issue (label: `improvement`, plus component label)
 - Reference related notebook sections and test IDs
 - Track status here until issues are created
+
+## Milestone
+Progress tracked in GitHub milestone: [Strategic Enhancements v1.2.0](https://github.com/georgicaradu5-source/Play-stuff/milestone/2)
+
+**Associated Issues:**
+- [#38 Modularization](https://github.com/georgicaradu5-source/Play-stuff/issues/38)
+- [#39 Telemetry Expansion](https://github.com/georgicaradu5-source/Play-stuff/issues/39)
+- [#40 Rate Limiter Integration](https://github.com/georgicaradu5-source/Play-stuff/issues/40)
+- [#41 Security Hardening](https://github.com/georgicaradu5-source/Play-stuff/issues/41)
+- [#42 Learning Loop Refinement](https://github.com/georgicaradu5-source/Play-stuff/issues/42)
+
+**Timeline:** Due November 22, 2025 (14 days)
