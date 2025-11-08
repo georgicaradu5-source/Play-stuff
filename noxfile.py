@@ -26,14 +26,14 @@ def type(session: nox.Session) -> None:  # noqa: A003 - intentional session name
 
 @nox.session
 def test(session: nox.Session) -> None:
-    """Run unit tests with coverage and enforce >=10% (demo mode)."""
+    """Run unit tests with coverage and enforce >=97.7%."""
     _install_dev(session)
     session.run(
         "pytest",
         "-q",
         "--cov=src",
         "--cov-report=term-missing",
-        "--cov-fail-under=10",
+        "--cov-fail-under=97.7",
     )
 
 
