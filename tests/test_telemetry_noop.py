@@ -30,3 +30,78 @@ def test_get_tracer_returns_noop_when_opentelemetry_missing():
     span = tr.start_span("unit-test")
     assert hasattr(span, "end")
     span.end()
+
+
+def test_noop_span_methods():
+    """Test all NoOp span methods execute without errors."""
+    from telemetry_core.noop import NoOpTelemetry
+
+    telem = NoOpTelemetry()
+    span = telem.start_span("test-span", attrs={"key": "value"})
+
+    # All methods should be no-ops
+    span.set_attribute("attr_key", "attr_value")
+    span.add_event("test-event", {"event_key": "event_value"})
+    span.record_exception(ValueError("test exception"))
+    span.end()
+
+    # No errors raised = success
+
+
+def test_noop_telemetry_event():
+    """Test NoOpTelemetry.event() executes without errors."""
+    from telemetry_core.noop import NoOpTelemetry
+
+    telem = NoOpTelemetry()
+    telem.event("test-event", {"key": "value"})
+    telem.event("another-event")  # without attrs
+
+
+def test_noop_telemetry_with_span():
+    """Test NoOpTelemetry.with_span() executes function and returns result."""
+    from telemetry_core.noop import NoOpTelemetry
+
+    telem = NoOpTelemetry()
+
+    def test_fn(span):
+        span.set_attribute("test", "value")
+        return "success"
+
+    result = telem.with_span("test-span", test_fn, attrs={"outer": "attr"})
+    assert result == "success"
+
+
+def test_noop_telemetry_set_user():
+    """Test NoOpTelemetry.set_user() executes without errors."""
+    from telemetry_core.noop import NoOpTelemetry
+
+    telem = NoOpTelemetry()
+    telem.set_user({"user_id": "12345", "name": "test_user"})
+    telem.set_user(None)  # with None
+
+
+def test_noop_telemetry_set_attributes():
+    """Test NoOpTelemetry.set_attributes() executes without errors."""
+    from telemetry_core.noop import NoOpTelemetry
+
+    telem = NoOpTelemetry()
+    telem.set_attributes({"key1": "value1", "key2": "value2"})
+
+
+def test_noop_telemetry_record_exception():
+    """Test NoOpTelemetry.record_exception() executes without errors."""
+    from telemetry_core.noop import NoOpTelemetry
+
+    telem = NoOpTelemetry()
+    exc = RuntimeError("test error")
+    telem.record_exception(exc, attrs={"error_context": "unit test"})
+    telem.record_exception(exc)  # without attrs
+
+
+def test_noop_telemetry_init_shutdown():
+    """Test NoOpTelemetry.init() and shutdown() execute without errors."""
+    from telemetry_core.noop import NoOpTelemetry
+
+    telem = NoOpTelemetry()
+    telem.init()
+    telem.shutdown()

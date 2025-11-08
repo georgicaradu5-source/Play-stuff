@@ -328,8 +328,9 @@ class TestTextDeduplication:
 
     def test_is_text_duplicate_days_cutoff(self, tmp_path: Path):
         """is_text_duplicate respects days cutoff."""
+        from datetime import UTC
         storage = Storage(db_path=str(tmp_path / "test.db"))
-        old_dt = (datetime.utcnow() - timedelta(days=10)).isoformat()
+        old_dt = (datetime.now(UTC) - timedelta(days=10)).isoformat()
         storage.store_text_hash(text="Old content", post_id="1", dt=old_dt)
 
         # Not duplicate because older than 7 days
@@ -338,9 +339,10 @@ class TestTextDeduplication:
 
     def test_get_recent_texts(self, tmp_path: Path):
         """get_recent_texts returns normalized texts within cutoff."""
+        from datetime import UTC
         storage = Storage(db_path=str(tmp_path / "test.db"))
         storage.store_text_hash(text="Recent post", post_id="1")
-        old_dt = (datetime.utcnow() - timedelta(days=10)).isoformat()
+        old_dt = (datetime.now(UTC) - timedelta(days=10)).isoformat()
         storage.store_text_hash(text="Old post", post_id="2", dt=old_dt)
 
         texts = storage.get_recent_texts(days=7)

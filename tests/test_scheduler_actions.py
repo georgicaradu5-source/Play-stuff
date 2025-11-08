@@ -157,8 +157,8 @@ def test_run_interact_actions_no_queries_warning():
     with patch("builtins.print") as mock_print:
         run_interact_actions(client, storage, config, dry_run=True)
 
-    # Warning printed
-    assert any("No queries" in str(call) for call in mock_print.call_args_list)
+    # Info message printed (changed from WARNING to INFO for post-only mode)
+    assert any("No search queries configured" in str(call) for call in mock_print.call_args_list)
 
 
 def test_run_interact_actions_executes_for_each_query():

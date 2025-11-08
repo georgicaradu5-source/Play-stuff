@@ -48,6 +48,20 @@ def test_authorize_success(monkeypatch):
     assert code == 0
 
 
+def test_authorize_failure(monkeypatch):
+    """Test --authorize with OAuth2 returns exit code 1 when authorization fails (covers main.py lines 245-247)."""
+    class DummyAuth:
+        def authorize_oauth2(self, scopes):
+            return False  # Authorization failed
+
+    import auth as auth_mod
+
+    monkeypatch.setattr(auth_mod.UnifiedAuth, "from_env", lambda *_args, **_kw: DummyAuth())
+
+    code = run_main_with_args(["--authorize"], env={"X_AUTH_MODE": "oauth2"})
+    assert code == 1  # Should exit with code 1 on failure
+
+
 def test_main_initializes_client_dry_run(monkeypatch, tmp_path):
     # Provide minimal config file
     cfg = tmp_path / "cfg.yaml"
