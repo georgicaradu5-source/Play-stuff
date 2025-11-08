@@ -48,3 +48,7 @@ Progress tracked in GitHub milestone: [Strategic Enhancements v1.2.0](https://gi
 - [#42 Learning Loop Refinement](https://github.com/georgicaradu5-source/Play-stuff/issues/42)
 
 **Timeline:** Due November 22, 2025 (14 days)
+
+**Resources:**
+- [Live Progress Status](STATUS.md) — Auto-updated daily
+- [Execution Plan](EXECUTION_PLAN.md) — Recommended sequence, branching, and validation steps
