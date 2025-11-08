@@ -46,6 +46,10 @@ make peek       # View recent actions from DB
 
 VS Code tasks are also available (Terminal -> Run Task): "Run Tests", "Dry-Run Agent", "Print Budget", "Print Rate Limits", "Peek Recent Actions".
 
+## Docs
+
+- Documentation index: [`docs/README.md`](docs/README.md) — quick links to guides, production readiness, environments, notebooks, and roadmap.
+
 ## Unified Features
 
 ### From Both Implementations
