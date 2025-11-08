@@ -1,5 +1,8 @@
 from typing import Any
 
+import pytest
+
+pytest.importorskip("opentelemetry")
 from opentelemetry import trace
 
 from telemetry_core.providers.opentelemetry_provider import create_opentelemetry
