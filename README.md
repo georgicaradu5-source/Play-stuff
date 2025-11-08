@@ -10,6 +10,15 @@
 
 > **Coverage monitoring:** Test coverage is tracked with [Codecov](https://codecov.io/gh/georgicaradu5-source/Play-stuff). Current coverage: **97.8%** with a 97.7% quality gate enforced via `pytest.ini`.
 
+> ### TL;DR / Start Here
+> 1. Read: [`docs/guides/QUICKSTART.md`](docs/guides/QUICKSTART.md) (5‑minute setup) · [`docs/PRODUCTION_READINESS.md`](docs/PRODUCTION_READINESS.md) (ops & gates) · [`docs/ENVIRONMENTS.md`](docs/ENVIRONMENTS.md) (GitHub environments & secrets)
+> 2. Core validation commands:
+>    * `nox -s all` – lint + type + tests
+>    * `python src/main.py --dry-run --mode both` – full safety simulation
+>    * `python scripts/peek_actions.py --limit 10` – inspect recent DB actions
+> 3. Contribute using dry-run first; never post live without validating budget & rate limits.
+
+
 A fully unified, production-ready autonomous agent for X (Twitter) that combines the best features from both implementations. Supports **both OAuth 1.0a (Tweepy) and OAuth 2.0 PKCE** authentication methods.
 
 ## Production Readiness
@@ -159,6 +168,18 @@ python src/main.py --dry-run --mode both
 ```
 
 ## Configuration
+### Strategic Notebooks
+
+For ongoing inspection and improvement tracking, see the strategic analysis notebook: [`notebooks/Repo_Inspection_and_DryRun.ipynb`](notebooks/Repo_Inspection_and_DryRun.ipynb).
+
+This notebook contains:
+- Latest repository inspection outputs (architecture graph, storage schema snap, config validation)
+- Prioritized improvement checklist (modularization, telemetry, rate limiting, security, learning loop)
+- Dry-run validation cells for client, scheduler, learning loop, rate limiter
+- Metrics & coverage summary (requires prior run of `nox -s test` or `pytest --cov=src --cov-report=xml` to produce `coverage.xml`)
+
+Outside contributors: open it first to understand current state and pick an improvement. If adding new sections, clear outputs before commit (`jupyter nbconvert --clear-output --inplace notebooks/Repo_Inspection_and_DryRun.ipynb`). Promoted checklists should become GitHub Issues (see `docs/roadmap/IMPROVEMENTS.md`).
+
 
 ### Configuration Validation (Optional)
 
@@ -375,6 +396,10 @@ nox -s all  # runs all three in sequence
 ```
 
 ## Telemetry (Optional)
+### Secrets & GitHub Environments
+
+Scripts `scripts/gh_env_setup.sh` / `scripts/gh_env_setup.ps1` help bootstrap staging/production GitHub Environments and set required secrets safely. Place X API and OAuth2 credentials in environment secrets (or override via `config.yaml` locally). **Do not commit secrets** (`.env`, `.token.json` are git‑ignored). Full walkthrough: [`docs/ENVIRONMENTS.md`](docs/ENVIRONMENTS.md).
+
 
 The agent can emit OpenTelemetry traces and include W3C TraceContext IDs in logs. See [docs/telemetry.md](docs/telemetry.md) for full instructions.
 

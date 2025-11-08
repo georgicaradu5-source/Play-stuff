@@ -6,7 +6,7 @@ Complete step-by-step setup guide for X Agent Unified. Get your unified X agent 
 
 ## Prerequisites
 
-- **Python 3.8+** (3.12 recommended)
+- **Python 3.11+** (3.12 recommended)
 - **X Developer Account** with approved app
 - **Git** (for cloning)
 - **VS Code** (recommended) or any editor
@@ -167,6 +167,8 @@ python src/main.py --validate config.yaml --dry-run true
 - `weekdays` must be integers 1-7 (Monday-Sunday)
 - `jitter_seconds` must be `[min, max]` where min < max
 - `actions` in queries must be: `like`, `reply`, `follow`, or `repost`
+
+> Note: The pinned toolchain targets Python 3.11 (see `pyproject.toml` → `requires-python` and tool configs). Python 3.12 is tested and recommended.
 
 **Note**: Validation requires `pydantic>=2.0`. If not installed, the agent falls back to basic YAML loading.
 

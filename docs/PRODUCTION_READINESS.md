@@ -37,6 +37,18 @@ Local validation
 1) Run tests: VS Code task "Run: Tests (pytest -v)"
 2) Dry-run end-to-end: VS Code task "Run: Dry-run (both modes)"
 
+Planning & inspection notebooks
+
+Use the strategic inspection notebook to snapshot health and guide contributions:
+
+- Open: `notebooks/Repo_Inspection_and_DryRun.ipynb`
+- Before metrics: run `nox -s test` (or `pytest --cov=src --cov-report=xml`) so `coverage.xml` is present
+- Clear outputs before commit:
+	```bash
+	jupyter nbconvert --clear-output --inplace notebooks/Repo_Inspection_and_DryRun.ipynb
+	```
+- Promote any actionable checklists into GitHub Issues with labels (`improvement`, `telemetry`, `security`, `rate-limit`, `learning`)
+
 Incident quick checks
 
 - Inspect artifacts from CI for budget, rate limits, and DB tail
