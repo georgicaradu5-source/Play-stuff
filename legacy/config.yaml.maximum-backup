@@ -1,0 +1,46 @@
+# X Agent Unified - SAFE FIRST RUN Configuration
+# Conservative settings for initial deployment and learning
+
+# === AUTHENTICATION ===
+auth_mode: oauth2
+
+# === PLAN TIER ===
+plan: free
+
+# === TOPICS ===
+# Start with focused niche for better engagement
+topics:
+  - power-platform
+  - data-viz
+  - automation
+  - ai
+
+# === SEARCH QUERIES ===
+# Targeted queries for quality engagement
+queries:
+  - query: '(Power BI OR "Power Platform") lang:en -is:retweet -is:reply has:media min_faves:10'
+    actions: [like, reply]
+  - query: '("data visualization" OR DAX) lang:en -is:retweet -is:reply has:media min_faves:5'
+    actions: [like, reply]
+
+# === SCHEDULING ===
+schedule:
+  # Conservative posting windows during peak engagement times
+  windows:
+    - morning        # 9am-12pm
+    - afternoon      # 1pm-5pm
+
+# === CADENCE ===
+cadence:
+  # Weekdays only for first run
+  weekdays: [1, 2, 3, 4, 5]
+
+# === LIMITS PER WINDOW - CONSERVATIVE ===
+# Total daily: (1 post + 2 replies + 5 likes) × 2 windows = 16 actions/day
+# Monthly projection: 16 × 22 weekdays = ~352 posts/month (well under 1,500 limit)
+max_per_window:
+  post: 1          # Safe daily posting
+  reply: 2         # Quality engagement
+  like: 5          # Discovery without spam
+  follow: 1        # Gradual network growth
+  repost: 0        # Disable until content strategy proven
