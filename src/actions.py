@@ -5,69 +5,15 @@ from __future__ import annotations
 import random
 from typing import TYPE_CHECKING
 
+from business.content import REPLY_TEMPLATES, TEMPLATES, choose_template, helpful_reply, make_post
+from business.filters import should_act_on_post
 from storage import Storage
 
 if TYPE_CHECKING:  # pragma: no cover - for type hints only
     from x_client import XClient
 
-TEMPLATES = {
-    "power-platform": [
-        "Quick tip for Power Platform builders: keep flows modular and document triggers. Small wins compound.",
-        "Power BI + Power Automate = fast insights and faster action. What combo do you use most?",
-        "Power Apps component libraries save so much rebuild time. Investing in reusable patterns pays off.",
-        "DataverseDataverse relationships enable so much - start with the data model and the rest follows.",
-    ],
-    "data-viz": [
-        "Data viz tip: label directly, minimize legends. Clarity > cleverness.",
-        "DAX calculations can be powerful - keep measures tidy and reusable.",
-        "Interactive dashboards shine when they answer questions before users ask.",
-        "Color choice matters: use contrast intentionally and test for accessibility.",
-    ],
-    "automation": [
-        "Automate the boring parts first. Start with high-frequency, low-risk tasks.",
-        "Workflow automation shines when paired with good naming and error alerts.",
-        "Build small, test early, then scale. Automation compounds when it's reliable.",
-        "Document your flows - future you (or your team) will thank you.",
-    ],
-    "ai": [
-        "AI is a tool, not magic. Frame the problem first, then pick the model.",
-        "Prompt engineering matters: be specific, give context, iterate.",
-        "Model hallucinations remind us: always validate outputs for critical use cases.",
-        "Fine-tuning can beat prompt tricks when you have domain-specific data.",
-    ],
-}
-
-
-REPLY_TEMPLATES = [
-    "Nice point! What's your favorite resource on this?",
-    "Interesting! How are you handling edge cases?",
-    "Love this - curious how you track success over time.",
-    "Great insight! Have you documented this approach anywhere?",
-    "This resonates. Any gotchas you hit along the way?",
-    "Solid tip! How long did it take to see results?",
-]
-
-
-def choose_template(topic: str) -> str:
-    """Choose a random template for the given topic."""
-    candidates = TEMPLATES.get(topic, ["Sharing a quick note on automation and data."])
-    return random.choice(candidates)
-
-
-def make_post(topic: str, slot: str, allow_media: bool = False) -> tuple[str, str | None]:
-    """Generate post text and optional media path."""
-    text = choose_template(topic)
-    media_path = None
-    # Media support: can be enabled later
-    if allow_media:
-        # Could select from a media library here
-        pass
-    return text, media_path
-
-
-def helpful_reply(base_text: str = "") -> str:
-    """Generate a helpful reply text."""
-    return random.choice(REPLY_TEMPLATES)
+# Re-export from business layer for backward compatibility
+__all__ = ["TEMPLATES", "REPLY_TEMPLATES", "choose_template", "make_post", "helpful_reply", "act_on_search"]
 
 
 def act_on_search(
@@ -93,8 +39,8 @@ def act_on_search(
         pid = p["id"]
         author_id = p.get("author_id")
 
-        # Skip self
-        if author_id and str(author_id) == str(me_user_id):
+        # Use business layer filter
+        if not should_act_on_post(pid, author_id, me_user_id):
             continue
 
         actions = []
