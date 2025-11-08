@@ -227,7 +227,7 @@ class XClient:
                 return resp.json()
 
     def search_recent(self, query: str, max_results: int = 20) -> list[dict[str, Any]]:
-        """Search recent tweets (7 days)."""
+        """Search recent tweets (7 days), with pagination support."""
         with start_span("x_client.search_recent") as span:
             try:
                 span.set_attribute("query", query)
@@ -241,62 +241,74 @@ class XClient:
                 return []
 
             results: list[dict[str, Any]] = []
+            fetched = 0
+            next_token = None
+            page_size = min(max_results, 100)
 
             if self.auth.mode == "tweepy":
                 client = cast(Any, self.auth.get_tweepy_client())
-                resp = client.search_recent_tweets(
-                    query=query,
-                    max_results=max_results,
-                    expansions=["author_id"],
-                    tweet_fields=["id", "author_id", "public_metrics"],
-                    user_fields=["id", "username"],
-                )
-
-                tweets = resp.data or []
-                users = {u.id: u for u in (resp.includes.get("users", []) if resp.includes else [])}
-
-                for t in tweets:
-                    author = users.get(t.author_id) if hasattr(t, "author_id") else None
-                    results.append(
-                        {
-                            "id": str(t.id),
-                            "author_id": str(getattr(t, "author_id", "")),
-                            "author_username": getattr(author, "username", None),
-                            "public_metrics": getattr(t, "public_metrics", {}),
-                        }
+                while fetched < max_results:
+                    resp = client.search_recent_tweets(
+                        query=query,
+                        max_results=min(page_size, max_results - fetched),
+                        expansions=["author_id"],
+                        tweet_fields=["id", "author_id", "public_metrics"],
+                        user_fields=["id", "username"],
+                        next_token=next_token,
                     )
-                return results
+                    tweets = resp.data or []
+                    users = {u.id: u for u in (resp.includes.get("users", []) if resp.includes else [])}
+                    for t in tweets:
+                        author = users.get(t.author_id) if hasattr(t, "author_id") else None
+                        results.append(
+                            {
+                                "id": str(t.id),
+                                "author_id": str(getattr(t, "author_id", "")),
+                                "author_username": getattr(author, "username", None),
+                                "public_metrics": getattr(t, "public_metrics", {}),
+                            }
+                        )
+                    fetched += len(tweets)
+                    next_token = getattr(resp.meta, "next_token", None) if hasattr(resp, "meta") else None
+                    if not next_token or fetched >= max_results or not tweets:
+                        break
+                return results[:max_results]
             else:
                 if requests is None:
                     raise RuntimeError("requests library not installed")
 
                 url = f"{self.BASE_URL_V2}/tweets/search/recent"
                 headers = {"Authorization": f"Bearer {self.auth.access_token}"}
-                params = {
-                    "query": query,
-                    "max_results": max_results,
-                    "expansions": "author_id",
-                    "tweet.fields": "id,author_id,public_metrics",
-                    "user.fields": "id,username",
-                }
-                resp = request_with_retries("GET", url, headers=headers, params=params, timeout=DEFAULT_TIMEOUT)
-                data = resp.json()
-
-                tweets = data.get("data", [])
-                users_list = data.get("includes", {}).get("users", [])
-                users = {u["id"]: u for u in users_list}
-
-                for t in tweets:
-                    author = users.get(t.get("author_id", ""))
-                    results.append(
-                        {
-                            "id": t["id"],
-                            "author_id": t.get("author_id", ""),
-                            "author_username": author.get("username") if author else None,
-                            "public_metrics": t.get("public_metrics", {}),
-                        }
-                    )
-                return results
+                while fetched < max_results:
+                    params = {
+                        "query": query,
+                        "max_results": min(page_size, max_results - fetched),
+                        "expansions": "author_id",
+                        "tweet.fields": "id,author_id,public_metrics",
+                        "user.fields": "id,username",
+                    }
+                    if next_token:
+                        params["next_token"] = next_token
+                    resp = request_with_retries("GET", url, headers=headers, params=params, timeout=DEFAULT_TIMEOUT)
+                    data = resp.json()
+                    tweets = data.get("data", [])
+                    users_list = data.get("includes", {}).get("users", [])
+                    users = {u["id"]: u for u in users_list}
+                    for t in tweets:
+                        author = users.get(t.get("author_id", ""))
+                        results.append(
+                            {
+                                "id": t["id"],
+                                "author_id": t.get("author_id", ""),
+                                "author_username": author.get("username") if author else None,
+                                "public_metrics": t.get("public_metrics", {}),
+                            }
+                        )
+                    fetched += len(tweets)
+                    next_token = data.get("meta", {}).get("next_token")
+                    if not next_token or fetched >= max_results or not tweets:
+                        break
+                return results[:max_results]
 
     def delete_post(self, tweet_id: str) -> bool:
         """Delete a post."""

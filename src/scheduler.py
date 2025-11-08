@@ -139,11 +139,13 @@ def run_interact_actions(
         me_data = client.get_me()
         me_user_id = me_data.get("data", {}).get("id", "unknown")
 
-        # Get queries from config
+        # Get search queries
         queries = config.get("queries", [])
+
+        # Skip interaction if no queries configured (e.g., Free tier post-only mode)
         if not queries:
-            logger.warning("No queries configured for interaction mode")
-            print("[WARNING] No queries configured for interaction mode")
+            print("[INFO] No search queries configured - skipping interaction phase")
+            print("[INFO] (Free tier: search requires Basic tier subscription)")
             return
 
         # Get limits

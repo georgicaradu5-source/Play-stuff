@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Literal
 
 try:
@@ -65,7 +65,8 @@ class BudgetManager:
 
     def _current_period(self) -> str:
         """Get current month period (YYYY-MM)."""
-        return datetime.utcnow().strftime("%Y-%m")
+        # Use timezone-aware UTC
+        return datetime.now(UTC).strftime("%Y-%m")
 
     def get_usage(self) -> dict:
         """Get current month usage."""

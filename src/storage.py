@@ -7,7 +7,7 @@ import os
 import sqlite3
 from collections.abc import Sequence
 from contextlib import contextmanager
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 from pathlib import Path
 
 DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "agent_unified.db")
@@ -172,7 +172,8 @@ class Storage:
     ) -> int:
         """Log an action to the database."""
         if dt is None:
-            dt = datetime.utcnow().isoformat()
+            # Use timezone-aware UTC timestamp
+            dt = datetime.now(UTC).isoformat()
 
         cursor = self.conn.execute(
             """
@@ -226,7 +227,7 @@ class Storage:
         reward: float | None = None,
     ) -> None:
         """Update metrics for a post."""
-        last_updated = datetime.utcnow().isoformat()
+        last_updated = datetime.now(UTC).isoformat()
 
         if reward is None:
             # Calculate reward if not provided
@@ -289,7 +290,7 @@ class Storage:
 
     def update_monthly_usage(self, period: str, create_count: int = 0, read_count: int = 0) -> None:
         """Update monthly usage counts."""
-        last_updated = datetime.utcnow().isoformat()
+        last_updated = datetime.now(UTC).isoformat()
 
         with self.conn:
             cursor = self.conn.execute(
@@ -319,7 +320,7 @@ class Storage:
         """Store text hash for deduplication."""
         text_hash = hashlib.sha256(text.encode()).hexdigest()
         text_norm = normalize_text(text)
-        created_at = dt or datetime.utcnow().isoformat()
+        created_at = dt or datetime.now(UTC).isoformat()
 
         with self.conn:
             self.conn.execute(
@@ -334,7 +335,7 @@ class Storage:
         """Check if text has been used recently (combined approach)."""
         # Hash-based check
         text_hash = hashlib.sha256(text.encode()).hexdigest()
-        cutoff = (datetime.utcnow() - timedelta(days=days)).isoformat()
+        cutoff = (datetime.now(UTC) - timedelta(days=days)).isoformat()
 
         cursor = self.conn.execute(
             "SELECT 1 FROM text_hashes WHERE text_hash = ? AND created_at > ?",
@@ -365,7 +366,7 @@ class Storage:
 
     def get_recent_texts(self, days: int = 7) -> list[str]:
         """Get recent text norms."""
-        cutoff = (datetime.utcnow() - timedelta(days=days)).isoformat()
+        cutoff = (datetime.now(UTC) - timedelta(days=days)).isoformat()
         cursor = self.conn.execute(
             "SELECT text_norm FROM text_hashes WHERE created_at >= ? ORDER BY created_at DESC",
             (cutoff,),
@@ -397,7 +398,7 @@ class Storage:
     def bandit_update(self, arm: str, reward: float) -> None:
         """Update bandit arm with reward."""
         reward = max(0.0, min(1.0, reward))
-        last_updated = datetime.utcnow().isoformat()
+        last_updated = datetime.now(UTC).isoformat()
 
         with self.conn:
             cursor = self.conn.execute("SELECT alpha, beta FROM bandit WHERE arm=?", (arm,))
