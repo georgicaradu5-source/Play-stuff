@@ -312,7 +312,7 @@ def main():
         print(f"[OK] Settled {count} posts")
         sys.exit(0)
 
-    # Run main scheduler
+    # Run main scheduler via legacy shim to support existing tests and patches
     from scheduler import run_scheduler
 
     try:
