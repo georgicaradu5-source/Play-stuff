@@ -20,7 +20,7 @@ jobs:
 
     steps:
       - name: Wait for status checks
-        uses: fountainhead/action-wait-for-check@v1.1.0
+        uses: fountainhead/action-wait-for-check@v1.2.0
         id: wait-for-checks
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
