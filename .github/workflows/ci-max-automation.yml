@@ -311,7 +311,7 @@ jobs:
 
       - name: Add automation-ready label
         if: github.event_name == 'pull_request' && needs.type-check.result == 'success' && needs.test.result == 'success' && needs.dry-run-gate.result == 'success' && needs.security-scan.result == 'success'
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             try {
