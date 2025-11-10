@@ -24,7 +24,7 @@ jobs:
 
     steps:
       - name: Checkout with full history
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0  # Full history for better analysis
 
@@ -96,7 +96,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -127,7 +127,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'schedule'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Auto-close stale issues
         run: |
@@ -151,7 +151,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Security audit
         run: |
